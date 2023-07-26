@@ -2,6 +2,7 @@ public without sharing class importScheduleLineController {
     @AuraEnabled
     public static string insertData(String recordId, String strFileData){
         String returnresponse = '';
+        System.debug('strFileData: ' + strFileData);
         Map<String, buildertek__Project_Task__c> projectInsertTaskMap = new Map<String, buildertek__Project_Task__c>();
         List<fieldWrapper> datalist = (List<fieldWrapper>)JSON.deserialize(strFileData, List<fieldWrapper>.class);
         Map<String, String> myMap = new Map<String, String>();
@@ -78,7 +79,9 @@ public without sharing class importScheduleLineController {
         }
         if (projectInsertTaskMap.size() > 0){
             try{
+                ProjectTaskTriggerHandler.blnSkipTaskTrigger = true;
                 insert projectInsertTaskMap.values();
+                ProjectTaskTriggerHandler.blnSkipTaskTrigger = false;
                 
                 Set<Id> taskIds = new Set<Id>();
                 for (String key : projectInsertTaskMap.keySet()) {
@@ -101,9 +104,9 @@ public without sharing class importScheduleLineController {
                     //         System.debug('Dependency If '+ projectInsertTaskMap.get(wrapper.Dependency));
                     }
                 }
-
+                ProjectTaskTriggerHandler.blnSkipTaskTrigger = true;
                 update projectInsertTaskMap.values();
-
+                ProjectTaskTriggerHandler.blnSkipTaskTrigger = false;
 
                 Map<String, buildertek__Project_Task__c> newProjectTaskMap = new Map<String, buildertek__Project_Task__c>([SELECT Id, Name, buildertek__Start__c, buildertek__Finish__c, buildertek__Schedule__c, buildertek__Duration__c, buildertek__Milestone__c, buildertek__Dependency__c, buildertek__Order__c FROM Project_Task__c WHERE Id IN: taskIds ORDER BY buildertek__Order__c ASC]);
 
@@ -119,7 +122,7 @@ public without sharing class importScheduleLineController {
                     System.debug('New newProjectTaskMap.get(key) ==> '+newProjectTaskMap.get(key));
                 }
                 update newProjectTaskMap.values();
-
+                
                 returnresponse = 'SUCCESS';
             } catch (Exception e){
                 returnresponse = 'ERROR'+' '+e.getMessage()+' '+e.getLineNumber();
@@ -127,31 +130,6 @@ public without sharing class importScheduleLineController {
         }
         return returnresponse;
     }
-
-    // public static Date addDaysSkippingWeekends(Date startDate, Integer duration){
-
-    //     System.debug('addDaysSkippingWeekends');
-    //     System.debug('original startDate ==> '+startDate);
-    //     System.debug('original duration ==> '+duration);
-    //     Date startDates = Date.newInstance(startDate.year(), startDate.month(), startDate.day());
-    //     Integer addedDays = 0;
-
-    //     while (addedDays < duration) {
-    //         startDates = startDates.addDays(1);
-    //         System.debug('startDates ==> '+startDates);
-    //         DateTime currentDate = DateTime.newInstance(startDates.year(), startDates.month(), startDates.day());
-    //         System.debug('currentDate ==> '+currentDate);
-    //         String todayDay = currentDate.format('EEEE');
-    //         System.debug('todayDay ==> '+todayDay);
-    //         if (todayDay != 'Saturday' && todayDay != 'Sunday') {
-    //             System.debug('addedDays ==> '+addedDays);
-    //             ++addedDays;
-    //         }
-    //     }
-
-    //     Date endDate = startDates.addDays(-1); 
-    //     return endDate;
-	// }
 
     // Skip weekend and calculate date
 	public static Date addDaysSkippingWeekends(Date sDate, Integer days){

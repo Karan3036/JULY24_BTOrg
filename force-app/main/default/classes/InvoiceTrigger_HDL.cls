@@ -59,14 +59,65 @@ public with sharing class InvoiceTrigger_HDL {
     // }
     public void onBeforeUpdate(buildertek__Billings__c[] oldInvoiceList, buildertek__Billings__c[] newInvoiceList, Map<ID, buildertek__Billings__c> oldInvoiceMap , Map<ID, buildertek__Billings__c> newInvoiceMap){ 
       
-       List<buildertek__Receipt__c> ReceiptList= [Select Id, Name , buildertek__Billing__c From buildertek__Receipt__c WHERE buildertek__Billing__c=: newInvoiceMap.keySet()];
-       for(buildertek__Billings__c inv : newInvoiceList){ 
-           if(!ReceiptList.isEmpty()){
-                // if(inv.buildertek__Status__c != oldInvoiceMap.get(inv.Id).buildertek__Status__c || inv.buildertek__Tax_Rate__c != oldInvoiceMap.get(inv.Id).buildertek__Tax_Rate__c || inv.buildertek__Terms__c != oldInvoiceMap.get(inv.Id).buildertek__Terms__c || inv.buildertek__Due_Date__c != oldInvoiceMap.get(inv.Id).buildertek__Due_Date__c || inv.buildertek__Invoiced_Date__c != oldInvoiceMap.get(inv.Id).buildertek__Invoiced_Date__c ) {
-                    inv.addError('You cannot update this Sales Invoice because there is a Receipt associated with it.  If you would like to change this Sales Invoice, please remove the Receipt first.');
-                // }
+    //    List<buildertek__Receipt__c> ReceiptList= [Select Id, Name , buildertek__Billing__c From buildertek__Receipt__c WHERE buildertek__Billing__c=: newInvoiceMap.keySet()];
+    //    for(buildertek__Billings__c inv : newInvoiceList){ 
+    //        if(!ReceiptList.isEmpty()){
+    //             // if(inv.buildertek__Status__c != oldInvoiceMap.get(inv.Id).buildertek__Status__c || inv.buildertek__Tax_Rate__c != oldInvoiceMap.get(inv.Id).buildertek__Tax_Rate__c || inv.buildertek__Terms__c != oldInvoiceMap.get(inv.Id).buildertek__Terms__c || inv.buildertek__Due_Date__c != oldInvoiceMap.get(inv.Id).buildertek__Due_Date__c || inv.buildertek__Invoiced_Date__c != oldInvoiceMap.get(inv.Id).buildertek__Invoiced_Date__c ) {
+    //                 inv.addError('You cannot update this Sales Invoice because there is a Receipt associated with it.  If you would like to change this Sales Invoice, please remove the Receipt first.');
+    //             // }
+    //         }
+    //     }
+    // To Create Budget Line when Budget Add to Sales invoice
+    try{
+        Map<String, buildertek__Budget_Item__c> MapToUpte = new  Map<String, buildertek__Budget_Item__c>();
+    // list<buildertek__Billings__c> UpdateSalesInvoice = new list<buildertek__Billings__c>();
+
+    String BLGroupID;
+    list<buildertek__Budget_Line_Group__c> BLGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name LIKE '%Sales Invoice%'];
+        if (BLGroup.size() == 0){
+            System.debug('Create Budgt Line Group');
+            buildertek__Budget_Line_Group__c BLG = new buildertek__Budget_Line_Group__c(Name = 'Sales Invoice');
+            insert BLG;
+
+            BLGroupID = BLG.Id;
+        } else {
+            BLGroupID = BLGroup[0].Id;
+        }
+
+    for(buildertek__Billings__c sl : newInvoiceList){
+        if(oldInvoiceMap.get(sl.Id).buildertek__Budget__c == null && sl.buildertek__Budget__c != oldInvoiceMap.get(sl.Id).buildertek__Budget__c){
+                buildertek__Budget_Item__c BL = new buildertek__Budget_Item__c();
+                BL.Name = sl.Name + ' budget line';
+                BL.buildertek__Unit_Price__c = 0;
+                BL.buildertek__Sales_Invoice__c = sl.buildertek__Total_Amount_Tax__c;
+                BL.buildertek__Quantity__c = 1;
+                BL.buildertek__Group__c = BLGroupID;
+                BL.buildertek__Budget__c = sl.buildertek__Budget__c;
+                MapToUpte.put(sl.Id, BL);
+        }
+
+    }
+        if(MapToUpte.size() > 0){
+            insert MapToUpte.values();
+            System.debug('BLlistToInsert => ' + MapToUpte);
+
+        for(buildertek__Billings__c slToUpdate : newInvoiceList){
+            if(oldInvoiceMap.get(slToUpdate.Id).buildertek__Budget__c == null && slToUpdate.buildertek__Budget__c != oldInvoiceMap.get(slToUpdate.Id).buildertek__Budget__c){
+                    System.debug('Sales Invoice name : '+ slToUpdate.Name +' Budget Line Id :  '+ MapToUpte.get(slToUpdate.Id).Id);
+                    // buildertek__Billings__c sl = new buildertek__Billings__c(Id = slToUpdate.Id);
+                    slToUpdate.buildertek__BT_Budget_Line__c = MapToUpte.get(slToUpdate.Id).Id;
+                    // UpdateSalesInvoice.add(slToUpdate);
+                }
             }
         }
+        // if(UpdateSalesInvoice.size() > 0){
+        //     update UpdateSalesInvoice;
+        //     System.debug('UpdateSalesInvoice => ' + UpdateSalesInvoice);
+        // }
+    }
+    catch(Exception e){
+        System.debug('error in update trigger => ' + e.getMessage() + ' at line no : '+ e.getLineNumber() );
+    }
 
     }
     
@@ -193,5 +244,6 @@ public with sharing class InvoiceTrigger_HDL {
                 update transactionList;
             }
         }
+
     }
 }

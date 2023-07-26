@@ -31,8 +31,7 @@
                                 <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
                                     <lightning-input label="Project" type="search" placeholder="Search BT Projects..."
                                         style="margin-bottom: 20px !important;" name="searchProjectName"
-                                        data-id="project" value={searchProjectName} onchange={handleProjectSearch}
-                                        >
+                                        data-id="project" value={searchProjectName} onchange={handleProjectSearch}>
                                     </lightning-input>
                                     <div if:true={showProjectName} class="records">
                                         <ul class="suggestions">
@@ -100,7 +99,7 @@
                                 <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
                                     <lightning-input name="project" label="Project Manager - User" type="search"
                                         placeholder="Search People..." data-id="user" value={searchProjectManager}
-                                        onchange={handleProjectManagerSearch} ></lightning-input>
+                                        onchange={handleProjectManagerSearch}></lightning-input>
                                     <div if:true={showProjectManagerName} class="records">
                                         <ul class="suggestions">
                                             <span class="sdls-media__body">
@@ -169,7 +168,7 @@
                                 </span>
                             </td>
                             <td class="slds-truncate">
-                                <a href=#>{item.Name}</a>
+                                <a href={url} data-id={item.Name} onclick={getLink}>{item.Name}</a>
                             </td>
                             <td>
                                 {item.buildertek__Description__c}

@@ -66,7 +66,7 @@ trigger ProjectTaskTrigger on buildertek__Project_Task__c(after insert, after up
     }else if (ProjectTaskTriggerHandler.newSchedule) {
         ProjectTaskTriggerHandler handler = new ProjectTaskTriggerHandler(Trigger.isExecuting, Trigger.size, Trigger.oldMap);
         if (Trigger.isAfter && (Trigger.isInsert || Trigger.isUpdate) ){
-            // handler.insertUpdateMilestones(Trigger.new, Trigger.newMap);
+            handler.insertUpdateMilestones(Trigger.new, Trigger.newMap);
         }
     }
 }

@@ -501,15 +501,21 @@ function convertJSONtoApexData(data, taskData, dependenciesData, resourceData) {
     let scheduleObj = {};
     var rowData = [];
     const phasedatamap = new Map();
+    // let milestonedataList = [];
+    console.log('data !-->', {data})
     if (data) {
         data.forEach(element => {
             if(element.hasOwnProperty('NewPhase')){
+                // let milestonedata = {};
                 console.log('element --> ',JSON.parse(JSON.stringify(element)));
                 console.log('in has phase as propertry');
                 console.log('element id --> ',element.id);
                 console.log('element newphase --> ',element.NewPhase);
                 phasedatamap.set(element.id, element.NewPhase);
                 console.log('phasedatamap -->', phasedatamap);
+                //Createing new milestone for new phase..
+                // milestonedata['buildertek__Schedule__c'] = taskData[0].id;
+                // milestonedata['buildertek__Phase__c'] = element.NewPhase;
             }
         });
         if (data.length > 0) {

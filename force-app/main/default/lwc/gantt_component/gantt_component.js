@@ -1180,11 +1180,21 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     ); //!helper method to get list of string to delete
 
     console.log('taskdata:- ',taskData);
+    var mapofphase = {};
+    var listofmilestone = [];
     taskData.forEach(newTaskRecord => {
       // console.log('newTaskRecord in recordtobedeleted :- ',newTaskRecord);
       // if(newTaskRecord.Id == "DemoGenretedId"){
       //     delete newTaskRecord.Id;
       // }
+
+      //
+      // if(mapofphase.has(newTaskRecord.buildertek__Phase__c)){
+      //   mapofphase[newTaskRecord.buildertek__Phase__c] = mapofphase.get(newTaskRecord.buildertek__Phase__c) + 1;
+      // } else {
+      //   mapofphase.put(newTaskRecord.buildertek__Phase__c , 1);
+      // }
+
       console.log('infor loop newTaskrecord');
       var demoidvar = newTaskRecord.Id
       console.log('demoidvar:- ',demoidvar);
