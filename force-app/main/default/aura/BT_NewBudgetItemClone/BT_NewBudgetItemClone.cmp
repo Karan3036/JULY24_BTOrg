@@ -273,7 +273,7 @@
      <aura:attribute name="salesInvoices" type="Billings__c[]" />
      <aura:attribute name="selectedSalesInvoices" type="List" default="[]" access="public"/>
      <aura:attribute name="allSLChecked" type="boolean" default="false" />
-     <!-- Add Sales Invoice Data Start -->
+     <!--  End -->
 
 
     <force:recordData aura:id="newforcerecord" layoutType="FULL" recordId="{!v.recordId}" targetRecord="{!v.newRecord}" targetFields="{!v.sampleNewRecord}" targetError="{!v.newRecordError}" />

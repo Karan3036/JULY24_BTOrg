@@ -3664,7 +3664,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             component.find('notifLib').showNotice({
                 "variant": "error",
                 "header": "Budget Lines selected.",
-                "message": "You can only add Change Order at the budget level.",
+                "message": "You can only add a Change Order at the budget level.",
                 closeCallback: function () { }
             });
         }
@@ -4146,7 +4146,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             component.find('notifLib').showNotice({
                 "variant": "error",
                 "header": "Budget Lines selected.",
-                "message": "You can only add Sales Invoice at the budget level.",
+                "message": "You can only add a Sales Invoice at the budget level.",
                 closeCallback: function () { }
             });
         }

@@ -10,6 +10,9 @@ trigger ProjectTaskTrigger on buildertek__Project_Task__c(after insert, after up
     System.debug(ProjectTaskTriggerHandler.blnSkipTaskTrigger);
     System.debug('outside condition project task ==> ');
     system.debug(BT_Utils.isTriggerDeactivate('Project_Task__c')+'--'+ProjectTaskTriggerHandler.blnSkipTaskTrigger);
+    if (ProjectTaskTriggerHandler.blnSkipTaskTrigger){
+        return;
+    }
     if (!BT_Utils.isTriggerDeactivate('Project_Task__c') && !ProjectTaskTriggerHandler.blnSkipTaskTrigger){
         System.debug('in trigger ==> ');
         ProjectTaskTriggerHandler handler = new ProjectTaskTriggerHandler(Trigger.isExecuting, Trigger.size, Trigger.oldMap);

@@ -2264,8 +2264,9 @@
                 component.set("v.addSalesInvoiceSection", false); // to close popup
                 component.set("v.selectedSalesInvoices", []); // to clear selected sales invoics
                 component.set('v.allSLChecked', false); // for check-all checkbox
-                // $A.get("e.force:refreshView").fire();
-                window.location.reload();
+                $A.get("e.force:refreshView").fire();
+                // document.location.reload(true);    
+                // window.location.reload();
 
 
 

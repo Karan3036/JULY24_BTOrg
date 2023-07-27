@@ -1,4 +1,5 @@
 public with sharing class InvoiceTrigger_HDL {
+    public static boolean skipsalesInvoiceUpdate = false;
     public InvoiceTrigger_HDL(){
         
     }
@@ -67,13 +68,16 @@ public with sharing class InvoiceTrigger_HDL {
     //             // }
     //         }
     //     }
-    // To Create Budget Line when Budget Add to Sales invoice
-    try{
+
+
+    // When Budget add to sales invoice it will create new Budget line
+    System.debug('Inside onBeforeUpdate');
         Map<String, buildertek__Budget_Item__c> MapToUpte = new  Map<String, buildertek__Budget_Item__c>();
     // list<buildertek__Billings__c> UpdateSalesInvoice = new list<buildertek__Billings__c>();
 
     String BLGroupID;
     list<buildertek__Budget_Line_Group__c> BLGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name LIKE '%Sales Invoice%'];
+        // Check is Buddget line group with name sales invoice is avialable or on if not abailabe it will create new
         if (BLGroup.size() == 0){
             System.debug('Create Budgt Line Group');
             buildertek__Budget_Line_Group__c BLG = new buildertek__Budget_Line_Group__c(Name = 'Sales Invoice');
@@ -104,21 +108,48 @@ public with sharing class InvoiceTrigger_HDL {
         for(buildertek__Billings__c slToUpdate : newInvoiceList){
             if(oldInvoiceMap.get(slToUpdate.Id).buildertek__Budget__c == null && slToUpdate.buildertek__Budget__c != oldInvoiceMap.get(slToUpdate.Id).buildertek__Budget__c){
                     System.debug('Sales Invoice name : '+ slToUpdate.Name +' Budget Line Id :  '+ MapToUpte.get(slToUpdate.Id).Id);
-                    // buildertek__Billings__c sl = new buildertek__Billings__c(Id = slToUpdate.Id);
                     slToUpdate.buildertek__BT_Budget_Line__c = MapToUpte.get(slToUpdate.Id).Id;
-                    // UpdateSalesInvoice.add(slToUpdate);
                 }
             }
         }
-        // if(UpdateSalesInvoice.size() > 0){
-        //     update UpdateSalesInvoice;
-        //     System.debug('UpdateSalesInvoice => ' + UpdateSalesInvoice);
-        // }
-    }
-    catch(Exception e){
-        System.debug('error in update trigger => ' + e.getMessage() + ' at line no : '+ e.getLineNumber() );
+
+         // remove Budget when Budget Line is unlink from Sales invoice
+        for(buildertek__Billings__c Sl : newInvoiceList){
+            if(!skipsalesInvoiceUpdate && Sl.buildertek__BT_Budget_Line__c == null && oldInvoiceMap.get(Sl.id).buildertek__BT_Budget_Line__c != null && Sl.buildertek__Budget__c != null){
+                Sl.buildertek__Budget__c = null;
+            }
+        }
+        
+
     }
 
+    // If user remove budget line from sales invoice it will delete sales invoice in perticular sales invoicce auto created from Code.
+    public void DeleteBudgetLine(buildertek__Billings__c[] oldInvoiceList, buildertek__Billings__c[] newInvoiceList, Map<ID, buildertek__Billings__c> oldInvoiceMap , Map<ID, buildertek__Billings__c> newInvoiceMap){
+        // try{
+            System.debug('Inside Delete Budget line From Sales Invoice');
+            list<buildertek__Budget_Item__c> BudgetLineToDELETE = new list<buildertek__Budget_Item__c>();
+            list<buildertek__Billings__c> SaleInvoiceToUpdate = new list<buildertek__Billings__c>();
+            Set<Id> BudgetLineToDELETESet = new Set<Id>();
+            for(buildertek__Billings__c Sl : newInvoiceList){
+                if(Sl.buildertek__BT_Budget_Line__c == null && oldInvoiceMap.get(Sl.id).buildertek__BT_Budget_Line__c != null){
+                    String BlName = sl.Name + ' budget line';
+                    list<buildertek__Budget_Item__c> BLlist = [SELECT Id, Name FROM buildertek__Budget_Item__c WHERE Id =: oldInvoiceMap.get(Sl.id).buildertek__BT_Budget_Line__c AND Name =: BlName LIMIT 1];
+                    for(buildertek__Budget_Item__c bl : BLlist){
+                        BudgetLineToDELETESet.add(bl.Id);
+                        }
+                    }
+                }
+                if(!skipsalesInvoiceUpdate && BudgetLineToDELETESet.size() > 0){
+                    System.debug('Budget line Is going to Delete From Sales Invoice');
+                    for(buildertek__Budget_Item__c BL : [SELECT Id, Name FROM buildertek__Budget_Item__c WHERE Id IN: BudgetLineToDELETESet]){
+                        BudgetLineToDELETE.add(BL);
+                    }
+                    delete BudgetLineToDELETE;
+                }
+
+        // } catch(Exception e){
+        //     System.debug('Error in Method removeBudget =>  at Line No. ' + e);
+        // }
     }
     
     public void OnAfterUpdate(buildertek__Billings__c[] oldInvoiceList, buildertek__Billings__c[] updatedInvoiceList, Map<ID, buildertek__Billings__c> InvoiceMap, Map<Id, buildertek__Billings__c> oldInvoiceMap){

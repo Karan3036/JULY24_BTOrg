@@ -519,7 +519,7 @@ export default base => class GanttToolbar extends base {
             var resourceData = JSON.parse(this.gantt.assignmentStore.json)
             let dataForApexController = convertJSONtoApexData(data, taskData, dependenciesData, resourceData);
             console.log('dataForApexController ',dataForApexController);
-            this.gantt.callGanttComponent.saveChanges(dataForApexController.scheduleData,dataForApexController.taskData);
+            this.gantt.callGanttComponent.saveChanges(dataForApexController.scheduleData,dataForApexController.taskData, dependenciesData);
 
         } catch (error) {
             console.log('Error-->' + error + ' message-->' + error.message);
