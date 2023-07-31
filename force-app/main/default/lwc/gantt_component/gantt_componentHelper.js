@@ -540,7 +540,7 @@ function convertJSONtoApexData(data, taskData, dependenciesData, resourceData) {
                 var endDate
                 if (rowData[i]['name'] != 'Milestone Complete') {
                     endDate = new Date(rowData[i].endDate);
-                    endDate.setDate(endDate.getDate() - 1)
+                    endDate.setDate(endDate.getDate())
                 } else {
                     endDate = new Date(rowData[i].endDate);
                     //endDate.setDate(endDate.getDate() + 1)

@@ -2,10 +2,10 @@ export default {
     "success" : true,
 
     "project" : {
-        "calendar"  : "general",
+        "calendar"  : "business",
         "startDate" : "2023-05-14"
     },
-    
+
     "calendars" : {
         "rows" : [
             {
@@ -23,7 +23,7 @@ export default {
                     {
                         "id"           : "business",
                         "name"         : "Business",
-                        "hoursPerDay"  : 8,
+                        "hoursPerDay"  : 16,
                         "daysPerWeek"  : 5,
                         "daysPerMonth" : 20,
                         "intervals"    : [

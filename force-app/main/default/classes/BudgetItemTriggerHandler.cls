@@ -98,7 +98,19 @@ public with sharing class BudgetItemTriggerHandler {
 			InvoiceTrigger_HDL.skipsalesInvoiceUpdate = true;
 			update slList;
 			InvoiceTrigger_HDL.skipsalesInvoiceUpdate = false;
+		}
 
+		//* for Change Order
+		list<buildertek__Change_Order__c> COList = [SELECT Id, Name, buildertek__Budget_Line__c, buildertek__Budget__c FROM buildertek__Change_Order__c WHERE buildertek__Budget_Line__c IN: budgetLineIds ];
+		for(buildertek__Change_Order__c co : COList){
+			system.debug('inside delete budget line for CO');
+			co.buildertek__Budget_Line__c = null;
+			co.buildertek__Budget__c = null;
+		}
+		if(COList.size() > 0){
+			ChangeOrderTriggerHandler.blnSkipChangeOrderUpdateTrigger = true;
+			update COList;
+			ChangeOrderTriggerHandler.blnSkipChangeOrderUpdateTrigger = false;
 		}
  	}
      

@@ -32,6 +32,9 @@ public without sharing class ChangeOrderTriggerHandler {
     }
     
     public void OnBeforeUpdate(buildertek__Change_Order__c[] oldChangeOrder, buildertek__Change_Order__c[] updatedChangeOrder, Map<ID, buildertek__Change_Order__c> ChangeOrderMap, Map<ID, buildertek__Change_Order__c> oldChangeOrderMap){
+       
+       if(!blnSkipChangeOrderUpdateTrigger){
+
         Boolean isPaid = false;
         Boolean isPartiallyPaid = false;
         List<buildertek__Billings__c> invoiceList ;
@@ -121,22 +124,23 @@ public without sharing class ChangeOrderTriggerHandler {
         }
 
         //will delete automatically created budget line if unlinked from the change order on update
-        for(buildertek__Change_Order__c changeOrder : oldChangeOrder){
-            for(buildertek__Change_Order__c changeOrder2 : updatedChangeOrder){
-                if(changeOrder.Id == changeOrder2.Id){
-                    if(changeOrder.buildertek__Budget_Line__c != changeOrder2.buildertek__Budget_Line__c && changeOrder.buildertek__Budget_Line__c != null) 
-                    {
-                        string Name  = changeOrder.Name + ' budget line';
-                        buildertek__Budget_Item__c  oldBudgetLine = [SELECT Id, buildertek__Item_Name__c, Name FROM buildertek__Budget_Item__c WHERE ID =: changeOrder.buildertek__Budget_Line__c];
-                        if(oldBudgetLine.Name == Name){
-                            delete oldBudgetLine;
-                        }
-                    }
-                }
-            }
-        }
+        // for(buildertek__Change_Order__c changeOrder : oldChangeOrder){
+        //     for(buildertek__Change_Order__c changeOrder2 : updatedChangeOrder){
+        //         if(changeOrder.Id == changeOrder2.Id){
+        //             if(changeOrder.buildertek__Budget_Line__c != changeOrder2.buildertek__Budget_Line__c && changeOrder.buildertek__Budget_Line__c != null) 
+        //             {
+        //                 string Name  = changeOrder.Name + ' budget line';
+        //                 buildertek__Budget_Item__c  oldBudgetLine = [SELECT Id, buildertek__Item_Name__c, Name FROM buildertek__Budget_Item__c WHERE ID =: changeOrder.buildertek__Budget_Line__c];
+        //                 if(oldBudgetLine.Name == Name){
+        //                     delete oldBudgetLine;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
 
+        // Create New Budget Line From ADD CO Button
         for(buildertek__Change_Order__c changeOrder : updatedChangeOrder){
             for(buildertek__Change_Order__c changeOrder2 : oldChangeOrder){
                 if(changeOrder.Id == changeOrder2.Id){
@@ -157,7 +161,7 @@ public without sharing class ChangeOrderTriggerHandler {
             }
         }
 
-        //BUIL -3336
+        //BUIL -3336 ------- Remove BUDGET from change order when Budget Line Removed from Change Order.   
         for(buildertek__Change_Order__c changeOrder:updatedChangeOrder){
             System.debug('Inside if comndition');
             System.debug(changeOrder.buildertek__Budget_Line__c);
@@ -167,6 +171,9 @@ public without sharing class ChangeOrderTriggerHandler {
                 changeOrder.buildertek__Budget__c = null;
             }
         }
+
+
+    }
 
     }
     
@@ -769,22 +776,35 @@ public without sharing class ChangeOrderTriggerHandler {
         if(rfqshareList.size()>0){
             Database.SaveResult[] lsr = Database.insert(rfqshareList,false);
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         //----------------------------------------------------------------------------
         
-        
-        
-        
     }
+
+    // If user remove budget line from change order which is auto created from code then it should be deleted ---------------
+    public void DeleteBudgetLine(buildertek__Change_Order__c[] oldChangeOrder, buildertek__Change_Order__c[] updatedChangeOrder, Map<ID, buildertek__Change_Order__c> ChangeOrderMap, Map<Id, buildertek__Change_Order__c> oldChangeOrderMap){
+         System.debug('Inside Delete Budget line From Sales Invoice');
+         list<buildertek__Budget_Item__c> BudgetLineToDELETE = new list<buildertek__Budget_Item__c>();
+         Set<Id> BudgetLineToDELETESet = new Set<Id>();
+         for(buildertek__Change_Order__c co : updatedChangeOrder){
+             String BlName = co.Name + ' budget line';
+             if(oldChangeOrderMap.get(co.id).buildertek__Budget_Line__c != null && co.buildertek__Budget_Line__c == null){
+                list<buildertek__Budget_Item__c> BLlist = [SELECT Id, Name FROM buildertek__Budget_Item__c WHERE Id =: oldChangeOrderMap.get(co.id).buildertek__Budget_Line__c AND Name =: BlName LIMIT 1];
+                    for(buildertek__Budget_Item__c bl : BLlist){
+                        BudgetLineToDELETESet.add(bl.Id);
+                        }
+                    }
+             }
+         if(!blnSkipChangeOrderUpdateTrigger && BudgetLineToDELETESet.size() > 0){
+             System.debug('Budget line Is going to Delete From Change Order');
+             for(buildertek__Budget_Item__c BL : [SELECT Id, Name FROM buildertek__Budget_Item__c WHERE Id IN: BudgetLineToDELETESet]){
+                     BudgetLineToDELETE.add(BL);
+             }
+             delete BudgetLineToDELETE;
+         }
+    }
+
+
     public void UpdateProjectValueInChangeOrder(buildertek__Change_Order__c[] updatedChangeOrder, Map<ID, buildertek__Change_Order__c> oldChangeOrderMap){
         list<id> OldcontractIds = new list<id>();
         Map<String, Decimal> contractMap = new Map<String, Decimal>();

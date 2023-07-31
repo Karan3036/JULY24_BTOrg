@@ -18,6 +18,9 @@ public with sharing class NewGanttChartTaskTriggerHandler{
                 if (projectTask.buildertek__Milestone__c){
                     phaseMileStoneMap.put(projectTask.buildertek__Phase__c, projectTask);
                 } else{
+                    if (projectTask.buildertek__finish__c == null) {
+                        projectTask.buildertek__finish__c = projectTask.buildertek__Start__c.addDays(1);
+                    }
                     if (phaseDateMap.containsKey(projectTask.buildertek__Phase__c)){
                         Date endDate = phaseDateMap.get(projectTask.buildertek__Phase__c);
                         if (endDate < projectTask.buildertek__finish__c){
