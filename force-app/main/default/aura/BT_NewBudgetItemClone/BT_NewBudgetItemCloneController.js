@@ -48,6 +48,12 @@
                 var budgetData = JSON.parse(JSON.stringify(response.getReturnValue()))
                 component.set("v.budgetName", budgetData.Name);
                 component.set("v.budgetId", budgetData.Id);
+                component.set("v.OriginalBudget", budgetData.buildertek__Original_Budget__c);
+                component.set("v.TotalCosts", budgetData.buildertek__Total_Costs__c);
+                component.set("v.TotalSalesPrice", budgetData.buildertek__Total_Sales_Price__c);
+                component.set("v.GrossMarginPer", budgetData.buildertek__Gross_Profit__c);
+                component.set("v.GrossMargin", budgetData.buildertek__Estimated_Gross_Profit__c);
+                component.set("v.ProjectedGrossMargin", budgetData.buildertek__Estimated_Gross_Profit_Percent__c);
                 if (component.find('expandCollapeseAllBtn')) {
                     if (component.find('expandCollapeseAllBtn').get('v.iconName')) {
                         var budgetIdele = component.get("v.budgetId");
@@ -4238,6 +4244,28 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             helper.AddNewSalesInvoicesHelper(component, event, SLlist)
         }
     },
+
+    addInvoicePO:function (component, event, helper) {
+        console.log('add Invoice po button click......');
+
+        var action = component.get("c.getInvoicePOData");
+        action.setParams({
+            "recordId": component.get("v.recordId")
+        });
+        action.setCallback(this, function (response) {
+            var state= response.getState();
+            var error= response.getError();
+            console.log(state);
+            console.log(error);
+
+            if(state === 'SUCCESS'){
+                console.log(response.getReturnValue());
+            }
+
+        });
+        $A.enqueueAction(action);
+
+    }
 
 
 

@@ -2372,7 +2372,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
     }
     @AuraEnabled
     public static buildertek__Budget__c getbudget(String recordId){
-        buildertek__Budget__c quoterecord = [Select Id,Name from buildertek__Budget__c  where Id =: recordId ORDER BY Name ASC LIMIT 1];
+        buildertek__Budget__c quoterecord = [Select Id, Name, buildertek__Original_Budget__c, buildertek__Total_Costs__c, buildertek__Total_Sales_Price__c, buildertek__Gross_Profit__c, buildertek__Estimated_Gross_Profit__c, buildertek__Estimated_Gross_Profit_Percent__c from buildertek__Budget__c  where Id =: recordId ORDER BY Name ASC LIMIT 1];
         return quoterecord;
     }
     @AuraEnabled
@@ -3139,6 +3139,19 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         }
     }
 
+
+    @AuraEnabled
+    public static List<buildertek__Account_Payable__c> getInvoicePOData(string RecId){
+        buildertek__Budget__c budgetRec = [SELECT Id, Name, buildertek__Project__c FROM buildertek__Budget__c where Id = :RecId ORDER BY Name ASC];
+
+        List<buildertek__Account_Payable__c> invoicePOList = new List<buildertek__Account_Payable__c>();
+        invoicePOList = [SELECT Id, Name, buildertek__Project__c, buildertek__Description__c,buildertek__BT_Budget_Line__c, buildertek__Net_Amount__c, buildertek__Budget__c  FROM buildertek__Account_Payable__c
+                        WHERE buildertek__BT_Budget_Line__c = null AND buildertek__Budget__c = null AND buildertek__Project__c=: budgetRec.buildertek__Project__c ORDER BY Name DESC];
+        
+        System.debug('invoicePOList======>>>>>>'+invoicePOList);
+
+        return invoicePOList;
+    }
 
 
 
