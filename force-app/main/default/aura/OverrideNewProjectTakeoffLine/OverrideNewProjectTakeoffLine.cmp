@@ -1,5 +1,4 @@
-<aura:component controller="OverrideNewProjectTakeoffLineController"
-                implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global">
+<aura:component controller="OverrideNewProjectTakeoffLineController" implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global">
     <aura:attribute name="parentRecordId" type="String" />
     <aura:attribute name="isOpen" type="boolean" default="false" />
     <aura:attribute name="Spinner" type="boolean" default="false" />
@@ -39,7 +38,7 @@
                 </header>
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                     <!-- <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Project Take Off Line</h2> -->
-                    <lightning:recordEditForm aura:id="recordViewForm" objectApiName="buildertek__Project_Takeoff_Lines__c">
+                    <lightning:recordEditForm aura:id="recordViewForm" objectApiName="buildertek__Project_Takeoff_Lines__c" density="Comfy">
                         <div class="slds-grid slds-wrap">
                             <!--  <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
                             <label>Product</label>

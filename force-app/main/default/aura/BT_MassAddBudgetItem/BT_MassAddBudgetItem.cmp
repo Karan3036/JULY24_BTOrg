@@ -148,7 +148,7 @@
                                     
                                 </td>
                                 <td>
-                                    <lightning:input name="{!index}" value="{!budgetLineWrapper.BudgetLine.buildertek__Quantity__c}" class="quantity-class"  type="number" default="1" />
+                                    <lightning:input name="{!index}" value="{!budgetLineWrapper.BudgetLine.buildertek__Quantity__c}" class="quantity-class"  type="number" />
                                 </td>
                                 <td>
                                     <lightning:input name="{!index}" value="{!budgetLineWrapper.BudgetLine.buildertek__Unit_Price__c}" class="unitCost-class"  type="number" step="0.01" />

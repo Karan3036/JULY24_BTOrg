@@ -173,6 +173,7 @@ export default class importScheduleLine extends LightningElement {
                             obj[headers[j].trim()] = data[j].trim();
                         }
                     }
+                    console.log('j:',j,'data.length:',data.length);
                 }
 
                 if (obj.StartDate !== undefined && obj.StartDate !== "") {
