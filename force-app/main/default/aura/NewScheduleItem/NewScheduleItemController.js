@@ -1,8 +1,24 @@
 ({
 	doInit : function(component, event, helper) {
 	    helper.getPODetails(component, event, helper);
-		helper.getSchedules(component, event, helper);
-		// helper.fetchPickListVal(component, 'phaseId', 'buildertek__Phase__c');
+	},
+    getschdule : function(component, event, helper) {
+        var proId = component.get("v.selectedProjectId");
+        console.log('proId====>',proId);
+	    if (proId != undefined) {
+            helper.getSchedules(component, event, helper);  
+        }else {
+            var toastEvent = $A.get("e.force:showToast"); 
+            toastEvent.setParams({
+                "title" : "Error",
+                "message" : 'Please select Project first.',
+                "type" : "error",
+                "duration" : 3000
+            });
+            toastEvent.fire();
+        }
+		
+		
 	},
 	 
 	clearSelectedValue : function(component, event, helper) {
@@ -27,11 +43,9 @@
 	             schedules[i].scheduleCheckbox = false;
 	        }
 	    }
-	    //alert('Is Checked ---------> '+ checkbox.get("v.value"));
 	    var scheduleId = checkbox.get("v.text");
 	    component.set("v.scheduleRecId", scheduleId);
 	    if(checkbox.get("v.value") == true){
-	        //helper.openNewTaskPopup(component, event, scheduleId); 
 	        component.set("v.isNewTask", true);
 	    }
 	},
@@ -40,22 +54,6 @@
       $A.get("e.force:closeQuickAction").fire();
    },
    
-   /*parentPress : function(component, event, helper) {
-        var selectedRecord = component.get("v.selectedProjectRecord").Id;
-	    //alert('selectedRecord -----> '+selectedRecord);
-	    var action = component.get("c.getProjectSchedules");
-	    action.setParams({
-	        projectId : selectedRecord
-	    });
-	    action.setCallback(this, function(response){
-	        var state = response.getState();
-	        if(state === "SUCCESS"){
-	            var result = response.getReturnValue();
-	            component.set("v.Schedules", result);
-	        }
-	    });
-	    $A.enqueueAction(action);
-   },*/
    
    save : function(component, event, helper) {
        component.set("v.Spinner", true);
@@ -72,7 +70,8 @@
        var conId = component.get("v.selectedContactRecord");
        console.log('conId====>',conId);
 
-       if (taskname != '' && scheduleId != '' && startDate != '') {
+       if (taskname != undefined && scheduleId != '' && startDate != null) {
+        // console.log('Successssssss');
         var action = component.get('c.insertScheduleTask');
        action.setParams({
            task: taskname,
@@ -119,7 +118,6 @@
                  var toastEvent = $A.get("e.force:showToast"); 
                         toastEvent.setParams({
                             "title" : "Error",
-                            //"message" : result.Message,
                             "message" : 'Something Went Wrong.',
                             "type" : "error",
                             "duration" : 5000
@@ -134,7 +132,6 @@
         var toastEvent = $A.get("e.force:showToast"); 
             toastEvent.setParams({
                 "title" : "Error",
-                //"message" : result.Message,
                 "message" : 'Required Field is missing.',
                 "type" : "error",
                 "duration" : 3000
@@ -181,8 +178,6 @@
 
             if(state === 'SUCCESS'){
                 console.log('inside success');
-                // var getValues=Object.values(result);
-                // var getKeys=Object.keys(result);
 
                 const keyValueArray = Object.entries(result).map(([key, value]) => ({ key, value }));
 
@@ -231,8 +226,11 @@
         component.set('v.predecessorList' , tempArray);
     },
     hideList:function(component, event, helper){
-            // component.set('v.diplayPredecessorlist' , false);
+            component.set('v.diplayPredecessorlist' , false);
 
     },
+    preventHide: function(component, event, helper) {
+        event.preventDefault();
+    }
 
 })

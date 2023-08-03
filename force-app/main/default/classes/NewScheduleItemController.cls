@@ -1,4 +1,4 @@
-public with sharing class NewScheduleItemController {
+public without sharing class NewScheduleItemController {
         
     @AuraEnabled
     public static WorkOrder getPurchaseOrderData(String recordId){
@@ -8,15 +8,7 @@ public with sharing class NewScheduleItemController {
     
     @AuraEnabled
     public static List<ScheduleWrap> getSchedulelist(String recordId){
-        WorkOrder pur = [select Id, buildertek__Project__c from WorkOrder where Id =: recordId]; 
-        system.debug('projectId -----> '+pur.buildertek__Project__c);
-        list<Schedule__c> getSchedulesList;
-         if(Schema.sObjectType.Schedule__c.fields.Id.isAccessible() &&
-            Schema.sObjectType.Schedule__c.fields.Name.isAccessible()&&
-            Schema.sObjectType.Schedule__c.fields.buildertek__Description__c.isAccessible() &&
-            Schema.sObjectType.Schedule__c.fields.buildertek__Project__c.isAccessible()){
-             getSchedulesList = [select id, Name, buildertek__Description__c from Schedule__c where buildertek__Project__c =: pur.buildertek__Project__c];
-            }
+        list<Schedule__c> getSchedulesList = [select id, Name, buildertek__Description__c from Schedule__c where buildertek__Project__c =: recordId];
         system.debug('getSchedulesList ---------> '+getSchedulesList);
         list<ScheduleWrap> ScheduleWrapList = new list<ScheduleWrap>(); 
         for(Schedule__c sch : getSchedulesList){
@@ -30,13 +22,7 @@ public with sharing class NewScheduleItemController {
     
     @AuraEnabled
     public static List<ScheduleWrap> getProjectSchedules(String projectId){
-         list<Schedule__c> getSchedulesList;
-        if(Schema.sObjectType.Schedule__c.fields.Id.isAccessible() &&
-            Schema.sObjectType.Schedule__c.fields.Name.isAccessible()&&
-            Schema.sObjectType.Schedule__c.fields.buildertek__Description__c.isAccessible() &&
-            Schema.sObjectType.Schedule__c.fields.buildertek__Project__c.isAccessible()){
-            getSchedulesList = [select id, Name, buildertek__Description__c from Schedule__c where buildertek__Project__c =: projectId];
-         }
+         list<Schedule__c> getSchedulesList = [select id, Name, buildertek__Description__c from Schedule__c where buildertek__Project__c =: projectId];
         system.debug('getSchedulesList -----------> '+getSchedulesList);
         list<ScheduleWrap> ScheduleWrapList = new list<ScheduleWrap>(); 
         for(Schedule__c sch : getSchedulesList){
@@ -67,8 +53,6 @@ public with sharing class NewScheduleItemController {
     
     @AuraEnabled
     public static String insertScheduleTask(String task, String scheduleId, String dependency, Date startdate, String project, String contactorResource){
-        ErrorMessageClass errMessage = new ErrorMessageClass();
-        try{
             buildertek__Project_Task__c projectTask = new buildertek__Project_Task__c();
     
             if (!String.isBlank(task)) {
@@ -93,17 +77,9 @@ public with sharing class NewScheduleItemController {
             System.debug('projectTask :: '+projectTask);
             insert projectTask; 
             System.debug('projectTask id :: '+projectTask.Id);
-            // errMessage.MessageType = 'Success';
-            // errMessage.Message = 'Purchase Order Scheduled Successfully';
+
             return projectTask.Id;
-        } catch(Exception exp){
-            errMessage.Message = exp.getMessage(); 
-            errMessage.MessageType = 'Error';
-            System.debug('error line :: '+exp.getLineNumber());
-            System.debug('error line :: '+exp.getMessage());
-    
-            return null;
-        }
+        
     }
     
     
@@ -122,10 +98,5 @@ public with sharing class NewScheduleItemController {
     public Class ScheduleWrap{
        @AuraEnabled public boolean scheduleCheckbox;
        @AuraEnabled public Schedule__c getSchedulesList;
-   }
-   
-   public class ErrorMessageClass{
-       @AuraEnabled public String Message { get; set; }
-       @AuraEnabled public String MessageType { get; set; }
    }
 }

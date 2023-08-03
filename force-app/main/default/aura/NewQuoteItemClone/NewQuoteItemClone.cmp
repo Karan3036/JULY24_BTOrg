@@ -209,7 +209,6 @@
 
     <aura:attribute name="quoteNameData" type="Object" />
     <aura:handler name="change" value="{!v.quoteNameData}" action="{!c.setTabName}"/>
-    <!-- <aura:handler name="change" value="{!v.quoteNameData}" action="{!c.SetCss}"/>  -->
     <force:recordData aura:id="recordLoader" recordId="{!v.recordId}" fields="Name" targetFields="{!v.quoteNameData}" />
     <!-- Handler -->
 
@@ -218,11 +217,7 @@
     <c:BT_Spinner />
     <aura:attribute name="parentValue" type="String" />
     <!-- <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> -->
-    <!-- <aura:html tag="style">
-        .slds-tabs_card{
-            height: 100%;
-        }
-    </aura:html> -->
+
 
 
 
