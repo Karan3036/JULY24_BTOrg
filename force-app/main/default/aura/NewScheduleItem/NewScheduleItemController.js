@@ -2,6 +2,7 @@
 	doInit : function(component, event, helper) {
 	    helper.getPODetails(component, event, helper);
 	},
+    
     getschdule : function(component, event, helper) {
         var proId = component.get("v.selectedProjectId");
         console.log('proId====>',proId);
@@ -21,34 +22,6 @@
 		
 	},
 	 
-	clearSelectedValue : function(component, event, helper) {
-	    component.set("v.isProject", false);
-	    component.set("v.selectedProjectRecord", null);
-	    component.set("v.selectedLookUpRecordName", '');
-	},
-    clearSelectedValueAccount : function(component, event, helper) {
-	    component.set("v.isVendor", false);
-	    component.set("v.selectedAccountRecord", []); 
-	},
-	
-	handleCheck : function(component, event, helper) {
-        var checkbox = event.getSource();  
-        var schedules = component.get("v.Schedules");
-	    for(var i=0 ; i < schedules.length;i++){
-	        if(schedules[i].getSchedulesList.Id == checkbox.get("v.text") && schedules[i].scheduleCheckbox == false){
-	            schedules[i].scheduleCheckbox = true;
-	            component.find("checkContractor")[i].set("v.value", true);
-	        }
-	        else if(schedules[i].getSchedulesList.Id == checkbox.get("v.text") && schedules[i].scheduleCheckbox == true){
-	             schedules[i].scheduleCheckbox = false;
-	        }
-	    }
-	    var scheduleId = checkbox.get("v.text");
-	    component.set("v.scheduleRecId", scheduleId);
-	    if(checkbox.get("v.value") == true){
-	        component.set("v.isNewTask", true);
-	    }
-	},
 	
 	closeModel: function(component, event, helper) {
       $A.get("e.force:closeQuickAction").fire();
@@ -70,7 +43,7 @@
        var conId = component.get("v.selectedContactRecord");
        console.log('conId====>',conId);
 
-       if (taskname != undefined && scheduleId != '' && startDate != null) {
+       if (taskname != undefined && taskname != '' && scheduleId != '' && startDate != null) {
         // console.log('Successssssss');
         var action = component.get('c.insertScheduleTask');
        action.setParams({
@@ -140,26 +113,6 @@
        }
        
    },
-	
-	SearchFunction : function(component, event, helper) {
-	    var input, filter, table, tr, td, i,a,b,c;
-    	input = document.getElementById("scheduleFilterInput");
-    	filter = input.value.toUpperCase();
-    	table = document.getElementById("myTables");
-    	tr = table.getElementsByTagName("tr");
-    	for (i = 0; i < tr.length; i++) {
-    		td = tr[i].getElementsByTagName("td")[1];
-    		
-    		if (td) {
-    			a=td;
-    			if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-    				tr[i].style.display = "";
-    			} else {
-    				tr[i].style.display = "none";
-    			}
-    		}     
-    	}
-	},
 
     serachPredecessor:function(component, event, helper) {
         console.log('serachPredecessor test');
@@ -231,6 +184,6 @@
     },
     preventHide: function(component, event, helper) {
         event.preventDefault();
-    }
+    },
 
 })

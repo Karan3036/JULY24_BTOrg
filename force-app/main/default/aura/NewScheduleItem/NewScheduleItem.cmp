@@ -1,29 +1,15 @@
 <aura:component controller="NewScheduleItemController" implements="force:appHostable,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes,lightning:actionOverride,force:hasRecordId,forceCommunity:availableForAllPageTypes" access='global'>
      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-     <aura:attribute name="scheduleString" type="string" />
-     <aura:attribute name="Schedules" type="list" />  
-     <aura:attribute name="ScheduleId" type="string" />
+     <!-- <aura:attribute name="Schedules" type="list" />  -->
+     <aura:attribute name="Schedules" type="List" />
+    <aura:attribute name="scheduleOptions" type="List" />
      <aura:attribute name="Spinner" type="boolean" default="false"/>
      <aura:attribute name="disablePro" type="boolean" default="false"/>
      <aura:attribute name="disableCon" type="boolean" default="false"/>
-     <aura:attribute name="isNewTask" type="boolean" />
-     <aura:attribute name="isNewTasks" type="boolean" />
      <aura:attribute name="TaskName" type="String" />
      <aura:attribute name="startTime" type="Date" />
-     <aura:attribute name="description" type="String" />
-     <aura:attribute name="duration" type="String" />
      <aura:attribute name="startDate" type="Date" />
-     <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
      <aura:attribute name="selectedContactRecord" type="sObject"/>
-     <aura:attribute name="selectedContacts" type="sObject[]"  />
-    <aura:attribute name="selectedAccountRecord" type="sObject" default="{}"/>
-     <aura:attribute name="selectedProjectRecord" type="sObject" default="{}"/>
-     <aura:attribute name="isProject" type="boolean" default="false"/>
-    <aura:attribute name="isVendor" type="boolean" default="false"/>
-     <aura:attribute name="scheduleRecId" type="String"/>
-     <aura:attribute name="projectId" type="String"/>
-     <aura:attribute name="selectedPhaseValue" type="String"/>
-     <aura:attribute name="selectedLookUpRecordName" type="String"/> 
      <aura:attribute name="selectedValue" type="String"/>
      <aura:attribute name="selectedProjectId" type="String"/>
 
@@ -77,12 +63,15 @@
                 <div class="slds-form-element__row">
                     <div class="slds-form-element slds-size_1-of-2">
                         <div class="slds-form-element__control">
-                            <lightning:select name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}">
-                                <option text="None" value="" /> 
+                            <!-- <lightning:select name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}">
+                                <option text="None" value="None" /> 
                                 <aura:iteration items="{!v.Schedules}" var="sch">
                                     <option text="{!sch.getSchedulesList.Name +' - '+sch.getSchedulesList.buildertek__Description__c}" value="{!sch.getSchedulesList.Id}" />
                                 </aura:iteration>
-                            </lightning:select>
+                            </lightning:select> -->
+                            <lightning:combobox name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" 
+                placeholder="Select a schedule" options="{!v.scheduleOptions}" 
+                onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}" />
                         </div>
                     </div>
 

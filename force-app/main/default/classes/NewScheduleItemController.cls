@@ -20,36 +20,6 @@ public without sharing class NewScheduleItemController {
         return ScheduleWrapList;    
     }
     
-    @AuraEnabled
-    public static List<ScheduleWrap> getProjectSchedules(String projectId){
-         list<Schedule__c> getSchedulesList = [select id, Name, buildertek__Description__c from Schedule__c where buildertek__Project__c =: projectId];
-        system.debug('getSchedulesList -----------> '+getSchedulesList);
-        list<ScheduleWrap> ScheduleWrapList = new list<ScheduleWrap>(); 
-        for(Schedule__c sch : getSchedulesList){
-            ScheduleWrap ScheduleWrapRec = new ScheduleWrap();
-            ScheduleWrapRec.getSchedulesList = sch;
-            ScheduleWrapRec.scheduleCheckbox = false;
-            ScheduleWrapList.add(ScheduleWrapRec);
-        }
-        return ScheduleWrapList;
-    }
-    
-    @AuraEnabled
-    public static List <String> getselectOptions(sObject objectName, string fieldName) {
-        system.debug('objObject --->' + objectName);
-        system.debug('fld --->' + fieldName);
-        List< String > allOpts = new List< String > ();
-        Schema.sObjectType objType = objectName.getSObjectType();
-        Schema.DescribeSObjectResult objDescribe = objType.getDescribe();
-        Map< String, Schema.SObjectField > fieldMap = objDescribe.fields.getMap();
-        List< Schema.PicklistEntry > values = fieldMap.get(fieldName).getDescribe().getPickListValues();
-        for (Schema.PicklistEntry a: values) {
-            allOpts.add(a.getValue());
-        }
-        system.debug('allOpts ---->' + allOpts);
-        allOpts.sort();
-        return allOpts;
-    }
     
     @AuraEnabled
     public static String insertScheduleTask(String task, String scheduleId, String dependency, Date startdate, String project, String contactorResource){
