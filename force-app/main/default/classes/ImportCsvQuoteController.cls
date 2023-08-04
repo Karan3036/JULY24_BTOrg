@@ -38,8 +38,10 @@ public with sharing class ImportCsvQuoteController {
                 System.debug('strFileData ::: '+strFileData);
                 
                 if(!String.isBlank(strFileData) && response.isSuccess) {
+                    System.debug('If 1 ::: ');
                     List<buildertek__Quote_Item__c > listQuotes = new List<buildertek__Quote_Item__c >();
                     listCSVData = getListOfFileContentsAsStrings(strFileData);
+                    System.debug('If 2 ::: listCSVData : ' + listCSVData);
 					Map<String,buildertek__Quote_Item__c > quoteItemMap = new Map<String,buildertek__Quote_Item__c >();
 
                     //get id from name 
@@ -50,9 +52,13 @@ public with sharing class ImportCsvQuoteController {
                     Map<String,Product2> productMap=new Map<String,Product2>();
                     Map<String,buildertek__Cost_Codes__c> costCodeMap=new Map<String,buildertek__Cost_Codes__c>();
                     Map<String,buildertek__Quote_Line_Group__c> groupingMap=new Map<String,buildertek__Quote_Line_Group__c>();
-                    
-                    for(Integer intIndex = 1; intIndex < listCSVData.size(); intIndex++) {
-                        for(Integer intInnerIndex = 0; intInnerIndex < listCSVData.get(intIndex).size(); intInnerIndex++) {
+                    System.debug('If 3 ::: listCSVData.size() : ' + listCSVData.size());
+                    for(Integer intIndex = 1; intIndex <= listCSVData.size(); intIndex++) {
+                        System.debug('If 3 ::: intIndex : ' + intIndex);
+                        System.debug('If 4 ::: listCSVData.get(intIndex).size() : ' + listCSVData.get(intIndex).size());
+                        for(Integer intInnerIndex = 0; intInnerIndex <= listCSVData.get(intIndex).size(); intInnerIndex++) {
+                            System.debug('If 4 ::: listCSVData.get(0).get(intInnerIndex : ' + listCSVData.get(0).get(intInnerIndex));
+                            System.debug('If 4 ::: listCSVData.get(intIndex).get(intInnerIndex)) ' + listCSVData.get(intIndex).get(intInnerIndex));
                             switch on listCSVData.get(0).get(intInnerIndex) {
                                 when 'Product Description' {
                                     if(String.isNotBlank(listCSVData.get(intIndex).get(intInnerIndex))) {
@@ -210,6 +216,7 @@ public with sharing class ImportCsvQuoteController {
         catch(Exception ex) {
             response.isSuccess = false;
             response.strMessage = ex.getMessage();
+            System.debug('Error in importBudgets => ' + ex + '\n at line no ==> ' + ex.getLineNumber());
         }
         
         return response;
@@ -222,6 +229,7 @@ public with sharing class ImportCsvQuoteController {
     */
     public static List<List<String>> getListOfFileContentsAsStrings(String strContents) {
         List<List<String>> listOfFileContentsAsStrings;
+        try{
         if(String.isNotBlank(strContents)) {
             List<String> listLines;
             
@@ -232,6 +240,9 @@ public with sharing class ImportCsvQuoteController {
             else if(strContents.contains('\n')) {
                 // Split up the file contents into List of rows [ Using new line ].
                 listLines = strContents.split('\n');
+            }
+            else{
+                listLines = new list<string>{strContents};
             }
             
             if(listLines != Null && !listLines.isEmpty()) {
@@ -259,8 +270,12 @@ public with sharing class ImportCsvQuoteController {
                 }
             }
         }
+    }catch(Exception e){
+        System.debug('error in => getListOfFileContentsAsStrings' + e);
+    }
         
         system.debug('listOfFileContentsAsStrings:-\n' + JSON.serialize(listOfFileContentsAsStrings));
+        System.debug('listOfFileContentsAsStrings 1 ==> ' + listOfFileContentsAsStrings);
         return listOfFileContentsAsStrings;
     }
     

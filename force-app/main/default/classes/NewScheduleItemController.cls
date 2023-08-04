@@ -36,6 +36,10 @@ public without sharing class NewScheduleItemController {
             }
             if (startdate != null) {
                 projectTask.buildertek__Start__c = startdate;
+                projectTask.buildertek__Original_Start_Date__c = startdate;
+                projectTask.buildertek__Original_End_Date__c = startdate;
+                projectTask.buildertek__Finish__c = startdate;
+                projectTask.buildertek__Duration__c = 1;
             }
             if (!String.isBlank(contactorResource)) {
                 projectTask.buildertek__Contractor_Resource__c = contactorResource;
