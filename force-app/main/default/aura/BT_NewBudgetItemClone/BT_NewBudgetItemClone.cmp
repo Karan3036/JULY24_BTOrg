@@ -300,22 +300,22 @@
                 <a href="{!v.fromWhereBudgetIsOpen}" style="font-size:17px;padding-right: 50px;" onclick="{!c.closetab}">{!v.budgetName} </a>
                 <div class="rkclass">
                     <div class="rkclasses">
-                        <p>Original Budget </p><p> {!v.OriginalBudget}</p>
+                        <p>Original Budget </p><p> USD {!v.OriginalBudget}</p>
                     </div>
                     <div class="rkclasses">
-                        <p>Total Costs </p><p> {!v.TotalCosts}</p>
+                        <p>Total Costs </p><p> USD {!v.TotalCosts}</p>
                     </div>
                     <div class="rkclasses">
-                        <p>Total Sales Price </p><p> {!v.TotalSalesPrice}</p>
+                        <p>Total Sales Price </p><p> USD {!v.TotalSalesPrice}</p>
                     </div>
                     <div class="rkclasses">
-                        <p>Gross Margin (%) </p><p> {!v.GrossMarginPer}</p>
+                        <p>Gross Margin (%) </p><p> {!v.GrossMarginPer}%</p>
                     </div>
                     <div class="rkclasses">
-                        <p>Gross Margin ($) </p><p> {!v.GrossMargin}</p>
+                        <p>Gross Margin ($) </p><p> USD {!v.GrossMargin}</p>
                     </div>
                     <div class="rkclasses">
-                        <p>Projected Gross Margin (%) </p><p> {!v.ProjectedGrossMargin}</p>
+                        <p>Projected Gross Margin (%) </p><p> {!v.ProjectedGrossMargin}%</p>
                     </div>
                     
                     
