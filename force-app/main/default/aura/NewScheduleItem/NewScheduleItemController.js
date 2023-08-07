@@ -44,7 +44,6 @@
        console.log('conId====>',conId);
 
        if (taskname != undefined && taskname != '' && scheduleId != '' && startDate != null) {
-        // console.log('Successssssss');
         var action = component.get('c.insertScheduleTask');
        action.setParams({
            task: taskname,
@@ -56,12 +55,8 @@
        });
        action.setCallback(this, function(response){
             var state = response.getState();
-            // alert('state -------> '+state);
             if(state === "SUCCESS"){
                 var result = response.getReturnValue();
-                // alert('result --------> '+JSON.stringify(result));
-                // console.log('response --------> '+response);
-                // console.log('result --------> '+result);
                     component.set("v.Spinner", false);
                     $A.get("e.force:closeQuickAction").fire()
                     var navEvt = $A.get("e.force:navigateToSObject");
@@ -185,5 +180,4 @@
     preventHide: function(component, event, helper) {
         event.preventDefault();
     },
-    //tet
 })

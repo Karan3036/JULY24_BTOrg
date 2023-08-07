@@ -35,11 +35,12 @@ public without sharing class NewScheduleItemController {
                 projectTask.buildertek__Schedule__c = scheduleId;
             }
             if (startdate != null) {
-                DateTime adjustedDate = NewScheduleItemController.adjustDate(startdate);
-                projectTask.buildertek__Start__c = adjustedDate.date();
-                projectTask.buildertek__Original_Start_Date__c = adjustedDate.date();
-                projectTask.buildertek__Original_End_Date__c = adjustedDate.date();
-                projectTask.buildertek__Finish__c = adjustedDate.date();
+                Date adjustedDate = NewScheduleItemController.modifyDate(startdate);
+                System.debug('adjustedDate==>'+adjustedDate);
+                projectTask.buildertek__Start__c = adjustedDate;
+                projectTask.buildertek__Original_Start_Date__c = adjustedDate;
+                projectTask.buildertek__Original_End_Date__c = adjustedDate;
+                projectTask.buildertek__Finish__c = adjustedDate;
                 projectTask.buildertek__Duration__c = 1;
             }
             if (!String.isBlank(contactorResource)) {
@@ -52,32 +53,38 @@ public without sharing class NewScheduleItemController {
                 Decimal lagValue = schduleItemList[0].buildertek__Lag__c;
                 if (lagValue != 0) {
                     Integer lagDays = lagValue.intValue() + 1;
-                    if (schduleItemList[0].buildertek__Finish__c >= startdate) {
-                        DateTime adjustedDate = NewScheduleItemController.adjustDate(schduleItemList[0].buildertek__Finish__c.addDays(lagDays));
-                        projectTask.buildertek__Start__c = adjustedDate.date();
-                        projectTask.buildertek__Finish__c = adjustedDate.date();
+                    if (schduleItemList[0].buildertek__Finish__c > startdate) {
+                        Date adjustedDate = NewScheduleItemController.modifyDate(schduleItemList[0].buildertek__Finish__c.addDays(lagDays));
+                        System.debug('adjustedDate==>'+adjustedDate);
+                        projectTask.buildertek__Start__c = adjustedDate;
+                        projectTask.buildertek__Finish__c = adjustedDate;
                     }else {
-                        DateTime adjustedDate = NewScheduleItemController.adjustDate(startdate);
-                        projectTask.buildertek__Start__c = adjustedDate.date();
-                        projectTask.buildertek__Finish__c = adjustedDate.date();
+                        Date adjustedDate = NewScheduleItemController.modifyDate(startdate);
+                        System.debug('adjustedDate==>'+adjustedDate);
+                        projectTask.buildertek__Start__c = adjustedDate;
+                        projectTask.buildertek__Finish__c = adjustedDate;
                     }
                     
                 }else {
-                    if (schduleItemList[0].buildertek__Finish__c >= startdate) {
-                        DateTime adjustedDate = NewScheduleItemController.adjustDate(schduleItemList[0].buildertek__Finish__c.addDays(1));
-                        projectTask.buildertek__Start__c = adjustedDate.date();
-                        projectTask.buildertek__Finish__c = adjustedDate.date();
+                    if (schduleItemList[0].buildertek__Finish__c > startdate) {
+                        Date adjustedDate = NewScheduleItemController.modifyDate(schduleItemList[0].buildertek__Finish__c.addDays(1));
+                        System.debug('adjustedDate==>'+adjustedDate);
+                        projectTask.buildertek__Start__c = adjustedDate;
+                        projectTask.buildertek__Finish__c = adjustedDate;
                     }else {
-                        DateTime adjustedDate = NewScheduleItemController.adjustDate(startdate);
-                        projectTask.buildertek__Start__c = adjustedDate.date();
-                        projectTask.buildertek__Finish__c = adjustedDate.date();
+                        Date adjustedDate = NewScheduleItemController.modifyDate(startdate);
+                        System.debug('adjustedDate==>'+adjustedDate);
+                        projectTask.buildertek__Start__c = adjustedDate;
+                        projectTask.buildertek__Finish__c = adjustedDate;
                     }
                 }
             }
             
     
             System.debug('projectTask :: '+projectTask);
+            ProjectTaskTriggerHandler.blnSkipTaskTrigger = true;
             insert projectTask; 
+            ProjectTaskTriggerHandler.blnSkipTaskTrigger = false;
             System.debug('projectTask id :: '+projectTask.Id);
 
             return projectTask.Id;
@@ -101,17 +108,23 @@ public without sharing class NewScheduleItemController {
        @AuraEnabled public boolean scheduleCheckbox;
        @AuraEnabled public Schedule__c getSchedulesList;
    }
+   
 
-   public static DateTime adjustDate(DateTime startDate) {
-    DateTime currDate = DateTime.newInstance(startDate.year(), startDate.month(), startDate.day());
-    String todayDay = currDate.format('EEEE');
+ public static Date modifyDate(Date inputDate) {
+    // Convert the Date to a DateTime to use the format method
+    DateTime dt = DateTime.newInstance(inputDate.year(), inputDate.month(), inputDate.day());
     
-    if (todayDay == 'Saturday') {
-        startDate = startDate.addDays(2);
-    } else if (todayDay == 'Sunday') {
-        startDate = startDate.addDays(1);
+    // Check if the inputDate is Saturday
+    if (dt.format('E') == 'Sat') {
+        return inputDate.addDays(2);
     }
-    
-    return startDate;
- }
+    // Check if the inputDate is Sunday
+    else if (dt.format('E') == 'Sun') {
+        return inputDate.addDays(1);
+    }
+    // If not Saturday or Sunday, return the original date
+    else {
+        return inputDate;
+    }
+}
 }

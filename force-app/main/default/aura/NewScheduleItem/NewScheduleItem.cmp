@@ -1,8 +1,7 @@
 <aura:component controller="NewScheduleItemController" implements="force:appHostable,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes,lightning:actionOverride,force:hasRecordId,forceCommunity:availableForAllPageTypes" access='global'>
      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-     <!-- <aura:attribute name="Schedules" type="list" />  -->
      <aura:attribute name="Schedules" type="List" />
-    <aura:attribute name="scheduleOptions" type="List" />
+     <aura:attribute name="scheduleOptions" type="List" />
      <aura:attribute name="Spinner" type="boolean" default="false"/>
      <aura:attribute name="disablePro" type="boolean" default="false"/>
      <aura:attribute name="disableCon" type="boolean" default="false"/>
@@ -36,7 +35,7 @@
      </aura:html>
 
      
-     <ltng:require styles="{!$Resource.MOdalPreviewWidth52}"/>
+     <ltng:require styles="{!$Resource.MOdalPreviewWidth72}"/>
      <header class="slds-modal__header">
         <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Create Schedule Item</h2>
      </header>   
@@ -45,12 +44,12 @@
             <div class="slds-form-element__group" >
 
                 <div class="slds-form-element__row">
-                    <div class="slds-form-element slds-size_1-of-2">
+                    <div class="slds-form-element slds-size_1-of-2 slds-p-around_small">
                         <div class="slds-form-element__control">
                             <lightning:input type="text" label="Task Name" aura:id="taskName" name="Task Name" value="{!v.TaskName}" required="true"/>
                         </div>
                     </div>
-                    <div class="slds-form-element slds-size_1-of-2">
+                    <div class="slds-form-element slds-size_1-of-2 slds-p-around_small">
                         <div class="slds-form-element__control rkclass1">
                             <label>Project</label>
                             <lightning:recordEditForm objectApiName="WorkOrder">
@@ -61,27 +60,21 @@
                 </div>
 
                 <div class="slds-form-element__row">
-                    <div class="slds-form-element slds-size_1-of-2">
+                    <div class="slds-form-element slds-size_1-of-2 slds-p-around_small">
                         <div class="slds-form-element__control">
-                            <!-- <lightning:select name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}">
-                                <option text="None" value="None" /> 
-                                <aura:iteration items="{!v.Schedules}" var="sch">
-                                    <option text="{!sch.getSchedulesList.Name +' - '+sch.getSchedulesList.buildertek__Description__c}" value="{!sch.getSchedulesList.Id}" />
-                                </aura:iteration>
-                            </lightning:select> -->
                             <lightning:combobox name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" 
-                placeholder="Select a schedule" options="{!v.scheduleOptions}" 
-                onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}" />
+                                placeholder="Select a schedule" options="{!v.scheduleOptions}" 
+                                onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}" />
                         </div>
                     </div>
 
-                    <div class="slds-form-element slds-size_1-of-2">
+                    <div class="slds-form-element slds-size_1-of-2 slds-p-around_small">
                         <div class="slds-form-element__control">
                             <label >Schedule Item</label>
 
                             <lightning:input autocomplete="off" type="search" placeholder="Search Schedule Item" variant="label-hidden" value="{!v.selectedPredecessor}" onfocus="{!c.serachPredecessor}"  onkeyup="{!c.onkeyUp}" onblur="{!c.hideList}" />
                             <aura:if isTrue="{!v.diplayPredecessorlist}" >
-                                <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox" style="height:100px;position: fixed;width: 47%;margin-left: 24.5%;" onmousedown="{!c.preventHide}">
+                                <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox" style="height:100px;position: fixed;width: 46.6%;margin-left: 24.2%;" onmousedown="{!c.preventHide}">
                                     <ul class="slds-listbox slds-listbox_vertical" role="presentation">
                                         <aura:iteration items="{!v.predecessorList}" var="result">
                                             <li role="presentation" class="slds-listbox__item" data-value="{!result.value}" onclick="{!c.clickPredecessorValue}" data-id="{!result.key}">
@@ -112,13 +105,13 @@
 
 
                 <div class="slds-form-element__row">
-                    <div class="slds-form-element slds-size_1-of-2">
+                    <div class="slds-form-element slds-size_1-of-2 slds-p-around_small">
                         <div class="slds-form-element__control">
                             <lightning:input type="date" label="Start Date" aura:id="startDate" name="Start Date" value="{!v.startTime}" required="true"/> 
                         </div>
                     </div>
 
-                    <div class="slds-form-element slds-size_1-of-2">
+                    <div class="slds-form-element slds-size_1-of-2 slds-p-around_small">
                         <div class="slds-form-element__control rkclass1">
                             <label >Resource</label>
                                 <lightning:recordEditForm objectApiName="WorkOrder">
@@ -142,7 +135,7 @@
                         title="Save"
                         onclick="{! c.save }"/>
     </footer>
-    <!-- </aura:if>-->
+    
     <aura:if isTrue="{!v.Spinner}">
         <div aura:id="spinnerId" class="slds-spinner_container">
            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
