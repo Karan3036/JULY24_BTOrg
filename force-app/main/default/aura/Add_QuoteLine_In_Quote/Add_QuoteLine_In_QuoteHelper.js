@@ -136,39 +136,6 @@
             component.set('v.Spinner', false);
         }
     }, 
-    changeProductFamilyHelper : function(component, event, helper , priceBookId, productFamilyId){
-        console.log('method is calllll');
-        component.set('v.Spinner', true);
-        console.log('selectedPricebook====>',priceBookId);
-        console.log('selectedProductFamily=====>',productFamilyId);
-        let sProductFamily = component.get("v.sProductFamily");
-        console.log('sProductFamily=====>',sProductFamily);
-        if (priceBookId != '' && productFamilyId != '') {
-            
-            var action = component.get("c.getProductsthroughProductFamily");
-            action.setParams({
-                "pbookId": priceBookId ,
-                "pfId": productFamilyId
-            });
-            action.setCallback(this, function(response) {
-                var rows = response.getReturnValue();
-                if (response.getState() == "SUCCESS" && rows != null) {
-                    console.log('quoteLineList ==> ',{rows});
-                    component.set("v.quoteLineList", rows);
-                    component.set("v.tableDataList", rows);
-                }
-                component.set('v.Spinner', false);
-            });
-            $A.enqueueAction(action);
-        } else {
-            component.set("v.quoteLineList", []);
-            component.set("v.tableDataList", []);
-            if(component.get('v.selectedPricebookId')!= undefined){
-                var selectedPricebook = component.find("selectedPricebook").get("v.value");
-                helper.changePricebookHelper(component, event, helper , selectedPricebook);
-            }
-        }
-    },
 
     searchInDatatableHelper : function(component, event, helper){
 
@@ -202,7 +169,6 @@
                     if (familyMatch && nameMatch) {
                         tableDataList.push(element);
                     }
-
                 });
             } else if (sProductFamily != undefined && sProductFamily != '') {
                 console.log('in2');
@@ -255,106 +221,6 @@
                 component.find("selectAll").set("v.checked", false);
             }
             component.set("v.tableDataList", tableDataList);
-        }
-    },
-    searchDatatableHelper : function(component, event, helper){
-
-        if (component.get("v.selectedPricebookId") != '') {
-            let sProductFamily = component.get("v.sProductFamily");
-            let sProductName = component.get("v.sProductName");
-            let sPriceBook = component.get("v.selectedPricebookId");
-            var quoteLineList = component.get("v.quoteLineList");
-            var tableDataList = [];
-            if (sProductName != '' && sProductFamily == '') {
-                let searchTerms = sProductName.toLowerCase().split(' ');
-
-                quoteLineList.forEach(element => {
-                    let nameLowerCase = element.Name.toLowerCase();
-                    let allSearchTermsFound = true;
-                    
-                    // Check if all search terms are present in the Name field
-                    for (let term of searchTerms) {
-                        if (!nameLowerCase.includes(term)) {
-                            allSearchTermsFound = false;
-                            break;
-                        }
-                    }
-
-                    // If all search terms are found, add the element to the tableDataList
-                    if (allSearchTermsFound) {
-                        tableDataList.push(element);
-                    }
-                });
-                if (tableDataList.length > 0) {
-                    component.set("v.tableDataList", tableDataList);
-                }
-                else {
-                    var action = component.get("c.getProductsbyName");
-                    action.setParams({
-                        "pbookId": sPriceBook ,
-                        "pName": sProductName
-                    });
-                    action.setCallback(this, function(response) {
-                        var rows = response.getReturnValue();
-                        if (response.getState() == "SUCCESS" && rows != null) {
-                            console.log('quoteLineList ==> ',{rows});
-                            component.set("v.quoteLineList", rows);
-                            component.set("v.tableDataList", rows);
-                        }
-                    });
-                    $A.enqueueAction(action);
-
-                }
-                
-            }
-            else if (sProductName != '' && sProductFamily != '') {
-                let familySearchTerms = sProductFamily.toLowerCase().split(' ');
-                let nameSearchTerms = sProductName.toLowerCase().split(' ');
-
-                quoteLineList.forEach(element => {
-                    let familyLowerCase = element.Family ? element.Family.toLowerCase() : '';
-                    let nameLowerCase = element.Name.toLowerCase();
-
-                    let familyMatch = familySearchTerms.every(term => familyLowerCase.includes(term));
-                    let nameMatch = nameSearchTerms.every(term => nameLowerCase.includes(term));
-
-                    // If both family and name match, add the element to the tableDataList
-                    if (familyMatch && nameMatch) {
-                        tableDataList.push(element);
-                    }
-
-                });
-                if (tableDataList.length > 0) {
-                    component.set("v.tableDataList", tableDataList);
-                }
-                else{
-                    var action = component.get("c.getProductsbyNameandFamily");
-                    action.setParams({
-                        "pbookId": sPriceBook ,
-                        "pName": sProductName ,
-                        "pfId": sProductFamily
-                    });
-                    action.setCallback(this, function(response) {
-                        var rows = response.getReturnValue();
-                        if (response.getState() == "SUCCESS" && rows != null) {
-                            console.log('quoteLineList ==> ',{rows});
-                            component.set("v.quoteLineList", rows);
-                            component.set("v.tableDataList", rows);
-                        }
-                    });
-                    $A.enqueueAction(action);
-                }
-                
-            }
-            else if (sProductName == '' && sProductFamily != '') {
-                var selectedPricebook = component.find("selectedPricebook").get("v.value");
-                var selectedProductFamily = component.find("selectedProductFamily").get("v.value");
-                helper.changeProductFamilyHelper(component, event, helper , selectedPricebook, selectedProductFamily);
-            }
-            else if (sProductName == '' && sProductFamily == '') {
-                var selectedPricebook = component.find("selectedPricebook").get("v.value");
-                helper.changePricebookHelper(component, event, helper , selectedPricebook);
-            }
         }
     }, 
 
@@ -433,8 +299,20 @@
             
         });
         console.log('selectedProducts => ',{selectedProducts});
-        var truelist = component.get("v.trueCheckBoxList");
-        component.set("v.selectedProducts", truelist);
-     });
-        console.log('selectedProducts => ',{selectedProducts});
         component.set("v.selectedProducts", selectedProducts);
+        if (selectedProducts.length > 0) {
+            component.set("v.selecteProducts", false);
+        }else{
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                title: 'Error',
+                message: 'Please select at least one Product.',
+                duration: ' 5000',
+                key: 'info_alt',
+                type: 'error',
+                mode: 'pester'
+            });
+            toastEvent.fire();
+        }
+    },
+})

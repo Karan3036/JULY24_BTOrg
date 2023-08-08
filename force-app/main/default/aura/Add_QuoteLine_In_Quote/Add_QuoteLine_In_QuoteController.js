@@ -13,14 +13,9 @@
      var selectedPricebook = component.find("selectedPricebook").get("v.value");
        helper.changePricebookHelper(component, event, helper , selectedPricebook);
    },
-   changeProductFamily: function(component, event, helper) {
-    var selectedPricebook = component.find("selectedPricebook").get("v.value");
-    var selectedProductFamily = component.find("selectedProductFamily").get("v.value");
-      helper.changeProductFamilyHelper(component, event, helper , selectedPricebook, selectedProductFamily);
-  },
 
    searchInDatatable: function(component, event, helper){
-       helper.searchDatatableHelper(component, event, helper);
+       helper.searchInDatatableHelper(component, event, helper);
    }, 
 
    goToEditModal: function(component, event, helper) {
@@ -36,7 +31,7 @@
            }
        });
        
-    //    component.set("v.sProductFamily", '');
+       component.set("v.sProductFamily", '');
        component.set("v.sProductName", '');
 
        component.set("v.tableDataList", quoteLineList);
@@ -63,50 +58,11 @@
            }
        });
        component.find("selectAll").set("v.checked", checkAll);
-       var quoteLineList = component.get("v.quoteLineList");
-        console.log('quoteLineList => ',{quoteLineList});
-        var selectedProducts = [];
-        var phaseValue= component.get('v.getPhase');
-        //find No Grouping from quoteLineGroupOptions and store it's Id in noGroupingId
-        var noGroupingId = '';
-        var quoteLineGroupOptions = component.get("v.quoteLineGroupOptions");
-        //iterate through quoteLineGroupOptions and find first No Grouping
-        quoteLineGroupOptions.forEach(element => {
-            if (element.key == 'No Grouping') {
-                noGroupingId = element.value;
-            }
-        });
-        quoteLineList.forEach(element => {
-            console.log(phaseValue);
-            console.log(phaseValue!= undefined);
-            if(element.Selected){
-                selectedProducts.push({
-                    'Id':element.Id,
-                    'Name': element.Name,
-                    'buildertek__Unit_Price__c': element.UnitPrice,
-                    'buildertek__Grouping__c': element.Phase ? element.Phase : noGroupingId,
-                    'buildertek__Quantity__c': '1',
-                    'buildertek__Additional_Discount__c': element.Discount ? element.Discount : 0,
-                    'buildertek__Unit_Cost__c': element.UnitCost ? element.UnitCost : element.UnitPrice,
-                    'buildertek__Markup__c': element.MarkUp ? element.MarkUp : 0,
-                    'buildertek__Product__c': element.Id,
-                    'buildertek__Size__c': element.Size,
-                    'buildertek__Description__c': element.Description ? element.Description : element.Name,
-                    'buildertek__Product_Family__c': element.Family ? element.Family : 'No Grouping',
-                    'buildertek__UOM__c': element.QuantityUnitOfMeasure     //----
+   },
 
-                })
-                console.log('Quantity Unit Of Measure => ', element.QuantityUnitOfMeasure);
-            }
-            
-        });
-        console.log('selectedProducts => ',{selectedProducts});
-        var try001 = component.set("v.trueCheckBoxList",selectedProducts);
-        console.log('try001===>',{try001});
-
-
-", checkAll);
-   console.log('saveQuoteLine');
+   saveQuoteLine : function(component, event, helper){
+       component.set("v.Spinner", true);
+       console.log('saveQuoteLine');
        var listQlines = component.get("v.selectedProducts");
        var flag=false;
        listQlines.forEach(function(elem){
