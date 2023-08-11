@@ -72,7 +72,8 @@
         $A.enqueueAction(actions);
     },
 
-    getFieldSetforTakeOffLines: function (component, event, helper , parentRecordId) {
+    getFieldSetforTakeOffLines: function (component, event, helper , parentid) {
+    
 		var action5 = component.get("c.getFieldSet");
         action5.setParams({
             objectName: 'buildertek__Project_Takeoff_Lines__c',
@@ -83,12 +84,7 @@
                 component.set("v.Spinner", false);
                 var listOfFields0 = JSON.parse(response.getReturnValue());
                 console.log('listOfFieldsofPOLine-->>',{listOfFields0});
-                component.set("v.listOfFields0", listOfFields0);
-
-                if(parentRecordId != undefined && parentRecordId != ''){
-                    // const parentRecordId = 'home';
-                    parentRecordId != 'home' ?component.find('projectTakeOff').set("v.value", parentRecordId): " ";
-                }
+                component.set("v.listOfFields0", listOfFields0);                
             }
         });
         $A.enqueueAction(action5);

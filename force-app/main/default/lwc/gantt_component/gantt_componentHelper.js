@@ -7,7 +7,7 @@ function formatApexDatatoJSData(scheduleData, scheduleItemsData, scheduleItemsDa
     var taskData = scheduleItemsData;
     var taskDependencyData = [];
     var resourceRowData = [];
-    var resourceRowIdList = []
+    var resourceRowIdList = [];
     var assignmentRowData= [];
     var scheduleItemIdsList = [];
     var rows = [];
@@ -501,7 +501,7 @@ function convertJSONtoApexData(data, taskData, dependenciesData, resourceData) {
     let scheduleObj = {};
     var rowData = [];
     const phasedatamap = new Map();
-    // let milestonedataList = []; 
+    // let milestonedataList = [];
     console.log('data !-->', {data})
     if (data) {
         data.forEach(element => {

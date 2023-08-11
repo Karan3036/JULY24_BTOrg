@@ -1,5 +1,7 @@
 <aura:component controller="OverrideNewProjectTakeoffLineController" implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global">
     <aura:attribute name="parentRecordId" type="String" />
+    <aura:attribute name="parentTakeOffId" type="String" />
+
     <aura:attribute name="isSaveNew" type="boolean" default="false"/>
     <aura:attribute name="isOpen" type="boolean" default="false" />
     <aura:attribute name="Spinner" type="boolean" default="false" />
@@ -65,7 +67,7 @@
                                         <aura:if  isTrue="{!field.name !='buildertek__Project_Takeoff__c'}">
                                             <lightning:inputField fieldName="{!field.name}" />
                                             <aura:set attribute="else">
-                                                <lightning:inputField fieldName="{!field.name}" aura:id="projectTakeOff" />
+                                                <lightning:inputField fieldName="{!field.name}" value = "{!v.parentTakeOffId}" aura:id="projectTakeOff" />
                                             </aura:set>
                                             
                                         </aura:if>

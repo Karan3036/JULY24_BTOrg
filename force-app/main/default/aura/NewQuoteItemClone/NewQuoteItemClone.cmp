@@ -217,7 +217,50 @@
     <c:BT_Spinner />
     <aura:attribute name="parentValue" type="String" />
     <!-- <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> -->
+    <aura:HTML tag="style">
+        .slds-tabs_card{
+            min-height: fit-content !important; 
+            height: fit-content !important;
+        }
 
+        .slds-tabs_default{
+            min-height: fit-content !important; 
+            height: fit-content;
+        }
+        <!-- .slds-tabs_default{
+            min-height: 67vh; height: 67vh;
+        }
+        @media only screen and (max-height: 1080px) and (min-height: 990px){
+            .slds-tabs_default{
+                min-height: 67vh; height: 67vh;
+            }
+        }
+        @media only screen and (max-height: 990px) and (min-height: 900px){
+            .slds-tabs_default{
+                min-height: 71vh; height: 71vh;
+            }
+        }
+        @media only screen and (max-height: 900px) and (min-height: 810px){
+            .slds-tabs_default{
+                min-height: 75vh; height: 75vh;
+            }
+        }
+        @media only screen and (max-height: 810px) and (min-height: 720px){
+            .slds-tabs_default{
+                min-height: 80vh; height: 80vh;
+            }
+        }
+        @media only screen and (max-height: 720px) and (min-height: 630px){
+            .slds-tabs_default{
+                min-height: 84vh; height: 84vh;
+            }
+        }
+        @media only screen and (max-height: 630px) and (min-height: 540px){
+            .slds-tabs_default{
+                min-height: 89vh; height: 89vh;
+            }
+        } -->
+    </aura:HTML>
 
 
 
@@ -235,7 +278,7 @@
             </div>
     </aura:if>
 
-        <div style="margin: 0px 0px;">
+        <div style="margin: 0px 0px; min-height: 60vh; height: 60vh;">
             <div style="display:block">
                 <aura:if isTrue="{!v.isproject}">
                     <!-- <a href="{!'/'+v.quoteId}" onclick="{!c.closetab}">{!v.quoteName}</a> -->
@@ -657,7 +700,7 @@
             <div aura:id="quoteItem" />
             <!-- <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:50vh;padding:0px !important;"> -->
             <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:54vh;padding:0px !important;" aura:id="av">
-                <div>
+                <div style="min-height: 60vh; height: 61vh;">
                     <aura:if isTrue="{!!v.removeSingleQuoteLineOption}">
                         <div id='Tablebox' style="margin-top: -5px;padding-inline: 10px;padding-block: 0px;">
                             <br />
@@ -745,6 +788,7 @@
                                                         width:100% !important;
                                                     }
                                                 </aura:html>
+                                                <label class="slds-form-element__label">{!v.label}</label>
                                                 <c:BT_LightningLookup objectAPIName="Product2"
                                                     IconName="standard:product"
                                                     selectedRecord="{!v.selectedLookUpRecord}" aura:id="productId"
@@ -825,7 +869,7 @@
                     </aura:if>
 
                     <aura:if isTrue="{!or(or(or(v.isDuplicate,v.isMassDuplicate),v.isOpen),v.isQuoteRecChange)}">
-                        <div class="slds-m-around_xx-large">
+                        <!-- <div class="slds-m-around_xx-large"> -->
                             <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                                 <div class="slds-modal__container">
@@ -885,7 +929,7 @@
                                 </div>
                             </section>
                             <div class="slds-backdrop slds-backdrop_open"></div>
-                        </div>
+                        <!-- </div> -->
                     </aura:if>
 
                     <aura:if isTrue="{!v.isQuotelinedelete}">
@@ -1412,7 +1456,7 @@
                             </div>
                             <!--<br />-->
                             <aura:if isTrue="{!v.total > 50}">
-                                <div class="slds-align_absolute-center" style="background-color: white;">
+                                <div class="slds-align_absolute-center" style="background-color: white; padding-block: 5px">
                                     <lightning:button disabled="{!v.page == 1}" variant="brand" label="Previous"
                                         onclick="{! c.navigate }" />
                                     <lightning:button disabled="{!v.page == v.pages}" aura:id="previousPage"

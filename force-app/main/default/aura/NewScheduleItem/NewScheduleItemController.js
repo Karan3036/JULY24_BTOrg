@@ -6,9 +6,11 @@
     getschdule : function(component, event, helper) {
         var proId = component.get("v.selectedProjectId");
         console.log('proId====>',proId);
-	    if (proId != undefined) {
+	    if (proId != undefined && proId != '' && proId != null) {
             helper.getSchedules(component, event, helper);  
         }else {
+            var scheduleOptions = [];
+            component.set("v.scheduleOptions", scheduleOptions);
             var toastEvent = $A.get("e.force:showToast"); 
             toastEvent.setParams({
                 "title" : "Error",

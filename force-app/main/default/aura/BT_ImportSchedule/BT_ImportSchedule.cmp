@@ -3,22 +3,22 @@
     <aura:attribute name="Spinner" type="Boolean" />
     <aura:attribute name="ParentId" type="String" />
     <!-- Attribute Declration For Pagination -->
-    
+
     <aura:attribute name="PaginationList" type="Object"/>
     <aura:attribute name="startPage" type="Integer" />
     <aura:attribute name="endPage" type="Integer"/>
     <aura:attribute name="totalRecords" type="Integer"/>
     <aura:attribute name="pageSize" type="Integer" default="10"/>
-    
+
     <!-- Attribute Declration For Pagination End-->
-    
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
         <div class="slds slds-scope">
     		<table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
     		    <thead>
     				<tr class="slds-text-title_caps">
     					<th scope="col" style="background-color:rgba(27, 82, 151, 1.0); color:white; border-top-left-radius:5px;vertical-align: top;line-height: 2;width:10px">
-    				        <ui:inputCheckbox aura:id="checkContractors" change="{!c.selectAll}" />		
+    				        <ui:inputCheckbox aura:id="checkContractors" change="{!c.selectAll}" />
     					</th>
     					<th  style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
     						Title
@@ -27,13 +27,13 @@
     						Project
     					</th>
     					<th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
-    					   Description 
+    					   Description
     					</th>
     					<th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
-    					   Start Date 
+    					   Start Date
     					</th>
     					<th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
-    					   Total Working(Days) 
+    					   Total Working(Days)
     					</th>
     					<th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
     					   End Date
@@ -49,27 +49,27 @@
     			            <td style="width:10px;">
     			                <ui:inputCheckbox aura:id="checkContractor" value="{rec.scheduleCheck}" text="{!rec.scheduleRecord.Id}" change="{!c.handleCheck}" />
     			            <!--    <lightning:input aura:id="quoteselection" type="checkbox" value="{!rec.quoteCheck}" text="{!rec.quoteRecord.Id}" onclick="{!c.uncheckAll}" style="cursor: pointer !important;"/>-->
-    			            </td> 
-    			            <td role="gridcell">
-    			                <ui:outputText value="{!rec.scheduleRecord.Name}" />  
     			            </td>
     			            <td role="gridcell">
-    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Project__r.Name}" />  
-    			            </td>
-    			            <td>
-    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Description__c}" />    
-    			            </td>
-    			            <td>
-    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Start_Date__c}" />    
-    			            </td>
-    			            <td>
-    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Total_Duration__c}" />    
-    			            </td>
-    			            <td>
-    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__End_Date__c}" />    
+    			                <ui:outputText value="{!rec.scheduleRecord.Name}" />
     			            </td>
     			            <td role="gridcell">
-    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Type__c}" />  
+    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Project__r.Name}" />
+    			            </td>
+    			            <td>
+    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Description__c}" />
+    			            </td>
+    			            <td>
+    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Start_Date__c}" />
+    			            </td>
+    			            <td>
+    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Total_Duration__c}" />
+    			            </td>
+    			            <td>
+    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__End_Date__c}" />
+    			            </td>
+    			            <td role="gridcell">
+    			                <ui:outputText value="{!rec.scheduleRecord.buildertek__Type__c}" />
     			            </td>
     			        </tr>
     			    </aura:iteration>
@@ -78,17 +78,17 @@
     		<br/>
     		<aura:if isTrue="{!v.PaginationList.length > 10}">
     		    <lightning:buttonGroup >
-                    <lightning:button label="Previous" disabled="{!v.startPage == 0}"  
+                    <lightning:button label="Previous" disabled="{!v.startPage == 0}"
                                       onclick="{!c.previous}" variant="brand"
                                       iconName='utility:back'/>
                     &nbsp; &nbsp; &nbsp;
-                    <lightning:button label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                    <lightning:button label="Next" disabled="{!v.endPage >= v.totalRecords}"
                                       onclick="{!c.next}" variant="brand"
                                       iconName='utility:forward' iconPosition='right'/>
-                </lightning:buttonGroup>    
+                </lightning:buttonGroup>
     		</aura:if>
-            
-        </div> 
+
+        </div>
         <aura:if isTrue="{!v.Spinner}">
             <div aura:id="spinnerId" class="slds-spinner_container">
                <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">

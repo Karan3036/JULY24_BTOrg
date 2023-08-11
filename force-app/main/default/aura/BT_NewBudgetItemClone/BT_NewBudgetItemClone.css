@@ -246,10 +246,11 @@
         overflow: auto;
     }
   } */
-  /* .THIS .divconts1{
-    max-height: 62vh;
+  .THIS .divconts1{
+    max-height: 60vh;
+    height : 59vh;
     overflow: auto;
-} */
+}
 .THIS .divconts2{
     max-height: 49vh;
     overflow: auto;

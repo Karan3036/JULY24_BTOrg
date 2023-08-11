@@ -2,6 +2,26 @@
     doInit: function (component, event, helper) {
         component.set("v.isOpen", true);
         component.set("v.Spinner", true);
+        // var value = helper.getParameterByName(component, event, 'inContextOfRef');
+        // var context = '';
+        // var parentId = '';
+        // component.set("v.parentRecordId", parentId);
+        // if (value != null) {
+        //     context = JSON.parse(window.atob(value));
+        //     parentId = context.attributes.recordId;
+        //     component.set("v.parentRecordId", parentId);
+        // } else {
+        //     var relatedList = window.location.pathname;
+        //     var stringList = relatedList.split("/");
+        //     parentId = stringList[4];
+        //     if (parentId == 'related') {
+        //         var stringList = relatedList.split("/");
+        //         parentId = stringList[3];
+        //         component.set("v.parentRecordId", parentId);
+        //     }
+        // }
+        // console.log('parentUpdated-------'+ component.get("v.parentRecordId"));
+        // console.log({parentId});
 
         var value = helper.getParameterByName(component, event, 'inContextOfRef');
         var context = '';
@@ -19,11 +39,27 @@
                 var stringList = relatedList.split("/");
                 parentRecordId = stringList[3];
             }
+
             component.set("v.parentRecordId", parentRecordId);
         }
-        console.log('parent-------'+ parentRecordId);
+        if(parentRecordId != null && parentRecordId != ''){
+            var action = component.get("c.getobjectName");
+            action.setParams({
+                recordId: parentRecordId,
+            });
+            action.setCallback(this, function (response) {
+                if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
+                    var objName = response.getReturnValue();
+                    if(objName == 'buildertek__Project_Takeoff__c'){
+                        component.set("v.parentTakeOffId", parentRecordId);
+                    }
+                } 
+            });
+            $A.enqueueAction(action);
+        }
+
         helper.fetchpricebooks(component, event, helper);
-        helper.getFieldSetforTakeOffLines(component, event, helper , parentRecordId);
+        helper.getFieldSetforTakeOffLines(component, event, helper);
     },
 
     handleComponentEvent: function (component, event, helper) {

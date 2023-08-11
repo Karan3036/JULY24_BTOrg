@@ -1,6 +1,5 @@
 <aura:component controller="NewScheduleItemController" implements="force:appHostable,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes,lightning:actionOverride,force:hasRecordId,forceCommunity:availableForAllPageTypes" access='global'>
      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-     <aura:attribute name="Schedules" type="List" />
      <aura:attribute name="scheduleOptions" type="List" />
      <aura:attribute name="Spinner" type="boolean" default="false"/>
      <aura:attribute name="disablePro" type="boolean" default="false"/>
@@ -63,8 +62,8 @@
                     <div class="slds-form-element slds-size_1-of-2 slds-p-around_small">
                         <div class="slds-form-element__control">
                             <lightning:combobox name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" 
-                                placeholder="Select a schedule" options="{!v.scheduleOptions}" 
-                                onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}" />
+                placeholder="Select a schedule" options="{!v.scheduleOptions}" 
+                onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}" />
                         </div>
                     </div>
 

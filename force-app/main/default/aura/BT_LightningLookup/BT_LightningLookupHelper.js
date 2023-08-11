@@ -29,6 +29,7 @@
             var state = response.getState();
             if (state === "SUCCESS") {
                 var storeResponse = response.getReturnValue();
+                console.log({storeResponse});
               // if storeResponse size is equal 0 ,display No Result Found... message on screen.                }
                 if (storeResponse.length == 0) {
                     component.set("v.Message", 'No Result Found...');
