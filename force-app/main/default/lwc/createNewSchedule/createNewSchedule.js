@@ -4,6 +4,7 @@ import searchUsers from '@salesforce/apex/bryntumGanttController.searchUsers';
 import fetchScheduleList from '@salesforce/apex/bryntumGanttController.fetchScheduleList';
 import getScheduleItemList from '@salesforce/apex/bryntumGanttController.getScheduleItemList';
 import createNewSchedule from '@salesforce/apex/bryntumGanttController.createNewSchedule';
+import getProjectName from '@salesforce/apex/bryntumGanttController.getProjectName';
 import { NavigationMixin } from 'lightning/navigation';
 
 export default class CreateNewSchedule extends NavigationMixin(LightningElement) {
@@ -26,10 +27,42 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
     @track description = '';
     @track type = 'Standard';
     @track url = '';
+    @track showProjectIcon = false;
+    @track showUserIcon = false;
+    @track isInputEnabledForProject = false;
+    @track isInputEnabledForUser = false;
 
     connectedCallback(event) {
         document.addEventListener('click', this.handleDocumentEvent.bind(this));
         this.getFields();
+        let name = 'inContextOfRef';
+        let url = window.location.href;
+        let regex = new RegExp("[?&]" + name + "(=1.([^&#]*)|&|#|$)");
+        let results = regex.exec(url);
+        console.log('results:', results);
+        let value = decodeURIComponent(results[2].replace(/\+/g, " "));
+        console.log('value:', value);
+        let context = JSON.parse(window.atob(value));
+        let parentRecordId = context.attributes.recordId;
+        if (parentRecordId) {
+            console.log(parentRecordId);
+            this.getProjectNameFromId(parentRecordId);
+        }
+
+    }
+
+    getProjectNameFromId(parentRecordId) {
+        console.log('parentRecordId:', parentRecordId);
+        getProjectName({ parentRecordId: parentRecordId })
+            .then((result) => {
+                this.searchProjectName = result;
+                this.isInputEnabledForProject = true;
+                this.showProjectIcon = true;
+                console.log('result:', result);
+            })
+            .catch((error) => {
+                console.log('error:', JSON.stringify(error));
+            });
     }
 
     handleProjectSearch(event) {
@@ -104,9 +137,13 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
 
         if (this.searchbarValue === 'project') {
             this.searchProjectName = selectedValue;
+            this.showProjectIcon = true;
+            this.isInputEnabledForProject = true;
             this.projectId = pId;
         } else {
             this.searchProjectManager = selectedValue;
+            this.isInputEnabledForUser = true;
+            this.showUserIcon = true;
             this.userId = pId;
         }
 
@@ -226,6 +263,20 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
 
     disconnectedCallback() {
         document.removeEventListener('click', this.handleDocumentEvent.bind(this));
+    }
+
+    clearInput(event) {
+        let clearInputForType = event.currentTarget.dataset.id;
+        console.log('clearInputForType',clearInputForType);
+        if(clearInputForType === 'project'){
+            this.searchProjectName = '';
+            this.showProjectIcon = false;
+            this.isInputEnabledForProject = false;    
+        } else{
+            this.searchProjectManager = '';
+            this.showUserIcon = false;
+            this.isInputEnabledForUser = false;
+        }
     }
 
 }

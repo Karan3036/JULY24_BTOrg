@@ -1,9 +1,11 @@
 .cuf-content {
     padding: 0 !important;
 }
+
 .slds-p-around_medium {
     padding: 0 !important;
 }
+
 .slds-modal__content {
     overflow-y: hidden !important;
     height: unset !important;
@@ -48,4 +50,25 @@
 .suggestions li:hover {
     background-color: #e8e8e8;
     border: 1px solid #ccc;
+}
+
+.iconContainer-left,
+.iconContainer-right {
+    position: absolute;
+    top: 56%;
+    transform: translateY(-50%);
+}
+
+.iconContainer-left {
+    left: 5px;
+    top: 36px;
+}
+
+.iconContainer-right {
+    right: 10px;
+    top: 36px;
+}
+
+.custom-input {
+    text-indent: 20px;
 }

@@ -37,8 +37,8 @@ public with sharing class NewGanttChartTaskTriggerHandler{
             for (String key : phaseDateMap.keySet()){
                 if (phaseMileStoneMap.containsKey(key)){
                     buildertek__Project_Task__c task = phaseMileStoneMap.get(key);
-                    task.buildertek__Start__c = phaseDateMap.get(key).addDays(1);
-                    task.buildertek__finish__c = phaseDateMap.get(key).addDays(1);
+                    task.buildertek__Start__c = phaseDateMap.get(key);
+                    task.buildertek__finish__c = phaseDateMap.get(key);
                     if (key != null && key != ''){
                         mileStoneList.add(task) ;
                     }
@@ -46,8 +46,8 @@ public with sharing class NewGanttChartTaskTriggerHandler{
                     buildertek__Project_Task__c task = new buildertek__Project_Task__c();
                     task.Name = 'Milestone Complete';
                     task.buildertek__Phase__c = key;
-                    task.buildertek__Start__c = phaseDateMap.get(key).addDays(1);
-                    task.buildertek__Finish__c = phaseDateMap.get(key).addDays(1);
+                    task.buildertek__Start__c = phaseDateMap.get(key);
+                    task.buildertek__Finish__c = phaseDateMap.get(key);
                     task.buildertek__Duration__c = 0;
                     task.buildertek__Schedule__c = scheduleId;
                     task.buildertek__Milestone__c = true;
@@ -59,7 +59,9 @@ public with sharing class NewGanttChartTaskTriggerHandler{
             }
             NewGanttChartTaskTriggerHandler.blnSkipTaskTrigger = true;
             ProjectTaskTriggerHandler.blnSkipTaskTrigger = true;
-            upsert mileStoneList;
+            if (mileStoneList.size() > 0) {
+                upsert mileStoneList;
+            }
             NewGanttChartTaskTriggerHandler.blnSkipTaskTrigger = false;
             ProjectTaskTriggerHandler.blnSkipTaskTrigger = false;
         }

@@ -42,6 +42,8 @@
     <lightning:overlayLibrary aura:id="overlayLib" />
     <lightning:workspaceAPI aura:id="workspace" />
     <ltng:require styles="{!$Resource.MOdalPreviewWidth72}" />
+    <aura:attribute name="selectedRecordMap" type="String" />
+
     <!-- <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}" /> -->
 
    
@@ -123,11 +125,6 @@
                                     </lightning:select>
                                 </td>
                                 <td >
-                                    <!-- <lightning:select name="{!index}" value="{!quoteLineWrapper.productId}" class="product-class pointer1" onchange="{!c.gotProduct}">
-                                        <aura:iteration items="{!quoteLineWrapper.productOptionList}" var="productOption">
-                                            <option name="{!quoteLineWrapper}" value="{!productOption.value}">{!productOption.label}</option>
-                                        </aura:iteration>
-                                    </lightning:select> -->
                                     <aura:html tag="style">
                                         .mainDiv{
                                             padding-top:0% !important;
@@ -140,14 +137,11 @@
                                         }
                                         .subDiv{
                                             width:100% !important;
-                                            margin-top:17px !important;
-
+                                            margin-top:0 !important;
                                         }
                                     </aura:html>
-                                    
-                                    <!-- parentId="{!quoteLineWrapper.pricebookEntryId != '' ? quoteLineWrapper.pricebookEntryId : 'No pricebook'}" -->
-                                   
-                                        <c:BT_LightningLookup objectAPIName="Product2"  IconName="standard:product" selectedRecord="{!quoteLineWrapper.selectedLookUpRecord}" aura:id="productId"   parentId="{!quoteLineWrapper.pricebookEntryId}" prodctfamly="{!quoteLineWrapper.productFamily != '' ? quoteLineWrapper.productFamily : 'All Families'}" />
+                                
+                                    <c:BT_LightningLookup objectAPIName="Product2"  IconName="standard:product" selectedRecord="{!quoteLineWrapper.selectedLookUpRecord}" aura:id="productId"   parentId="{!quoteLineWrapper.pricebookEntryId}" prodctfamly="{!quoteLineWrapper.productFamily != '' ? quoteLineWrapper.productFamily : 'All Families'}" />
                                     
                                 </td>
                                 <td>

@@ -376,42 +376,33 @@ public with sharing class MassUpdateQuote{
     }
 
     @AuraEnabled
-    public static List<PricebookEntry> getProductPrice(String productId, List<String> pricebookId){
-        // Boolean containsEmptyString = false;
-        // list<string> ProdIds = new list<string>();
-        // wrapperClass wrapper= new wrapperClass();
-        // wrapper.priceBookList= new List<PricebookEntry>();
-        // wrapper.productList= new List<Product2>();
+    public static wrapperClass getProductPrice(String productId, List<String> pricebookId){
+        Boolean containsEmptyString = false;
+        list<string> ProdIds = new list<string>();
+        wrapperClass wrapper= new wrapperClass();
+        wrapper.priceBookList= new List<PricebookEntry>();
+        wrapper.productList= new List<Product2>();
 
-        // for (String id : pricebookId) {
-        //     if (String.isBlank(id)) { // Check if the string is empty or only whitespace
-        //         containsEmptyString = true;
-        //         break; // Exit the loop if an empty string is found
-        //     }
-        // }
+        for (String id : pricebookId) {
+            if (String.isBlank(id)) { // Check if the string is empty or only whitespace
+                containsEmptyString = true;
+                break; // Exit the loop if an empty string is found
+            }
+        }
         
-        // if (containsEmptyString) {
-        //     System.debug('The pricebookId list contains empty strings.');
-        //     // PElist = [select id, Product2Id, product2.family from pricebookEntry];   
-        //     list<PricebookEntry> price = [select id, Product2Id, product2.family from pricebookEntry];
-        //     for (pricebookEntry PE :  price){
-        //         ProdIds.add(PE.Product2Id);
-        //     } 
-        //     wrapper.productList=[Select Id , Name From Product2 WHERE ID NOT IN:ProdIds LIMIT 800];
+        if (containsEmptyString) {
+            System.debug('The pricebookId list contains empty strings.');
+            list<PricebookEntry> price = [select id, Product2Id, product2.family from pricebookEntry];
+            for (pricebookEntry PE :  price){
+                ProdIds.add(PE.Product2Id);
+            } 
+            wrapper.productList=[Select Id , Name From Product2 WHERE ID NOT IN:ProdIds LIMIT 800];
 
-        // } else {
-            // wrapper.priceBookList = [select id, UnitPrice, pricebook2Id, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Product2Id, Product2.Name ,Product2.buildertek__Quote_Group__r.Name, Product2.QuantityUnitOfMeasure	
-            //         from PricebookEntry where product2Id = :productId and pricebook2Id =: pricebookId LIMIT 800];
-        // }
-        System.debug('########pricebook' + productId);
-        list<PricebookEntry> pList = new list<PricebookEntry>();
-
-        pList = [select id, UnitPrice, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Product2Id, Product2.buildertek__Quote_Group__r.Name, Product2.QuantityUnitOfMeasure	
-                 from PricebookEntry
-                 where product2Id = :productId and pricebook2Id =: pricebookId];
-
-        system.debug('====pList' + pList);
-        return pList;
+        } else {
+            wrapper.priceBookList = [select id, UnitPrice, pricebook2Id, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Product2Id, Product2.Name ,Product2.buildertek__Quote_Group__r.Name, Product2.QuantityUnitOfMeasure	
+                    FROM PricebookEntry where product2Id = :productId and pricebook2Id =: pricebookId LIMIT 800];
+        }
+        return wrapper;
 
     }
 

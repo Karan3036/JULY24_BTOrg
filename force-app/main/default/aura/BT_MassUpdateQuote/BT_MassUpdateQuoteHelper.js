@@ -611,11 +611,15 @@
             );
         }
     },
+
     getProductDetails: function(component, event, helper ,productId,  priceBookIdList) {
-        console.log({priceBookIdList});
+        $A.get("e.c:BT_SpinnerEvent").setParams({
+            "action": "SHOW"
+        }).fire(); 
+
+
         var quoteLineWrapperList = component.get("v.quoteLineWrapperList");
         console.log({quoteLineWrapperList});
-
         var action = component.get("c.getProductPrice");
         action.setParams({
             "productId": productId,
@@ -623,59 +627,68 @@
         });
         action.setCallback(this, function(response) {
             var result = response.getReturnValue();
-            console.log({result});
-            // var priceBookEntryWrap=result.priceBookList[0];
-            // var productWrap=result.productList[0];
-            // console.log(priceBookEntryWrap.Product2Id);
-            var priceBookEntryWrap=result[0];
+            var state= response.getState();
+            var priceBookEntryWrap=result.priceBookList[0];
+            var productWrap=result.productList;
+            $A.get("e.c:BT_SpinnerEvent").setParams({
+                "action": "HIDE"
+            }).fire();
+            if(state === 'SUCCESS'){
 
+                const setQuoteLineWrapper= (pricebookList , index)=>{
+                    quoteLineWrapperList[index].QuoteLine.buildertek__Unit_Cost__c=pricebookList.UnitPrice;
+                    quoteLineWrapperList[index].QuoteLine.buildertek__Markup__c=pricebookList.buildertek__Markup__c;
+                    quoteLineWrapperList[index].QuoteLine.Name=pricebookList.Product2.Name;
+                    // quoteLineWrapperList[index].QuoteLine.buildertek__Product__c=pricebookList.Product2Id;
+                    quoteLineWrapperList[index].GroupingOptions = component.get('v.GroupingOptions');
+                    quoteLineWrapperList[index].QuoteLine.buildertek__Quantity__c = 1;
 
-            var quoteLineWrapperList = component.get("v.quoteLineWrapperList");
-            if(productWrap.length > 0){
-                quoteLineWrapperList.forEach(function(value , index){
-                    if(value.pricebookEntryId===priceBookEntryWrap.Pricebook2Id && value.Product===priceBookEntryWrap.Product2Id){
-                        console.log(quoteLineWrapperList[index]);
-                        quoteLineWrapperList[index].QuoteLine.buildertek__Unit_Cost__c=priceBookEntryWrap.UnitPrice;
-                        quoteLineWrapperList[index].QuoteLine.buildertek__Markup__c=priceBookEntryWrap.buildertek__Markup__c;
-                        quoteLineWrapperList[index].QuoteLine.Name=priceBookEntryWrap.Product2.Name;
-                        // quoteLineWrapperList[index].QuoteLine.buildertek__Grouping__c=result[0].Product2.buildertek__Quote_Group__c;
-                        quoteLineWrapperList[index].QuoteLine.buildertek__Product__c=priceBookEntryWrap.Product2Id;
-                        quoteLineWrapperList[index].GroupingOptions = component.get('v.GroupingOptions');
-                        quoteLineWrapperList[index].QuoteLine.buildertek__Quantity__c = 1;
-    
-                        if(priceBookEntryWrap.Product2.buildertek__Quote_Group__c !=undefined && priceBookEntryWrap.Product2.buildertek__Quote_Group__c !='') {
-                            quoteLineWrapperList[index].QuoteLine.buildertek__Grouping__c=priceBookEntryWrap.Product2.buildertek__Quote_Group__c;
-                        }else {
-                            var GroupingOptions = component.get('v.GroupingOptions');
-                            for(var i = 0; i < GroupingOptions.length; i++) {
-                                if(GroupingOptions[i].Name == 'No Grouping') {
-                                    quoteLineWrapperList[index].QuoteLine.buildertek__Grouping__c = GroupingOptions[i].Id;
-                                }
+                    if(pricebookList.Product2.buildertek__Quote_Group__c !=undefined && pricebookList.Product2.buildertek__Quote_Group__c !='') {
+                        quoteLineWrapperList[index].QuoteLine.buildertek__Grouping__c=pricebookList.Product2.buildertek__Quote_Group__c;
+                    }else {
+                        var GroupingOptions = component.get('v.GroupingOptions');
+                        for(var i = 0; i < GroupingOptions.length; i++) {
+                            if(GroupingOptions[i].Name == 'No Grouping') {
+                                quoteLineWrapperList[index].QuoteLine.buildertek__Grouping__c = GroupingOptions[i].Id;
                             }
                         }
-    
-    
-    
                     }
-    
-                });
-            }else{
-                quoteLineWrapperList.forEach(function(value , index){
-                    if(value.Product===productWrap.Id){
-                        console.log('yes it is');
-                    }
+                    component.set("v.quoteLineWrapperList" , quoteLineWrapperList);
+                }
 
-                })
+                if(priceBookEntryWrap != undefined){
+                    quoteLineWrapperList.forEach(function(value , index){
+                        if(value.pricebookEntryId===priceBookEntryWrap.Pricebook2Id && value.Product===priceBookEntryWrap.Product2Id){
+                            setQuoteLineWrapper(priceBookEntryWrap , index);
+                        }
+                    })
+                }else{
+                    quoteLineWrapperList.forEach(function(value , index){
+                        // console.log({value});
+                        // console.log(productWrap);
+                        const productWrapper = productWrap.find(subvalue => subvalue.Id === value.Product);
+                        if (productWrapper) {
+                            const createObj = {
+                                UnitPrice: '',
+                                buildertek__Markup__c: '0',
+                                Product2: {
+                                    Name: productWrapper.Name
+                                },
+                                Product2Id: productWrapper.Id
+                            };
+                            // console.log({ createObj });
+                            setQuoteLineWrapper(createObj, index);
+                        }          
+                    })
+
+                }
             }
-
-            console.log({quoteLineWrapperList});
-            component.set("v.quoteLineWrapperList" , quoteLineWrapperList);
-            console.log(component.get("v.quoteLineWrapperList"));
-
-
             
         });
         $A.enqueueAction(action);
+      
+
+       
     },
 
 })

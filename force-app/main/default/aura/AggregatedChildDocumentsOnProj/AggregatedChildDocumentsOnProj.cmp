@@ -1,0 +1,68 @@
+<aura:component implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"  access="global" controller="AggregatedChildDocsController" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="objectNameList" type="List"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute type="sObject"  name="attachmentData"/>
+    <lightning:navigation aura:id="navService"/>
+
+
+
+
+    <lightning:accordion aura:id="accordion" onsectiontoggle="{!c.handleSectionToggle }">
+        <aura:iteration items="{!v.objectNameList}" var="objName">
+            <lightning:accordionSection name="{!objName}" label="{!objName}" >
+                <aura:set attribute="body">
+                    <div style="overflow: auto;">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                            <thead>
+                                <tr class="slds-line-height_reset slds-text-title_caps">
+                                    <th  class="slds-is-resizable" scope="col">
+                                        <div class="slds-truncate" title="Name">
+                                            No.
+                                        </div>
+                                    </th>
+                                    <th  class="slds-is-resizable" scope="col">
+                                        <div class="slds-truncate" title="Account Number">
+                                           Name
+                                        </div>
+                                    </th>
+                                    <th class="slds-is-resizable" scope="col">
+                                        <div class="slds-truncate" title="Industry">
+                                            Attachment
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.attachmentData}" var="attachment" indexVar="indx">
+                                    <tr class="slds-hint-parent">
+                                            
+                                        <th data-label="index" scope="row">
+                                            <div class="slds-truncate" title="index">
+                                                {!indx+1}
+                                            </div>
+                                        </th>
+                                        <td data-label="Name">
+                                            <div class="slds-truncate" title="{!attachment.parentName}"><a href="javascript:void(0);" onclick="{!c.openRecordPage}" data-record-id="{!attachment.parentId}">{!attachment.parentName} </a></div>
+                                            
+        
+                                        </td>
+                                        <td data-label="Attachment">
+                                            <a href="{!'/servlet/servlet.FileDownload?file='+attachment.fileId}" target="_blank">{!attachment.name}</a>
+                                        </td>
+                        
+                                            
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </div>
+                </aura:set>
+            </lightning:accordionSection>
+        </aura:iteration>
+    </lightning:accordion>
+
+    <c:BT_Spinner />
+
+
+</aura:component>

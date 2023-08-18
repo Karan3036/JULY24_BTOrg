@@ -428,20 +428,24 @@
     handleComponentEvent: function(component, event, helper) {
         console.log('handleComponentEvent');
         var selectedAccountGetFromEvent = event.getParam("recordByEvent");
-        var productId=selectedAccountGetFromEvent.Id;
-        console.log(selectedAccountGetFromEvent.Name);
+        // console.log(selectedAccountGetFromEvent);
+        component.set('v.selectedRecordMap' , selectedAccountGetFromEvent.Id);
+        // console.log(component.get('v.selectedRecordMap'));
 
+        var productId=component.get('v.selectedRecordMap');
         var priceBookIdList=[];
         var quoteLineWrapperList = component.get("v.quoteLineWrapperList");
+
         quoteLineWrapperList.forEach(function(value, index){
+            // console.log(value.selectedLookUpRecord);
+            // console.log(productId);
             if(value.selectedLookUpRecord.Id == productId){
                 quoteLineWrapperList[index].Product=productId;
+                quoteLineWrapperList[index].QuoteLine.buildertek__Product__c=productId;
                  priceBookIdList.push(value.pricebookEntryId);
-                // priceBookIdList=value.pricebookEntryId
-
             }
         })
-
+        console.log({productId});
 
         helper.getProductDetails(component, event, helper , productId, priceBookIdList);
     },
