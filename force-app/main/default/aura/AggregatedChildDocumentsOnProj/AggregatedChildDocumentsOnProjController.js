@@ -40,6 +40,7 @@
             var action = component.get("c.getAttachement");
             action.setParams({
                 "objectName": getSectionName,
+                "projectId": component.get('v.recordId'),
             });
             action.setCallback(this, function (response) {
                 console.log(response.getError());            
