@@ -173,7 +173,7 @@
             <header class="slds-modal__header">
                 <h2 class="slds-text-heading_medium slds-hyphenate">Edit Selected Quote Line Items</h2>
             </header>
-            <div class="slds-modal__content rkclasses" id="modal-content-id-1" style="max-height: 70vh;">
+            <div class="slds-modal__content" id="modal-content-id-1" style="max-height: 70vh;">
                 <div style="height: auto; min-height:150px;">
                     <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-label="Example default base table of Opportunities">
                         <thead>

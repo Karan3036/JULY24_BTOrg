@@ -63,21 +63,28 @@
 
     handleUploadFinished: function (component, event, helper) {
         var uploadedFiles = event.getParam("files");
-
         // Get the file name
         var contentDocId = [];
+        var filename = [];
 
         var existentList = component.get('v.uploadedFileId');
         console.log('ex lsit =>' + existentList.length);
         if (existentList.length > 0 ) {
             contentDocId = existentList;
         }
+        var existentLists = component.get('v.uploadedFilename');
+        console.log('ex lsit =>' + existentLists.length);
+        if (existentLists.length > 0 ) {
+            filename = existentLists;
+        }
 
         uploadedFiles.forEach(file => {
             console.log(file.name + ' Id ==>' + file.documentId);
             contentDocId.push(file.documentId);
+            filename.push(file.name);
         });
         component.set('v.uploadedFileId', contentDocId);
+        component.set('v.uploadedFilename', filename);
     
     },
 

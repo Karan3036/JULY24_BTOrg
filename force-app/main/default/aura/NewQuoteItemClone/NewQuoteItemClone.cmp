@@ -1185,7 +1185,7 @@
                                                                             onclick="{!c.doView}">
                                                                             {!tar.recordName}
                                                                         </a>
-                                                                        <button
+                                                                        <!-- <button
                                                                             class="slds-button slds-button_icon slds-cell-edit__button slds-m-left_x-small"
                                                                             tabindex="-1" title="">
                                                                             <span style="display:none;"
@@ -1199,7 +1199,7 @@
                                                                             </span>
                                                                             <span
                                                                                 class="slds-assistive-text">Edit</span>
-                                                                        </button>
+                                                                        </button> -->
                                                                     </div>
                                                                 </aura:set>
                                                             </aura:if>
