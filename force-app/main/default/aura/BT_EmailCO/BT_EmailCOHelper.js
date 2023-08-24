@@ -27,6 +27,7 @@
         console.log('folname',folname);
         dbAction.setParams({
             folderName: folname,
+            recordId: component.get("v.recordId")
         });
         dbAction.setCallback(this, function (response) {
             var state = response.getState();

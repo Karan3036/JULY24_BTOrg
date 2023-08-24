@@ -8,7 +8,6 @@
 
     <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg']" />
     <aura:attribute name="uploadedFileId" type="list" />
-    <aura:attribute name="uploadedFilename" type="list" />
     <aura:attribute name="record" type="Object" />
     <aura:attribute name="projectRecord" type="Object" />
     <aura:attribute name="Spinner" type="boolean" default="false" />
@@ -163,18 +162,22 @@
 
             <div class="file-upld">
                 <lightning:fileUpload label="Upload Files" name="checkInFileUploader" multiple="true"
+                                        accept="{!v.filetype}"
                                         onuploadfinished="{!c.handleUploadFinished}" />
             </div>
 
             <!-- File Preview section -->
-            <aura:if isTrue="{!not(empty(v.uploadedFilename))}">
-                <!-- <div class="file-div-tab">
-                    <div class="main-file-cmp"> -->
-                        <aura:iteration items="{!v.uploadedFilename}" var="cd" indexVar="indexNum">
-                            <div style="margin-left: 1rem; margin-top : 6px;">{!cd}</div>
+            <aura:if isTrue="{!not(empty(v.uploadedFileId))}">
+                <div class="file-div-tab">
+                    <div class="main-file-cmp">
+                        <aura:iteration items="{!v.uploadedFileId}" var="cd" indexVar="indexNum">
+                            <div class="slds-m-horizontal_x-small">
+                                <!-- <lightning:carouselImage src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + cd}" onclick="{!c.onImageClick}" id="{!cd}"/> -->
+                                <lightning:carouselImage src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + cd}" id="{!cd}"/>
+                            </div>
                         </aura:iteration>
-                    <!-- </div>
-                </div> -->
+                    </div>
+                </div>
             </aura:if>
 
         </lightning:recordEditForm>
