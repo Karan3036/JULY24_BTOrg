@@ -71,7 +71,7 @@
         var signName = component.get("v.SignatureName");
         var signatureaction = component.get("c.saveSign");
         var toastEvent = $A.get('e.force:showToast');
-        var vSplit = document.getElementById("divsign").toDataURL().split(',')[1];
+        var vSplit = component.find("divsign").getElement().toDataURL().split(',')[1];
 
         signatureaction.setParams({
             base64Data: encodeURIComponent(vSplit),
@@ -134,9 +134,11 @@
             var state = response.getState();
             var subject = 'Quote[ref:' + component.get("v.recordId") + ']';
             if (state === "SUCCESS") {
+                component.set("v.Spinner", false);
+
                 var result = response.getReturnValue();
                 if (result === 'Success') {
-                    component.set("v.Spinner", false);
+                    // component.set("v.Spinner", false);
                     $A.get("e.force:closeQuickAction").fire();
                     var toastEvent = $A.get("e.force:showToast");
                     toastEvent.setParams({
@@ -144,7 +146,9 @@
                         "type": 'success',
                         "message": "Email Sent Successfully"
                     });
+                    // component.set("v.Spinner", false);
                     toastEvent.fire();
+                    
                     // location.reload();
                 } else {
                     $A.get("e.force:closeQuickAction").fire();
@@ -152,7 +156,8 @@
                     toastEvent.setParams({
                         "type": 'error',
                         "message": result
-                    });
+                    });       
+                    component.set("v.Spinner", false);
                     toastEvent.fire();
                 }
                 $A.get('e.force:refreshView').fire();
@@ -161,7 +166,7 @@
 
         $A.enqueueAction(action);
 
-        component.set("v.Spinner", false);
+        // component.set("v.Spinner", false);
 
 
     },
@@ -173,8 +178,9 @@
         var signName = component.get("v.SignatureName");
         var signatureaction = component.get("c.saveSign");
         var toastEvent = $A.get('e.force:showToast');
-        var vSplit = document.getElementById("divsign").toDataURL().split(',')[1];
-
+        var vSplit = component.find("divsign").getElement().toDataURL().split(',')[1];
+        console.log("vsplit:---------------" , vSplit);
+debugger;
         signatureaction.setParams({
             base64Data: encodeURIComponent(vSplit),
             contentType: "image/png",
@@ -184,7 +190,8 @@
         signatureaction.setCallback(this, function(e) {
             if (e.getState() == 'SUCCESS') {
                 var result = e.getReturnValue();
-
+                console.log('result' , result);
+                debugger;
                 component.set("v.fileimageId", result);
                 setTimeout(
                     function() {

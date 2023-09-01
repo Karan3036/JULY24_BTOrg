@@ -1,5 +1,4 @@
-<aura:component
-    implements="flexipage:availableForAllPageTypes,force:hasSObjectName,force:appHostable,forceCommunity:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,lightning:actionOverride"
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasSObjectName,force:appHostable,forceCommunity:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,lightning:actionOverride"
     access="GLOBAL" controller="BT_NewGanttChartCls">
 
     <aura:attribute name="isOldGantt" type="Boolean" default="false" />
@@ -14,7 +13,7 @@
         </aura:set>
         <aura:set attribute="else">
             <!-- Code when is false -->
-            <c:createNewSchedule onfilterchange="{!c.handleFilterChange}" />
+            <c:createNewSchedule oncloseclicked="{!c.handleFilterChange}" />
         </aura:set>
     </aura:if>
 

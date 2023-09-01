@@ -314,8 +314,7 @@
                                                 <!-- <canvas id="demo" style="touch-action: none;margin: 0px;"></canvas>
                                                 <canvas id="emptycanvas" style="touch-action: none;margin: 0px;display:none"></canvas> -->
 
-                                                <!-- <div style="float:right;margin-right:18px;" onclick="clearsignaturePad()"> -->
-                                                    <div style="float:right;margin-right:18px;">
+                                                <div style="float:right;margin-right:18px;" onclick="clearsignaturePad()">
                                                     <a href="#" style="text-decoration:none;" id="btnClear">Clear Signature</a>
                                                 </div>
                                                 <script src="{!URLFOR($Resource.signatureForSF1,'signature/js/signature_pad.js')}"></script>
@@ -446,9 +445,6 @@
             var context = canvas.getContext("2d");
             var mouseButton = 0;
             var lastX = lastY = null;
-            var NewCanvas = document.getElementById("divsign");
-            console.log("NewCanvas:::>" , NewCanvas);
-            var images = [];
 
             setTimeout(function() {
                 context.fillStyle = '#fff';
@@ -531,50 +527,16 @@
                     document.getElementById('spinner').className -= ' slds-hide';
                     document.getElementById('spinner').className += ' slds-spinner_container';
                     //End:: BUIL-3389 -
+
                     var image = canvas.toDataURL().split(',')[1];
-                    images.push(image);
-                    if (NewCanvas != null) {
-                        var imageNew = NewCanvas.toDataURL().split(',')[1];
-                        if(!NewSignaturePad.isEmpty()){
-                            images.push(imageNew);
-                        }
-                    }
-                    var imageString;
-                    if (images.length>1) {
-                        imageString = images.join(',');
-                    } else{
-                        imageString = images[0];
-                    }
-                    
-                    console.log(typeof(imageString));
                     document.getElementById('signid').style.display = "none";
-                    callSaveSigMethod(imageString);
-                    console.log("IMAGES---->" , images);
+                    callSaveSigMethod(image);
 
                 }
                 }
-                // newSignBox();
                 return;
             }
-            // var NewCanvas = document.getElementById("divsign");
-            // console.log("NewCanvas:::>" , NewCanvas);
-            // function newSignBox() {
-            //     const x ='{!Result}';
-            //    if(x == 'Accepted'){
-            //       document.getElementById('acceptid').style.display = "block";
-            //     }else{
-            //     if (signaturePad.isEmpty()) {
-            //         document.getElementById('signid').style.display = "block";
-            //     } else {
-            //         //Start :: BUIL-3389 -
-            //         document.getElementById('spinner').className -= ' slds-hide';
-            //         document.getElementById('spinner').className += ' slds-spinner_container';
-            //         //End:: BUIL-3389 -
-            //     var image = NewCanvas.toDataURL().split(',')[1];
-            //     callSaveSigMethod1(image);
-            //     }
-            // }
-            // }
+
             function createAttachment() {
                 //Start :: BUIL-3389 -
                 document.getElementById('spinner').className += ' slds-hide';
@@ -589,9 +551,6 @@
 
 
         </script>
-        <!-- <apex:actionFunction name="callSaveSigMethod1" action="{!uploadSignature}" rerender="frmid">
-            <apex:param name="imageValue" assignTo="{!imageContent}" value="" />
-        </apex:actionFunction> -->
         <apex:actionFunction name="callSaveSigMethod" action="{!uploadSignature}" oncomplete="createAttachment()" rerender="frmid">
             <apex:param name="imageValue" assignTo="{!imageContent}" value="" />
         </apex:actionFunction>
@@ -637,12 +596,8 @@
                 }
                 //cansig();
             }
-            // function clearsignaturePad() {
-            //     location.reload();
-            // }
-            document.getElementById("btnClear").onclick = function(event) {
-                        event.preventDefault();
-                        window.signaturePad.clear();
+            function clearsignaturePad() {
+                location.reload();
             }
         </script>
     </apex:form>

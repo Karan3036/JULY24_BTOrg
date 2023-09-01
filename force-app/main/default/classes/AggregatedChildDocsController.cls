@@ -1,143 +1,95 @@
 public without sharing class AggregatedChildDocsController {
 
     @AuraEnabled
-    public static  List<String> getChildObectName(String projectId){
-        List<String> childObjeNameList = new  List<String>();
-        List<String> chilRelationName = new  List<String>();
-        List<sObject> sobj= new List<sObject>();
-        List<String> sObjectNameList =new List<String>();
-        List<AggregateResult> aggregateAttachmentParent = [SELECT COUNT(Id) recordsCount, Parent.Type parentType FROM Attachment  GROUP BY Parent.Type];   
-        Map<String, String> parentTypeToRelationMap = new Map<String, String>();
-
+    public static  Map<String , String> getChildObectName(){
+        Map<String , String> sObjectNameMap =new Map<String , String>();
         for (ChildRelationship relationship : SObjectType.buildertek__Project__c.getChildRelationships()) {
-
-            childObjeNameList.add(relationship.getChildSObject().getDescribe().getName());
-            parentTypeToRelationMap.put(relationship.getChildSObject().getDescribe().getName(), relationship.getRelationshipName());
+            sObjectNameMap.put(relationship.getChildSObject().getDescribe().getName() , relationship.getChildSObject().getDescribe().getLabel());
         }
+        return sObjectNameMap; 
+    }
 
-        // System.debug(parentTypeToRelationMap);
-
-        // for (AggregateResult aggParentObjName : aggregateAttachmentParent) {
-        //     String parentType = (String) aggParentObjName.get('parentType');
-        //     if (parentTypeToRelationMap.containsKey(parentType)) {-
-        //         chilRelationName.add(parentTypeToRelationMap.get(parentType));
-        //     }
-        // }
+    
+    
+    public class contntDocumentLinkWrapp {
+        @AuraEnabled
+        public String ContentDocumentId;
+        // @AuraEnabled
+        // public String Name;
+        @AuraEnabled
+        public String ParentId;
+        @AuraEnabled
+        public String ParentName;
+        // @AuraEnabled public List<ContentDocumentLink> records;
+        // @AuraEnabled public Integer totalPages;
+        @AuraEnabled public  String orgBaseURL;
 
 
         
-        // List<String> dynamicQueries = new List<String>();
-        // for (String s : chilRelationName) {
-        //     String dynamicQuery = 'SELECT Id, Name, (SELECT Id, Name FROM ' + s + ') FROM buildertek__Project__c WHERE Id = \'' + projectId + '\'';
-        //     dynamicQueries.add(dynamicQuery);
-        // }
-
-        List<AggregateResult> aggregatedResults = [SELECT COUNT(Id) recordsCount, Parent.Type parentType FROM Attachment  WHERE Parent.Type IN :childObjeNameList GROUP BY Parent.Type];   
-        for (AggregateResult result : aggregatedResults) {
-            System.debug((String) result.get('parentType'));
-            sObjectNameList.add((String) result.get('parentType'));
-        }
-        return sObjectNameList; 
-    }
-    
-    public class objDocumentWrap {
-        @AuraEnabled
-        public String name;
-        @AuraEnabled
-        public DateTime fileDate;
-        @AuraEnabled
-        public String fileId;
-        @AuraEnabled
-        public String fileType;
-        @AuraEnabled
-        public String parentId;
-        @AuraEnabled
-        public String parentName;
-
-    
     } 
     
     @AuraEnabled
-    public static  List<objDocumentWrap>  getAttachement(String objectName , String projectId){
-
-        System.debug(objectName);
-        List<Attachment> aatachmentList=[Select Id, Name, ContentType, ParentId, BodyLength , Parent.Type ,  Parent.Name  FROM Attachment WHERE ParentId!= null AND Parent.Type=:objectName];
-
-        Map<String, String> parentTypeToRelationMap = new Map<String, String>();
-        String chilRelationName = '';
-
-        for (ChildRelationship relationship : SObjectType.buildertek__Project__c.getChildRelationships()){
-            parentTypeToRelationMap.put(relationship.getChildSObject().getDescribe().getName(), relationship.getRelationshipName());
-            
-        }
-
-        for(Attachment att : aatachmentList){
-           if(parentTypeToRelationMap.containsKey(att.Parent.Type)){
-                chilRelationName =parentTypeToRelationMap.get(att.Parent.Type);
-            }
-        }
-
-       
-
-        // System.debug(chilRelationName);
-        // System.debug(parentTypeToRelationMap);
-
-        String dynamicQuery = 'SELECT Id, Name, (SELECT Id, Name FROM ' + chilRelationName + ') FROM buildertek__Project__c WHERE Id = \'' + projectId + '\'';
-        System.debug(dynamicQuery);
-
-       
-
-
-        // Execute the query
-        List<buildertek__Project__c> projectRecords = Database.query(dynamicQuery);
-
-        // Organize child records into a map
-        Map<String, List<SObject>> childRecordsMap = new Map<String, List<SObject>>();
-        // for (String relationshipName : chilRelationName) {
-        childRecordsMap.put(chilRelationName, new List<SObject>());
-        // }
-
-        for (buildertek__Project__c project : projectRecords) {
-            // for (String relationshipName : chilRelationName) {
-                List<SObject> childRecords = project.getSObjects(chilRelationName);
-                childRecordsMap.get(chilRelationName).addAll(childRecords);
-            // }
-        }
-
-        // System.debug(childRecordsMap);
-
-        List<Id> childIdSet= new List<Id>();
-        for (String relationshipName : childRecordsMap.keySet()) {
-            List<SObject> childRecords = childRecordsMap.get(relationshipName);
-            for (SObject childRecord : childRecords) {
-                Id childId = (Id) childRecord.get('Id');
-                if(!childIdSet.contains(childId)){
-                    childIdSet.add(childId);
+    public static  List<contntDocumentLinkWrapp> getAttachement(String objectName , String projectId){
+        if(objectName !=null){
+            // Replace 'Your_Object_API_Name' with the actual API name of the object you're working with
+            String objectApiName = objectName;
+            // Get the describe result for the object
+            Schema.DescribeSObjectResult objectDescribe = Schema.getGlobalDescribe().get(objectApiName).getDescribe();
+            // Find the correct API name for the Project reference field dynamically
+            String projectReferenceFieldApiName = null;
+            for (Schema.SObjectField field : objectDescribe.fields.getMap().values()) {
+                Schema.DescribeFieldResult fieldDescribe = field.getDescribe();
+                // Check if the field is of reference type and points to the Project object
+                if (fieldDescribe.getType() == Schema.DisplayType.REFERENCE &&
+                fieldDescribe.getReferenceTo().size() == 1 &&
+                fieldDescribe.getReferenceTo()[0].getDescribe().getName() == 'buildertek__Project__c') {
+                    projectReferenceFieldApiName = fieldDescribe.getName();
+                    break; // Found the correct reference field, no need to continue the loop
                 }
             }
-        }
-        System.debug(childIdSet.size());
-        System.debug(childIdSet);
+            if (projectReferenceFieldApiName != null) {
 
+                System.debug(projectReferenceFieldApiName);
+                System.debug(objectApiName);
 
-        List<objDocumentWrap> documentWrapList = new List<objDocumentWrap>();
-        List<Attachment> attachmentList=[Select Id, Name, ContentType, ParentId, BodyLength , Parent.Type ,  Parent.Name  FROM Attachment WHERE ParentId=:childIdSet AND Parent.Type=:objectName];
+                String query = 'SELECT Id, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN (SELECT Id FROM ' + objectApiName + ' WHERE ' + projectReferenceFieldApiName + ' = :projectId)';
+                System.debug(query);
+                List<sObject> lstOfRecords = Database.query(query);
+                List<contntDocumentLinkWrapp> documentWrapList = new List<contntDocumentLinkWrapp>();
+                List<Id> cntDocLinkIdList= new List<Id>();
+                Map<String, List<ContentDocumentLink>> parentIdToDocuments = new Map<String, List<ContentDocumentLink>>();
 
-        System.debug(attachmentList);
-        for(Attachment att : attachmentList){
-            objDocumentWrap vDoc = new objDocumentWrap();
-            vDoc.fileId = att.Id;
-            vDoc.name = att.Name;
-            vDoc.fileType = att.ContentType;    
-            vDoc.parentId = att.ParentId;    
-            vDoc.parentName = att.Parent.Name;    
-            documentWrapList.add(vDoc);
-        }
+                for(sObject cdLink: lstOfRecords){
+                    cntDocLinkIdList.add((Id)cdLink.get('LinkedEntityId'));
+                }
+                if(cntDocLinkIdList.size() > 0){
+                    List<ContentDocumentLink> cntDocumentList=[Select Id , ContentDocumentId ,LinkedEntity.Type,  ContentDocument.Title, LinkedEntityId , ContentDocument.FileType, LinkedEntity.Name   FROM ContentDocumentLink  WHERE LinkedEntityId IN:cntDocLinkIdList  AND ContentDocumentId NOT IN(SELECT Id FROM ContentDocument WHERE Title LIKE 'Signature%')];
+                    // contntDocumentLinkWrapp wrap= new contntDocumentLinkWrapp();
+                    // wrap.records = cntDocumentList;
+                    // wrap.totalPages = (Integer)Math.ceil([SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId IN: cntDocLinkIdList AND ContentDocumentId NOT IN(SELECT Id FROM ContentDocument WHERE Title LIKE 'Signature%')] / (Decimal)pageSize);
+                    // wrap.orgBaseURL= URL.getSalesforceBaseUrl().toExternalForm();
+                    for(ContentDocumentLink cntDocLink:cntDocumentList){
+                        contntDocumentLinkWrapp wrap= new contntDocumentLinkWrapp();
+                        wrap.ContentDocumentId=cntDocLink.ContentDocumentId;
+                        // wrap.Name=cntDocLink.
+                        wrap.ParentId=cntDocLink.LinkedEntityId;
+                        wrap.ParentName=cntDocLink.LinkedEntity.Name;
+                        wrap.orgBaseURL=URL.getSalesforceBaseUrl().toExternalForm();
+                        documentWrapList.add(wrap);
+                    }
     
-        System.debug('### vDocs : ' + documentWrapList);
-    
-        return documentWrapList;
-
+                    return documentWrapList;
+            
+                }else{
+                    return null;
+                }
+            } else {
+                System.debug('No Project reference field found on the object.');
+                return null;
+            }
+        }else{
+            return null;
+        }
     }
-   
+
 }

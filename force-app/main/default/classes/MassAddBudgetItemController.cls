@@ -114,7 +114,7 @@ public with sharing class MassAddBudgetItemController {
 
     @AuraEnabled
     public static List<Account> getAccounts(){
-        List<Account> accounts = [SELECT Id, Name FROM Account ORDER BY Name ASC LIMIT 800];
+        List<Account> accounts = [SELECT Id, Name FROM Account ORDER BY Name ASC];
         return accounts;
     }
 

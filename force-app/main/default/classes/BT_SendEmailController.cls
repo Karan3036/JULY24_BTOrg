@@ -52,7 +52,7 @@ public with sharing class BT_SendEmailController{
     // }
 
     @AuraEnabled
-    public Static List<EmailTemplate> getTemplates(String folderName, String recordId){
+    public Static List<EmailTemplate> getTemplates(String folderName){
         system.debug('folderName ----------> ' + folderName);
         if(String.isNotBlank(folderName)){
             List<EmailTemplate> emailTemplateList;
@@ -62,13 +62,6 @@ public with sharing class BT_SendEmailController{
                                      from Emailtemplate
                                      where folder.name = :folderName AND DeveloperName != 'quote_top' AND DeveloperName != 'quote_bottom'];
         //  }
-        if (Id.valueOf(recordId).getSObjectType().getDescribe().getName() == 'buildertek__Quote__c') {
-            buildertek__Quote__c Quote = [SELECT Id, Name,buildertek__NewSignBox__c FROM buildertek__Quote__c WHERE Id =: recordId];
-            buildertek__Quote__c q = new buildertek__Quote__c();
-            q.Id = Quote.Id;
-            q.buildertek__NewSignBox__c = false;
-            update q;
-        }
             return emailTemplateList;
         }
         return null;
@@ -894,13 +887,7 @@ public with sharing class BT_SendEmailController{
                 }
                 system.debug(body);
             }
-            if (Id.valueOf(recordId).getSObjectType().getDescribe().getName() == 'buildertek__Quote__c') {
-                buildertek__Quote__c Quote = [SELECT Id, Name,buildertek__NewSignBox__c FROM buildertek__Quote__c WHERE Id =: recordId];
-                buildertek__Quote__c q = new buildertek__Quote__c();
-                q.Id = Quote.Id;
-                q.buildertek__NewSignBox__c = true;
-                update q;
-            }
+
             String message = 'Success';
             return message;
         } catch (Exception exp){
@@ -1347,14 +1334,13 @@ public with sharing class BT_SendEmailController{
     @AuraEnabled
     public static string saveSign(String recId,String base64Data, String contentType,string signName){
         system.debug('base64Data-------------'+base64Data);
-        transient Date nowDT = Date.today();
         string conversn;
         if(base64Data.length() > 1696 || Test.isRunningTest()){
             base64Data = EncodingUtil.urlDecode(base64Data, 'UTF-8');
             ContentVersion conVer = new ContentVersion();
             conVer.ContentLocation = 'S'; // to use S specify this document is in Salesforce, to use E for external files
             conVer.PathOnClient = 'SignatureName.png'; // The files name, extension is very important here which will help the file in preview.
-            conVer.Title = 'Signature' + ' ' + nowDT; // Display name of the files
+            conVer.Title = signName; // Display name of the files
             conVer.VersionData = EncodingUtil.base64Decode(base64Data); // converting your binary string to Blog
             insert conVer;    //Insert ContentVersion
             system.debug('*******conVer*******'+conVer);
@@ -1522,15 +1508,34 @@ public with sharing class BT_SendEmailController{
     }
 
 
-    @AuraEnabled
-    public static void NewSignChecked(String recordId){
-        System.debug('RecordId on close click:- '+recordId);
-        if (Id.valueOf(recordId).getSObjectType().getDescribe().getName() == 'buildertek__Quote__c') {
-            buildertek__Quote__c Quote = [SELECT Id, Name,buildertek__NewSignBox__c FROM buildertek__Quote__c WHERE Id =: recordId];
-            buildertek__Quote__c q = new buildertek__Quote__c();
-            q.Id = Quote.Id;
-            q.buildertek__NewSignBox__c = true;
-            update q;
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

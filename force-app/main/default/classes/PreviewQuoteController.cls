@@ -5,7 +5,7 @@ public without sharing class PreviewQuoteController{
         if (Schema.sObjectType.Emailtemplate.fields.Id.isAccessible() && Schema.sObjectType.Emailtemplate.fields.Name.isAccessible() && Schema.sObjectType.Emailtemplate.fields.folderid.isAccessible() && Schema.sObjectType.Folder.fields.Name.isAccessible()){
             temrec = [Select Id, Name, folder.name
                       from Emailtemplate
-                      where folder.name = 'BT Quote' AND DeveloperName != 'quote_top' AND DeveloperName != 'quote_bottom'];
+                      where folder.name = 'BT Quote'];
         }
         System.debug('Template ========>>>>>'+temrec);
         return temrec;
@@ -123,7 +123,6 @@ public without sharing class PreviewQuoteController{
     public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, List<String> emailIds, string memovalue){
        // try{
             String fileid = '';
-            String fileidNew = '';
             String body = '';
             String subject='';
             String salesRepEmailId='';
@@ -276,7 +275,7 @@ public without sharing class PreviewQuoteController{
             Messaging.Emailfileattachment efa = new Messaging.Emailfileattachment();
             // efa.setFileName('Quote.pdf');
             efa.setFileName(quoterecbody[0].Name+'.pdf');
-            Blob b = setAttachmentBody(recordId, templateId, fileid, fileidNew);
+            Blob b = setAttachmentBody(recordId, templateId, fileid);
             system.debug('Blob ---> ' + b);
             
             efa.setBody(b);
@@ -397,7 +396,6 @@ public without sharing class PreviewQuoteController{
         try{
             String body = '';
             String subject = '';
-            String fileidNew = '';
              list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id,
                                                                                                   buildertek__Quote_Configuration__c,buildertek__Email_Subject__c
                                                                                                   from buildertek__Admin_Interface_Node_Configuration__c
@@ -498,7 +496,7 @@ public without sharing class PreviewQuoteController{
             //system.debug('Blob ---> ' + setAttachmentBody(recordId, templateId, fileid));
             system.debug('templateId'+templateId);
 
-            Blob b = setAttachmentBody(recordId, templateId, fileid, fileidNew);
+            Blob b = setAttachmentBody(recordId, templateId, fileid);
             system.debug('Blob ---> ' + b);
 
             ContentVersion conVer = new ContentVersion();
@@ -512,7 +510,7 @@ public without sharing class PreviewQuoteController{
             conDocLink.Visibility = 'AllUsers';
             insert conDocLink;
 
-            efa.setBody(setAttachmentBody(recordId, templateId, fileid, fileidNew));
+            efa.setBody(setAttachmentBody(recordId, templateId, fileid));
             fileAttachments.add(efa);
             mail.setFileAttachments(fileAttachments);
             mails.add(mail);
@@ -609,7 +607,7 @@ public without sharing class PreviewQuoteController{
         }
     }
 
-    private static Blob setAttachmentBody(String recordId, String templateId, String fileid, String fileidNew){
+    private static Blob setAttachmentBody(String recordId, String templateId, String fileid){
         System.debug(recordId);
         System.debug(templateId);
         System.debug(fileid);
@@ -623,7 +621,6 @@ public without sharing class PreviewQuoteController{
         pdf.getParameters().put('recordId', recordId);
         pdf.getParameters().put('templateId', templateId);
         pdf.getParameters().put('fileId', fileId);
-        pdf.getParameters().put('fileIdNew', fileIdNew);
         pdf.setRedirect(true);
 
         Blob blobbody = !Test.isRunningTest() ? pdf.getContent() : Blob.ValueOf('dummy text');
@@ -631,7 +628,7 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static String getBlobBody(String recordId, String templateId, String fileid, String fileidNew){
+    public static String getBlobBody(String recordId, String templateId, String fileid){
 
         pagereference pdf;
         pdf = Page.buildertek__BT_GenerateQuotePDF;
@@ -639,7 +636,6 @@ public without sharing class PreviewQuoteController{
         pdf.getParameters().put('recordId', recordId);
         pdf.getParameters().put('templateId', templateId);
         pdf.getParameters().put('fileId', fileId);
-        pdf.getParameters().put('fileidNew', fileidNew);
         pdf.setRedirect(true);
 
         return EncodingUtil.base64Encode(pdf.getContent());
@@ -668,14 +664,13 @@ public without sharing class PreviewQuoteController{
     @AuraEnabled
     public static string saveSign(String recId, String base64Data, String contentType, string signName){
         system.debug('base64Data-------------' + base64Data);
-        transient Date nowDT = Date.today();
         string conversn;
         if (base64Data.length() > 1696 || Test.isRunningTest()){
             base64Data = EncodingUtil.urlDecode(base64Data, 'UTF-8');
             ContentVersion conVer = new ContentVersion();
             conVer.ContentLocation = 'S'; // to use S specify this document is in Salesforce, to use E for external files
             conVer.PathOnClient = 'SignatureName.png'; // The files name, extension is very important here which will help the file in preview.
-            conVer.Title = 'Signature' + ' ' + nowDT; // Display name of the files
+            conVer.Title = signName; // Display name of the files
             conVer.VersionData = EncodingUtil.base64Decode(base64Data); // converting your binary string to Blog
             insert conVer;    //Insert ContentVersion
             system.debug('*******conVer*******' + conVer);

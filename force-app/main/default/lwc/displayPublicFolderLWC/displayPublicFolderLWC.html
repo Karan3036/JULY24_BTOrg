@@ -1,0 +1,48 @@
+<template>
+
+    <template if:true={showspinner}>
+        <lightning-spinner alternative-text="Loading" variant="brand"></lightning-spinner>
+    </template>
+
+    <div class="container">
+        <div>
+            
+            <!-- <div class="detail-div">
+                <span> Folder Name : {folderWrap.publicFolder.Name}</span>
+                <span> Folder Description : {folderWrap.publicFolder.buildertek__Description__c}</span>
+                <span> No. Of Files : {folderWrap.publicFolder.buildertek__File_Count__c} </span>
+            </div> -->
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Expiry Date</th>
+                        <th>Content Distrubution</th>
+                        <th>Content Version</th>
+                        <th>Public URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={folderWrap.publicFileList} for:item="file">
+                        <tr key={file.Id}>
+                            <td>{file.buildertek__File_Name__c}</td>
+                            <td>{file.buildertek__Expiry_Date__c}</td>
+                            <td>{file.buildertek__Content_Distrubution__c}</td>
+                            <td>{file.buildertek__Content_Version__c}</td>
+                            <td>{file.buildertek__Public_URL__c}</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+
+
+        <template if:true={noFiles}>
+            <div class="footer-div">
+                No Files Available Under This Folder
+            </div>
+        </template>
+
+        </div>
+    </div>
+</template>

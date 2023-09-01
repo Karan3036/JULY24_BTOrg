@@ -70,6 +70,19 @@ public with sharing class PreviewChangeOrderController {
        }
        templateBody = templateBody1 ;
        system.debug('Final templateBody ----------> '+templateBody);
+
+       /* ====AC-34 changes ===*/
+       List<buildertek__Change_Order__c> corec=[SELECT id,  buildertek__TemplateId__c , buildertek__Template_Name__c  from buildertek__Change_Order__c where Id=:recordId limit 1];
+       List<EmailTemplate> emailTemp = [SELECT Id,Name,Subject FROM EmailTemplate WHERE Id =:templateId];
+       if(corec.size()>0){
+            corec[0].buildertek__TemplateId__c = templateId;
+            if(!emailTemp.isEmpty()){
+                corec[0].buildertek__Template_Name__c= emailTemp[0].Name;
+            }
+        }
+        update corec;
+       /* ==== End AC-34 changes ===*/
+
        return templateBody;
        
    }
@@ -77,7 +90,7 @@ public with sharing class PreviewChangeOrderController {
     @AuraEnabled
     public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc,string Emailsubject){
        Blob filebody;
-    //    try{
+       try{
             string fileid = '';
             String body = '';
             string templateBody1 = '';
@@ -86,7 +99,7 @@ public with sharing class PreviewChangeOrderController {
            // String subject = ' Change Order [ref:' + recordId + ']';
            
 
-           buildertek__Change_Order__c changeRec = [select id, Name ,buildertek__TemplateId__c , buildertek__Template_Name__c , buildertek__Auto_Number__c , buildertek__Project__r.Name , buildertek__Project__r.buildertek__Auto_Number__c from buildertek__Change_Order__c where Id =: recordId Limit 1];
+           buildertek__Change_Order__c changeRec = [select id, Name ,buildertek__Auto_Number__c , buildertek__Project__r.Name , buildertek__Project__r.buildertek__Auto_Number__c from buildertek__Change_Order__c where Id =: recordId Limit 1];
 
             String subject='';
             list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id,
@@ -100,27 +113,10 @@ public with sharing class PreviewChangeOrderController {
            } 
 
            /*==== AC-34 changes === */
-           List<EmailTemplate> emailTemp = [SELECT Id,Name,Subject FROM EmailTemplate WHERE Id =:templateId];
            buildertek__WideOrgEmailsettings__c getEmail = buildertek__WideOrgEmailsettings__c.getOrgDefaults();
            String wideOrgEmailName = getEmail.buildertek__WideEmail__c;
            List<OrgWideEmailAddress> wideOrgEmail =[select Id,Address from OrgWideEmailAddress WHERE Address =:wideOrgEmailName];
            /* ====AC-34 changes === */
-
-
-        //    list<buildertek__Change_Order__c> quoterecbody = new list<buildertek__Change_Order__c>();
-        //     quoterecbody = [select id, Name, buildertek__Status__c, buildertek__TemplateId__c,buildertek__Template_Name__c
-        //                     from buildertek__Change_Order__c
-        //                     where Id = :recordId
-        //                     limit 1];
-        //     if (quoterecbody.size() > 0){
-            changeRec.buildertek__TemplateId__c = templateId;
-                // if(!emailTemp.isEmpty()){
-                //     changeRec.buildertek__Template_Name__c	 = emailTemp[0].Name;
-                // }
-                // update quoterecbody;
-            // }
-
-
 
            List<string> strTO = new List<string>();
            List<string> strCC = new List<string>();
@@ -283,21 +279,22 @@ public with sharing class PreviewChangeOrderController {
                }
            }
 
-           List<buildertek__Change_Order__c> corec=[SELECT id,  Name,  buildertek__Customer_Accepted_Date__c, buildertek__Status__c,   buildertek__Date_Approved__c,  buildertek__CO_Submit_Date__c from buildertek__Change_Order__c where Id=:recordId limit 1];
+           List<buildertek__Change_Order__c> corec=[SELECT id,  Name,  buildertek__Customer_Accepted_Date__c,  buildertek__TemplateId__c , buildertek__Template_Name__c , buildertek__Status__c,   buildertek__Date_Approved__c,  buildertek__CO_Submit_Date__c from buildertek__Change_Order__c where Id=:recordId limit 1];
            if(corec.size()>0){
                corec[0].buildertek__Date_Approved__c = system.now();
                if (corec[0].buildertek__CO_Submit_Date__c == null) {
                corec[0].buildertek__CO_Submit_Date__c = System.today();  
                } 
+               
                update corec; 
            }
            
            return message;                   
-    //    }catch(Exception exp){
-    //         system.debug('Error Message --------> '+exp);
-    //        String message = exp.getMessage();
-    //        return message;    
-    //     }
+       }catch(Exception exp){
+            system.debug('Error Message --------> '+exp);
+           String message = exp.getMessage();
+           return message;    
+        }
         
     }
     
@@ -322,7 +319,6 @@ public with sharing class PreviewChangeOrderController {
            }
 
            /*==== AC-34 changes === */
-           List<EmailTemplate> emailTemp = [SELECT Id,Name,Subject FROM EmailTemplate WHERE Id =:templateId];
            buildertek__WideOrgEmailsettings__c getEmail = buildertek__WideOrgEmailsettings__c.getOrgDefaults();
            String wideOrgEmailName = getEmail.buildertek__WideEmail__c;
            List<OrgWideEmailAddress> wideOrgEmail =[select Id,Address from OrgWideEmailAddress WHERE Address =:wideOrgEmailName];
@@ -539,14 +535,6 @@ public with sharing class PreviewChangeOrderController {
                             }//else{
                               // corec[0].buildertek__Contract__c = contractlist[0].id; 
                            // }
-
-                           /* ====AC-34 changes ===*/
-
-                           corec[0].buildertek__TemplateId__c = templateId;
-                           if(!emailTemp.isEmpty()){
-                               corec[0].buildertek__Template_Name__c= emailTemp[0].Name;
-                           }
-                           /* ==== End AC-34 changes ===*/
                            update corec;
                    
                }
