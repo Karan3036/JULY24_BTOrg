@@ -64,4 +64,12 @@ public class New_InvoicePO_ComponentFields {
         String sObjName = recordId.getSObjectType().getDescribe().getName();  
         return sObjName;
     }
+
+    @AuraEnabled
+    public static List<buildertek__Purchase_Order__c> getPO(string recordId) {
+        System.debug(recordId);
+        List<buildertek__Purchase_Order__c> poList = [SELECT Id, Name, buildertek__Project__c FROM buildertek__Purchase_Order__c WHERE buildertek__Project__c =: recordId ORDER BY Name ASC];
+        System.debug(poList);
+        return poList;
+    }
 }

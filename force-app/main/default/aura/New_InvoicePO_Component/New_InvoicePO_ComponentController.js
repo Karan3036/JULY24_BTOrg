@@ -24,11 +24,12 @@
             context = JSON.parse(window.atob(value));
             parentRecordId = context.attributes.recordId;
             component.set("v.parentRecordId", parentRecordId);
-            console.log('parentRecordId---->>',parentRecordId);
+            console.log('parentRecordId---->>',{parentRecordId});
             var isproject = component.get("v.parentRecordId");
             if (isproject != null && isproject != '' && isproject != undefined) {
                 component.set("v.forProject", true);
             }
+            helper.handleChangeProjectHelper(component, event, helper);
         } else {
             var relatedList = window.location.pathname;
             var stringList = relatedList.split("/");
@@ -43,6 +44,7 @@
             if (isproject != null && isproject != '' && isproject != undefined) {
                 component.set("v.forProject", true);
             }
+            helper.handleChangeProjectHelper(component, event, helper);
         }
         if(parentRecordId != null && parentRecordId != ''){
             var action = component.get("c.getobjectName");
@@ -71,6 +73,10 @@
 		component.set("v.isLoading", true);
         event.preventDefault(); // Prevent default submit
         var fields = event.getParam("fields");
+        var poId = component.get("v.selectedPOId");
+        if (poId != null && poId != '' && poId != undefined) {
+            fields["buildertek__Purchase_Order__c"] = poId;
+        }
         var allData = JSON.stringify(fields);
 
         var action = component.get("c.saveData");
@@ -148,4 +154,74 @@
             }), 1000
         );
    },
+
+
+    changeProject:function(component, event, helper) {
+        console.log('displayPO');
+        component.set('v.displayPO', false);
+        component.set('v.selectedPOName' , '');
+        component.set('v.selectedPOId' , '');
+        helper.handleChangeProjectHelper(component, event, helper);
+
+    },
+    keyupPOData:function(component, event, helper) {
+
+        console.log('selectedPOId=====', component.get('v.selectedPOId'));
+        var allRecords = component.get("v.poList");
+        var listOfAllRecords=component.get('v.allPORecords');
+
+        var searchFilter = event.getSource().get("v.value").toUpperCase();
+        console.log({searchFilter});
+        var tempArray = [];
+
+        var i;
+        console.log("ok");
+        for (i = 0; i < listOfAllRecords.length; i++) {
+            console.log(listOfAllRecords[i].Name);
+            console.log(listOfAllRecords[i].Name.toUpperCase().indexOf(searchFilter) != -1);
+            if ((listOfAllRecords[i].Name && listOfAllRecords[i].Name.toUpperCase().indexOf(searchFilter) != -1)) {
+                    tempArray.push(listOfAllRecords[i]);
+            }else{
+                component.set('v.selectedPOId' , ' ')
+            }
+        }
+
+        component.set("v.poList", tempArray);
+        console.log({searchFilter});
+        if(searchFilter == undefined || searchFilter == ''){
+            component.set("v.poList", listOfAllRecords);
+        }
+
+    },
+    clickHandlerPO: function(component, event, helper){
+        console.log('clickHandlerBudget');
+        component.set('v.displayPO', false);
+        var recordId = event.currentTarget.dataset.value;
+        console.log('recordId ==> '+recordId);
+        component.set('v.selectedPOId', recordId);
+
+        var poList = component.get("v.poList");
+        poList.forEach(element => {
+            console.log('element => ',element);
+            if (recordId == element.Id) {
+                component.set('v.selectedPOName', element.Name);
+
+            }
+        });
+    },
+    searchPOData : function(component, event, helper) {
+        console.log('searchBudgetData');
+        component.set('v.loaded', true);
+        component.set('v.displayPO', true);
+        helper.handleChangeProjectHelper(component, event, helper);
+        event.stopPropagation();
+ 
+    },
+
+    hideList : function(component, event, helper) {
+        component.set('v.displayPO', false);
+    },
+    preventHide: function(component, event, helper) {
+        event.preventDefault();
+    },
 })

@@ -11,3 +11,13 @@
     border-color: rgb(119, 119, 119);
     color: var(--slds-c-input-text-color, var(--sds-c-input-text-color));
 }
+.THIS .budgetInput .slds-input__icon_left{
+    display: none;
+}
+.THIS .rkclass{
+    color: var(--slds-g-color-neutral-base-30, var(--lwc-colorTextLabel,rgb(68, 68, 68)));
+    font-size: var(--lwc-formLabelFontSize,0.75rem);
+    padding-right: var(--lwc-spacingXSmall,0.5rem);
+    padding-top: var(--lwc-spacingXxSmall,0.25rem);
+    margin-bottom: var(--lwc-spacingXxxSmall,0.125rem);
+}
