@@ -24,7 +24,11 @@
             context = JSON.parse(window.atob(value));
             parentRecordId = context.attributes.recordId;
             component.set("v.parentRecordId", parentRecordId);
-            console.log('parentRecordId---->>',{parentRecordId});
+            console.log('parentRecordId---->>',parentRecordId);
+            var isproject = component.get("v.parentRecordId");
+            if (isproject != null && isproject != '' && isproject != undefined) {
+                component.set("v.forProject", true);
+            }
         } else {
             var relatedList = window.location.pathname;
             var stringList = relatedList.split("/");
@@ -35,6 +39,10 @@
             }
             component.set("v.parentRecordId", parentRecordId);
             console.log('parentRecordId-->>',{parentRecordId});
+            var isproject = component.get("v.parentRecordId");
+            if (isproject != null && isproject != '' && isproject != undefined) {
+                component.set("v.forProject", true);
+            }
         }
         if(parentRecordId != null && parentRecordId != ''){
             var action = component.get("c.getobjectName");
@@ -47,6 +55,10 @@
                     var objName = response.getReturnValue();
                     if(objName == 'buildertek__Purchase_Order__c'){
                         component.set("v.parentprojectRecordId", parentRecordId);
+                        var isPO = component.get("v.parentprojectRecordId");
+                        if (isPO != null && isPO != '' && isPO != undefined) {
+                            component.set("v.forPO", true);
+                        }
                     }
                 } 
             });

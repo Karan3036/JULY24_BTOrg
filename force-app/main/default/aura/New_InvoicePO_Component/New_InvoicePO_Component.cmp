@@ -3,6 +3,8 @@
 <aura:attribute name="listOfFields0" type="List" />
 <aura:attribute name="isSaveNew" type="boolean" default="false"/>
 <aura:attribute name="isLoading" type="Boolean" default="false" />
+<aura:attribute name="forProject" type="Boolean" default="false" />
+<aura:attribute name="forPO" type="Boolean" default="false" />
 <aura:attribute name="parentprojectRecordId" type="String" default="" />
 <aura:attribute name="parentRecordId" type="String" default="" />
 <lightning:workspaceAPI aura:id="workspace"/>
@@ -26,16 +28,19 @@
                     <div class="slds-p-around_medium" style="background-color:white;">
                         <lightning:layout multipleRows="true">
                             <aura:iteration items="{!v.listOfFields0}" var="field">
-                                <aura:if isTrue="{!field.name == 'buildertek__Purchase_Order__c'}">
-                                    <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
-                                        <lightning:inputField fieldName="{!field.name}" value="{!v.parentprojectRecordId}" />
-                                    </lightning:layoutItem> 
-                                    <aura:set attribute="else">
-                                        <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
-                                            <lightning:inputField fieldName="{!field.name}"/>
-                                        </lightning:layoutItem>  
-                                    </aura:set>
-                                </aura:if> 
+                                <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
+                                    <aura:if  isTrue="{!and(field.name != 'buildertek__Purchase_Order__c', field.name != 'buildertek__Project__c')}" >                                 
+                                        <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="inputFields"   />  
+                                            <aura:set attribute="else"> 
+                                                <aura:if  isTrue="{!and(field.name =='buildertek__Purchase_Order__c')}" >                                            
+                                                    <lightning:inputField fieldName="{! field.name }" aura:id="purchaseorder"  value = "{!v.parentprojectRecordId}" disabled="{!v.forPO}"/>
+                                                </aura:if>
+                                                <aura:if  isTrue="{!and(field.name =='buildertek__Project__c')}" >                                        
+                                                    <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="inputFields"  value = "{!v.parentRecordId}" disabled="{!v.forProject}"/>
+                                                </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                </lightning:layoutItem>
                             </aura:iteration>
                         </lightning:layout>
                     </div>

@@ -6,3 +6,8 @@
     white-space: nowrap;
     font-size: 20px;
 }
+.THIS input[readonly][role=combobox][disabled] {
+    background-color: white;
+    border-color: rgb(119, 119, 119);
+    color: var(--slds-c-input-text-color, var(--sds-c-input-text-color));
+}
