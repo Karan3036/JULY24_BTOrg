@@ -21,30 +21,32 @@
         });
         $A.enqueueAction(getFields);
         if (value != null) {
+            console.log('in if');
             context = JSON.parse(window.atob(value));
             parentRecordId = context.attributes.recordId;
-            component.set("v.parentRecordId", parentRecordId);
-            console.log('parentRecordId---->>',{parentRecordId});
-            var isproject = component.get("v.parentRecordId");
-            if (isproject != null && isproject != '' && isproject != undefined) {
+            var isproject = context.attributes.objectApiName;
+            if (isproject == 'buildertek__Project__c') {
+                component.set("v.parentRecordId", parentRecordId);
                 component.set("v.forProject", true);
+                helper.handleChangeProjectHelper(component, event, helper);
             }
-            helper.handleChangeProjectHelper(component, event, helper);
         } else {
+            console.log('in else');
             var relatedList = window.location.pathname;
             var stringList = relatedList.split("/");
+            console.log('stringList==>',stringList);
             parentRecordId = stringList[4];
             if (parentRecordId == 'related') {
                 var stringList = relatedList.split("/");
                 parentRecordId = stringList[3];
             }
-            component.set("v.parentRecordId", parentRecordId);
-            console.log('parentRecordId-->>',{parentRecordId});
-            var isproject = component.get("v.parentRecordId");
-            if (isproject != null && isproject != '' && isproject != undefined) {
+            if (stringList.includes('buildertek__Project__c')) {
+                // If 'buildertek_project__c' is found in the stringList, set a specific value
+                component.set("v.parentRecordId", parentRecordId);
                 component.set("v.forProject", true);
+                helper.handleChangeProjectHelper(component, event, helper);
             }
-            helper.handleChangeProjectHelper(component, event, helper);
+            console.log('parentRecordId-->>',{parentRecordId});
         }
         if(parentRecordId != null && parentRecordId != ''){
             var action = component.get("c.getobjectName");
@@ -57,10 +59,6 @@
                     var objName = response.getReturnValue();
                     if(objName == 'buildertek__Purchase_Order__c'){
                         component.set("v.parentprojectRecordId", parentRecordId);
-                        var isPO = component.get("v.parentprojectRecordId");
-                        if (isPO != null && isPO != '' && isPO != undefined) {
-                            component.set("v.forPO", true);
-                        }
                     }
                 } 
             });
@@ -157,25 +155,16 @@
 
 
     changeProject:function(component, event, helper) {
-        console.log('displayPO');
         component.set('v.displayPO', false);
         component.set('v.selectedPOName' , '');
         component.set('v.selectedPOId' , '');
-        helper.handleChangeProjectHelper(component, event, helper);
-
     },
+
     keyupPOData:function(component, event, helper) {
-
-        console.log('selectedPOId=====', component.get('v.selectedPOId'));
-        var allRecords = component.get("v.poList");
         var listOfAllRecords=component.get('v.allPORecords');
-
         var searchFilter = event.getSource().get("v.value").toUpperCase();
-        console.log({searchFilter});
         var tempArray = [];
-
         var i;
-        console.log("ok");
         for (i = 0; i < listOfAllRecords.length; i++) {
             console.log(listOfAllRecords[i].Name);
             console.log(listOfAllRecords[i].Name.toUpperCase().indexOf(searchFilter) != -1);
@@ -193,8 +182,8 @@
         }
 
     },
+
     clickHandlerPO: function(component, event, helper){
-        console.log('clickHandlerBudget');
         component.set('v.displayPO', false);
         var recordId = event.currentTarget.dataset.value;
         console.log('recordId ==> '+recordId);
@@ -209,19 +198,24 @@
             }
         });
     },
+    
     searchPOData : function(component, event, helper) {
-        console.log('searchBudgetData');
-        component.set('v.loaded', true);
         component.set('v.displayPO', true);
         helper.handleChangeProjectHelper(component, event, helper);
         event.stopPropagation();
- 
     },
 
     hideList : function(component, event, helper) {
         component.set('v.displayPO', false);
     },
+
     preventHide: function(component, event, helper) {
         event.preventDefault();
     },
+
+    clearInput: function(component, event, helper) {
+        component.set('v.selectedPOName','');
+        component.set('v.selectedPOId','');
+    },
+    
 })

@@ -2604,6 +2604,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     closeModel: function (component, event, helper) {
         // for Hide/Close Model,set the "isOpen" attribute to "Fasle"  
         component.set("v.isOpen", false);
+        component.set("v.isBOMmodalOpen", false);
     },
     removegroupingcloseModel: function (component, event, helper) {
         // for Hide/Close Model,set the "isremovegroup" attribute to "Fasle"  
@@ -4699,5 +4700,41 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
 
 
 
-    }
+    },
+
+
+    onclickBOMGrouping : function(component, event, helper){
+        console.log('onclickBOMGrouping');
+        component.set("v.isBOMmodalOpen", true);
+        var opts = [
+            {label: "Phase", value:"buildertek__Group__c"},
+            {label: "Sub Group", value:"buildertek__Sub_Grouping__c"},
+            // {label: "Build Phase", value:"buildertek__Build_Phase__c"},
+            // {label: "Build Reference 1", value:"buildertek__Build_Reference_1__c"},
+            // {label: "Base Location", value:"buildertek__Base_Location__c"},
+            // {label: "Location (PL)", value:"buildertek__Location_Picklist__c"},
+            // {label: "Location Detailed Area", value:"buildertek__Location_Detailed_Area__c"},
+            // {label: "Location Detail Reference 1", value:"buildertek__Location_Detail_Reference_1__c"},
+            // {label: "Service Category", value:"buildertek__BL_SERVICE_CATEGORY__c"},
+            // {label: "Product Family", value:"buildertek__Product_Family__c"},
+        ]
+        component.set("v.GroupingOptions", opts);
+    },
+    submitDetails: function(component, event, helper) {
+        helper.submitDetails(component, event, helper);
+
+     },
+     returnToNormalVIew: function(component, event, helper){
+        component.set("v.valueofField1", '');
+        component.set("v.valueofField2", '');
+        // component.set("v.valueofField3", '');
+        // component.set("v.valueofField4", '');
+        
+        component.set("v.displayGrouping", false);
+        component.set("v.BudgetLineWrapper", null);
+        component.set("v.forthGrouping", false);
+        component.set("v.thirdGrouping", false);
+        component.set("v.secondGrouping", false);
+        component.set("v.firstGrouping", false);
+     }, 
 })

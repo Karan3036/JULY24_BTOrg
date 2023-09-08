@@ -4,13 +4,11 @@
 <aura:attribute name="isSaveNew" type="boolean" default="false"/>
 <aura:attribute name="isLoading" type="Boolean" default="false" />
 <aura:attribute name="forProject" type="Boolean" default="false" />
-<aura:attribute name="forPO" type="Boolean" default="false" />
 <aura:attribute name="parentprojectRecordId" type="String" default="" />
 <aura:attribute name="parentRecordId" type="String" default="" />
 
 <aura:attribute name="selectedPOName" type="String" default="" />
 <aura:attribute name="displayPO" type="boolean" default="false" />
-<aura:attribute name="loaded" type="Boolean" default="false" />
 <aura:attribute name="poList" type="List" />
 <aura:attribute name="allPORecords" type="List" />
 <aura:attribute name="selectedPOId" type="Id" default="" />
@@ -43,13 +41,15 @@
                                     <aura:if  isTrue="{!and(field.name != 'buildertek__Purchase_Order__c', field.name != 'buildertek__Project__c')}" >                                 
                                         <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="inputFields"   />  
                                             <aura:set attribute="else"> 
-                                                <aura:if  isTrue="{!and(field.name =='buildertek__Purchase_Order__c')}" >                                            
-                                                    <!-- <lightning:inputField fieldName="{! field.name }" aura:id="purchaseorder"  value = "{!v.parentprojectRecordId}" disabled="{!v.forPO}"/> -->
-                                                    <div style="display: flex;align-items: flex-start;justify-content: flex-start;flex-direction: column;" >
-                                                        <label class="rkclass">Purchase Order</label>
-                                                        <div class="slds-input-has-icon slds-input-has-iconright" style="width:100%;" >
+                                                <aura:if  isTrue="{!and(field.name =='buildertek__Project__c')}" >        
+                                                    <lightning:inputField fieldName="{!field.name}" aura:id="inputFields"  value="{!v.parentRecordId}" disabled="{!v.forProject}" onchange="{!c.changeProject}"/>
+                                                </aura:if>
+                                                <aura:if  isTrue="{!and(field.name =='buildertek__Purchase_Order__c')}" >
+                                                    <div style="display: flex;padding-left: 1%;flex-direction: column;" >
+                                                        <label class="rkclass"><span style="color: rgb(234, 0, 30);padding-right: 1px;">*</span>Purchase Order</label>
+                                                        <div class="slds-input-has-icon slds-input-has-iconright" style="width:99%;" >
                                                             <aura:if isTrue="{!v.selectedPOName == ''}">
-                                                                <span class="slds-icon_container slds-combobox__input-entity-icon searchIcon" title="record">
+                                                                <span class="slds-icon_container slds-combobox__input-entity-icon searchIcon crossicon" title="record">
                                                                     <lightning:icon class="slds-icon slds-icon slds-icon_small" iconName="utility:search" size="x-small" alternativeText="icon"/>
                                                                     <span class="slds-assistive-text"></span>
                                                                 </span>
@@ -60,37 +60,48 @@
                                                                     </span>
                                                                 </aura:set>
                                                             </aura:if>
-                                                            <lightning:input aura:id="budgetInput" class="budgetInput" autocomplete="off" type="search" placeholder="Search Budget..." variant="label-hidden" value="{!v.selectedPOName}"  onclick="{!c.searchPOData}" onkeyup="{!c.keyupPOData}" onblur="{!c.hideList}"/>
+                                                            <lightning:input aura:id="poInput" class="poInput" autocomplete="off" type="search" placeholder="Search PO..." variant="label-hidden" value="{!v.selectedPOName}"  onclick="{!c.searchPOData}" onkeyup="{!c.keyupPOData}" onblur="{!c.hideList}" required="true"/>
+                                                            <aura:if isTrue="{!not(empty(v.selectedPOName))}">
+                                                                <span class="slds-icon_container slds-combobox__input-entity-icon searchIcon crossicon" title="record">
+                                                                    <lightning:buttonIcon iconName="utility:clear" alternativeText="Clear" onclick="{!c.clearInput}" class="slds-icon slds-icon slds-icon_small" />
+                                                                    <span class="slds-assistive-text"></span>
+                                                                </span>
+                                                            </aura:if>
     
                                                             <aura:if isTrue="{!v.displayPO}" >
                                                             <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox" style="position: absolute;" onmousedown="{!c.preventHide}">
                                                                 <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                                    <aura:if isTrue="{!v.loaded }">
-                                                                        <aura:set attribute="else">
-                                                                            <aura:iteration items="{!v.poList}" var="result">
-                                                                                <li role="presentation" class="slds-listbox__item" data-value="{!result.Id}" onclick="{!c.clickHandlerPO}">
-                                                                                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
-                                                                                        <span class="slds-media__figure slds-listbox__option-icon ">
-                                                                                            <lightning:icon iconName="custom:custom5" size="small" alternativeText="Approved" title="Approved" />
-                                                                                        </span>
-                                                                                        <span class="slds-media__body">
-                                                                                            <span class="slds-truncate" title="All Opportunities">
-                                                                                                <span>{!result.Name}</span>
-                                                                                            </span>
-                                                                                        </span>
-                                                                                    </div>
-                                                                                </li>
-                                                                            </aura:iteration>    
-                                                                        </aura:set>
-                                                                    </aura:if>
+                                                                    <aura:iteration items="{!v.poList}" var="result">
+                                                                        <li role="presentation" class="slds-listbox__item" data-value="{!result.Id}" onclick="{!c.clickHandlerPO}">
+                                                                            <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                                                <span class="slds-media__figure slds-listbox__option-icon ">
+                                                                                    <lightning:icon iconName="custom:custom5" size="small" alternativeText="Approved" title="Approved" />
+                                                                                </span>
+                                                                                <span class="slds-media__body">
+                                                                                    <span class="slds-truncate" title="All Opportunities">
+                                                                                        <span>{!result.Name}</span>
+                                                                                    </span>
+                                                                                </span>
+                                                                            </div>
+                                                                        </li>
+                                                                    </aura:iteration>
                                                             
                                                                     
                                                                     <aura:if isTrue="{!empty(v.poList)}">
-                                                                        <span>
-                                                                            <p class="blank-lst" style="text-align: center; padding:10px">
-                                                                                There Are No Purchase Order
-                                                                            </p>
-                                                                        </span>
+                                                                        <aura:if isTrue="{!empty(v.selectedPOName)}">
+                                                                            <span>
+                                                                                <p class="blank-lst" style="text-align: center; padding:10px">
+                                                                                    Please select the Project first
+                                                                                </p>
+                                                                            </span>
+                                                                            <aura:set attribute="else">
+                                                                                <span>
+                                                                                    <p class="blank-lst" style="text-align: center; padding:10px">
+                                                                                        There Are No Purchase Order
+                                                                                    </p>
+                                                                                </span>
+                                                                            </aura:set>
+                                                                        </aura:if>
                                                                     </aura:if>
                                                                 </ul>
                                                             </div>
@@ -100,10 +111,7 @@
                                                         
                                                     </div>
                                                 </aura:if>
-                                                <aura:if  isTrue="{!and(field.name =='buildertek__Project__c')}" >                                        
-                                                    <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="projectlookupid"  value = "{!v.parentRecordId}" disabled="{!v.forProject}" onchange="{!c.changeProject}"/>
-                                                </aura:if>
-                                        </aura:set>
+                                            </aura:set>
                                     </aura:if>
                                 </lightning:layoutItem>
                             </aura:iteration>
