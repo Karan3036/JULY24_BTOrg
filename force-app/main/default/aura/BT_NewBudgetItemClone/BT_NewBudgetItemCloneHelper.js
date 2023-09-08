@@ -2514,13 +2514,15 @@
     },
 
     submitDetails: function(component, event, helper) {
-        var valueofField1 = component.get("v.valueofField1")
-        var valueofField2 = component.get("v.valueofField2")
+        var valueofField1 = component.get("v.valueofField1");
+        var valueofField2 = component.get("v.valueofField2");
+        // var valueofField1 = 'buildertek__Group__c';
+        // var valueofField2 = 'buildertek__Sub_Grouping__c';
         // var valueofField3 = component.get("v.valueofField3")
         // var valueofField4 = component.get("v.valueofField4")
 
-        console.log({valueofField1});
-        console.log({valueofField2});
+        console.log(valueofField1);
+        console.log(valueofField2);
         // console.log({valueofField3});
         // console.log({valueofField4});
 
@@ -2852,6 +2854,30 @@
         totalObj['fieldTotalList'] = budgetLineTotalData;
         return totalObj;
     }, 
+    expandRecordsHelper : function(component, event, helper, spanGroupId){
+        console.log('in expandrec');
+        let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+        let collapeallIcon = document.getElementById("collapeseGroupBtn_" + spanGroupId);
+        let expandallIcon = document.getElementById("expandGroupBtn_" + spanGroupId);
+
+        collapeallIcon.style.display = 'block';
+        expandallIcon.style.display = 'none';
+        for(let index = 0; index < recordDivList.length; index++) {
+            recordDivList[index].style.display = 'table-row';
+        }
+    },
+    collapeRecordsHelper : function(component, event, helper, spanGroupId){
+        console.log('in expandrec');
+        let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+        let collapeallIcon = document.getElementById("collapeseGroupBtn_" + spanGroupId);
+        let expandallIcon = document.getElementById("expandGroupBtn_" + spanGroupId);
+        
+        collapeallIcon.style.display = 'none';
+        expandallIcon.style.display = 'block';
+        for(let index = 0; index < recordDivList.length; index++) {
+            recordDivList[index].style.display = 'none';
+        }
+    },
     
     
 })

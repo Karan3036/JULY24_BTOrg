@@ -2691,8 +2691,15 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 );
                 var page = component.get("v.page") || 1
                 //To much loading on deletion problem
-                component.set("v.TotalRecords", {});
-                helper.getBudgetGroups(component, event, helper, page, function () { });
+                let getValue=component.get('v.displayGrouping')
+                if (getValue) {
+                    helper.getBudgetGrouping(component, event, helper); 
+                } else{
+                    component.set("v.TotalRecords", {});
+                    helper.getBudgetGroups(component, event, helper, page, function () { });
+                }
+                // component.set("v.TotalRecords", {});
+                // helper.getBudgetGroups(component, event, helper, page, function () { });
             }
         });
         $A.enqueueAction(action);
@@ -2990,8 +2997,16 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                         }), 3000
                     );
                     var page = component.get("v.page") || 1
-                    component.set("v.TotalRecords", {});
-                    helper.getBudgetGroups(component, event, helper, page, function () { });
+                    
+                    let getValue=component.get('v.displayGrouping')
+                    if (getValue) {
+                        helper.getBudgetGrouping(component, event, helper); 
+                    } else{
+                        component.set("v.TotalRecords", {});
+                        helper.getBudgetGroups(component, event, helper, page, function () { });
+                    }
+                    // component.set("v.TotalRecords", {});
+                    // helper.getBudgetGroups(component, event, helper, page, function () { });
                 }
             });
             $A.enqueueAction(action);
@@ -4737,4 +4752,403 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         component.set("v.secondGrouping", false);
         component.set("v.firstGrouping", false);
      }, 
+
+     expandCollapeAllBom: function(component, event, helper){
+        var BudgetLineWrapper = component.get("v.BudgetLineWrapper");
+
+        var iconName = event.currentTarget.dataset.iconname;
+        var recordId = component.get("v.recordId");
+
+        var expandallIcon = document.getElementById("expandAllBtn_" + recordId);
+        var collapeallIcon = document.getElementById("collapeseAllBtn_" + recordId);
+
+        let group1 = BudgetLineWrapper.groupWrapper;
+
+        if (iconName == 'Expand All') {
+            collapeallIcon.style.display = 'block';
+            expandallIcon.style.display = 'none';
+
+            if (component.get("v.forthGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let group4 = group3[k-1].budgetLineList;
+                            for (let l = 1; l <= group4.length; l++) {
+                                let spanGroupId = i+''+j+''+k+''+l;
+                                helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                            }
+                        }
+                    }
+                }
+            } else if (component.get("v.thirdGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let spanGroupId = i+''+j+''+k;
+                            helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                        }
+                    }
+                }
+            } else if (component.get("v.secondGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let spanGroupId = i+''+j;
+                        helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                    }
+                }
+            } else if(component.get("v.firstGrouping")){
+                for (let i = 1; i <= group1.length; i++) {
+                    let spanGroupId = i;
+                    helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                }
+            }
+            component.set("v.CollapeCount", 0);
+        } else if (iconName == 'Collapse All') {
+            collapeallIcon.style.display = 'none';
+            expandallIcon.style.display = 'block';
+
+            if (component.get("v.forthGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let group4 = group3[k-1].budgetLineList;
+                            for (let l = 1; l <= group4.length; l++) {
+                                let spanGroupId = i+''+j+''+k+''+l;
+                                helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                            }
+                        }
+                    }
+                }
+            } else if (component.get("v.thirdGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let spanGroupId = i+''+j+''+k;
+                            helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                        }
+                    }
+                }
+            } else if (component.get("v.secondGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let spanGroupId = i+''+j;
+                        helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                    }
+                }
+            } else if(component.get("v.firstGrouping")){
+                for (let i = 1; i <= group1.length; i++) {
+                    let spanGroupId = i;
+                    helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                }
+            }
+            component.set("v.CollapeCount", component.get("v.TotalRecordCount"));
+        }
+    },
+    expandCollapeGroup: function(component, event, helper){
+        var recordId = component.get("v.recordId");
+
+        var expandallIcon = document.getElementById("expandAllBtn_" + recordId);
+        var collapeallIcon = document.getElementById("collapeseAllBtn_" + recordId);
+
+        var iconName = event.currentTarget.dataset.iconname;
+        var spanId = event.target.id;
+
+        var totalRecordCount = component.get("v.TotalRecordCount");
+        var collapeCount = component.get("v.CollapeCount");
+    
+        if (iconName == 'Expand Group') {
+            let spanGroupId = spanId.replace('expandGroupBtn_','');
+            helper.expandRecordsHelper(component, event, helper, spanGroupId);
+
+            let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+            let selectedRecord = recordDivList.length;
+            collapeCount -= selectedRecord;
+        } else if (iconName == 'Collapse Group') {
+            let spanGroupId = spanId.replace('collapeseGroupBtn_','');
+            helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+
+            let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+            let selectedRecord = recordDivList.length;
+            collapeCount += selectedRecord;
+        }
+        component.set("v.CollapeCount", collapeCount);
+
+        if(collapeCount == totalRecordCount){
+            collapeallIcon.style.display = 'none';
+            expandallIcon.style.display = 'block';
+        } else{
+            collapeallIcon.style.display = 'block';
+            expandallIcon.style.display = 'none';
+        }
+
+    },
+    handleSelectAllGroup:function(component, event, helper) {
+        let firstGroup=component.get('v.firstGrouping');
+        let secondGroup=component.get('v.secondGrouping');
+        let thirdGroup=component.get('v.thirdGrouping');
+        let forthGrouping=component.get('v.forthGrouping');
+        console.log(firstGroup);
+        console.log(secondGroup);
+        console.log(thirdGroup);
+        console.log(forthGrouping);
+
+
+
+        let getCheckboxValue=event.getSource().get("v.value");
+        let BudgetLineWrapper = component.get('v.BudgetLineWrapper');
+        let selectedGroupName = event.getSource().get("v.name");
+        let groupWrapper= BudgetLineWrapper.groupWrapper;
+
+        console.log({selectedGroupName});
+        groupWrapper.forEach(function(elem){
+           
+            
+            if(firstGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    if(value.buildertek__Grouping__c === selectedGroupName){
+                        if(elem.isSelected=== true){
+                            value.isSelected=true;
+                        }else{
+                            value.isSelected=false;
+                        }
+                    } 
+                });
+            }else if(secondGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    let getGroupName;
+                    if(value.groupName!= undefined){
+                        getGroupName =elem.groupName+'_'+value.groupName;
+                    }else{
+                        getGroupName =elem.groupName+'_';
+                    }
+
+                    value.budgetLineList.forEach(function(value2){
+
+                        if(selectedGroupName === getGroupName){
+                            if(value.isSelected=== true){
+                                value2.isSelected=true;
+                            }else{
+                                value2.isSelected=false;
+                            }
+                        } 
+
+                    });
+                    
+                });
+            }else if(thirdGroup== true){
+                console.log({selectedGroupName});
+                elem.budgetLineList.forEach(function(value){
+                    value.budgetLineList.forEach(function(value2){
+                        let getGroupName;
+                        if(value.groupName!= undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName;
+                        }else if (value.groupName!= undefined && value2.groupName== undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_';
+                        }else if (value.groupName== undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'__'+value2.groupName;
+                        }else{
+
+                            getGroupName =elem.groupName+'__';
+                        }
+
+
+
+                        value2.budgetLineList.forEach(function(value3){
+                            if(getGroupName === selectedGroupName){
+                                if(value2.isSelected=== true){
+                                    value3.isSelected=true;
+                                }else{
+                                    value3.isSelected=false;
+                                }                            } 
+                        });
+                    });
+                    
+                });
+            }else if(forthGrouping== true){
+                elem.budgetLineList.forEach(function(value){
+                    value.budgetLineList.forEach(function(value2){
+                        value2.budgetLineList.forEach(function(value3){
+                            let getGroupName;
+                            if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_';
+                            }else{
+                                getGroupName =elem.groupName+'___';
+                            }
+
+                            value3.budgetLineList.forEach(function(value4){
+                                if(getGroupName === selectedGroupName){
+                                    if(value3.isSelected=== true){
+                                        value4.isSelected=true;
+                                    }else{
+                                        value4.isSelected=false;
+                                    }                                   } 
+                            });
+
+                        });
+                    });
+                    
+                });
+
+            }
+
+            
+            
+        });
+        component.set('v.BudgetLineWrapper' , BudgetLineWrapper );
+        console.log({BudgetLineWrapper});
+
+    },
+    unCheckAllGroup:function(component, event, helper) {
+        let firstGroup=component.get('v.firstGrouping');
+        let secondGroup=component.get('v.secondGrouping');
+        let thirdGroup=component.get('v.thirdGrouping');
+        let forthGrouping=component.get('v.forthGrouping');
+        let selectedId = event.getSource().get("v.text");
+        let selectedGroupName = event.getSource().get("v.name");
+        let BudgetLineWrapper = component.get('v.BudgetLineWrapper');
+        let getCurrentValue=event.getSource().get('v.value');
+
+
+        let groupWrapper= BudgetLineWrapper.groupWrapper;
+        groupWrapper.forEach(function(elem){
+            if(firstGroup== true){
+                
+                elem.budgetLineList.forEach(function(value){
+                    const allActive = elem.budgetLineList.every(function(obj) {
+                        return obj.isSelected === true;
+                     });
+                    if(value.buildertek__Grouping__c === selectedGroupName){
+                        if(getCurrentValue== true && allActive == true){
+                            elem.isSelected=true;
+                        }else{
+                            elem.isSelected=false;
+                        }
+                    } 
+                });
+            }else if(secondGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    let getGroupName;
+                    if(value.groupName!= undefined){
+                        getGroupName =elem.groupName+'_'+value.groupName;
+                    }else{
+                        getGroupName =elem.groupName+'_';
+                    }
+                    const allActive = value.budgetLineList.every(function(elem) {
+                        return elem.isSelected === true;
+                    });
+                    value.budgetLineList.forEach(function(value2){
+                        if(getGroupName === selectedGroupName){
+                            if(getCurrentValue== true && allActive == true){
+                                value.isSelected=true;
+                            }else{
+                                value.isSelected=false;
+
+                            }
+                        } 
+                    });    
+                });
+            }else if(thirdGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    
+                    value.budgetLineList.forEach(function(value2){
+                        let getGroupName;
+                        if(value.groupName!= undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName;
+                        }else if (value.groupName!= undefined && value2.groupName== undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_';
+                        }else if (value.groupName== undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'__'+value2.groupName;
+                        }else{
+                            getGroupName =elem.groupName+'__';
+                        }
+
+                        const allActive = value2.budgetLineList.every(function(elem) {
+                            return elem.isSelected === true;
+                         });
+                            
+                        value2.budgetLineList.forEach(function(value3){
+                        if(getGroupName === selectedGroupName){
+
+                            if(getCurrentValue== true && allActive == true){
+                                value2.isSelected=true;
+                            }else{
+                                value2.isSelected=false;
+
+                            }
+                        } 
+                         })
+                    });    
+                });
+            }else if(forthGrouping== true){
+                elem.budgetLineList.forEach(function(value){
+                    value.budgetLineList.forEach(function(value2){
+                        value2.budgetLineList.forEach(function(value3){
+                            let getGroupName;
+                            if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_';
+                            }else{
+                                getGroupName =elem.groupName+'___';
+                            }
+                            const allActive = value3.budgetLineList.every(function(elem) {
+                                return elem.isSelected === true;
+                            });
+                            value3.budgetLineList.forEach(function(value4){
+                               
+                                if(getGroupName === selectedGroupName){
+                    
+                                    if(getCurrentValue== true && allActive == true){
+                                        value3.isSelected=true;
+                                    }else{
+                                        value3.isSelected=false;
+        
+                                    }
+
+                                } 
+                            });
+
+                        
+                         })
+                    });    
+                });
+
+            }
+
+            
+        });
+        
+        
+        component.set('v.BudgetLineWrapper' , BudgetLineWrapper);
+        console.log({BudgetLineWrapper});
+
+    },
 })
