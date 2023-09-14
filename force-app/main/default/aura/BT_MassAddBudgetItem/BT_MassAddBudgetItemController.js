@@ -56,7 +56,6 @@
 
     getFamily : function(component, event, helper) {
         
-        console.log('getFamily');
         $A.get("e.c:BT_SpinnerEvent").setParams({
             "action": "SHOW"
         }).fire(); 
@@ -97,6 +96,7 @@
         $A.get("e.c:BT_SpinnerEvent").setParams({
             "action": "SHOW"
         }).fire();
+
         var budgetlineWrapperList = component.get("v.budgetLineWrapperList");
         var index = event.getSource().get("v.name");
         var family = budgetlineWrapperList[index].productFamily;

@@ -148,7 +148,7 @@
                         if(productFamily != ''){
                             console.log('inside if');
                             component.set("v.sProductFamily", productFamily);
-                            helper.searchInDatatableHelper(component, event, helper);
+                            // helper.searchDatatableHelper(component, event, helper);
                         }
                     }
                     console.log('productFamilyList ==> ',{productFamilyList});
