@@ -207,9 +207,9 @@ public without sharing class BudgetContractCreateHelper {
                 buildertek__Tax__c = currQuoteLine.buildertek__Tax__c,
                 buildertek__UOM__c = currQuoteLine.buildertek__UOM__c,
                 buildertek__Budget_Line_Group__c = currQuoteLine.buildertek__Grouping__c,
-                buildertek__Group__c = groupMap.get(currQuoteLine.buildertek__Grouping__r.Name)
+                buildertek__Group__c = groupMap.get(currQuoteLine.buildertek__Grouping__r.Name),
                 // buildertek__Notes__c=currQuoteLine.buildertek__Notes__c
-                // buildertek__Markup__c = currQuoteLine.buildertek__Markup__c
+                buildertek__Markup__c = currQuoteLine.buildertek__Markup__c
             ));
             if(currQuoteLine.buildertek__Purchase_Order__c!=null){
                 poIds.add(currQuoteLine.buildertek__Purchase_Order__c);    

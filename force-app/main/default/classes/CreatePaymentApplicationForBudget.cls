@@ -1038,7 +1038,7 @@ continutionSheet.Name =*/
                                                                     buildertek__Total_Material_Stored_To_Date__c
                                                                     FROM buildertek__SOV_Payment_Application__c
                                                                     Where buildertek__Project__c =:projectId 
-                                                                    // ==> chnages for BUIL-3490
+                                                                    // ==> chnages for BUIL-3491
                                                                     AND (buildertek__Status__c ='Company Accepted' OR buildertek__Status__c ='Customer Accepted')
                                                                     // AND (recordtype.name = 'AP' OR buildertek__PA_Type__c = 'AP')           
                                                                     AND recordtype.name = 'AP'

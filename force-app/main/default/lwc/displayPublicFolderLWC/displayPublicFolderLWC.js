@@ -1,12 +1,12 @@
 import { LightningElement, api, track } from 'lwc';
 import getDataFromFolder from '@salesforce/apex/displayPublicFolderCls.getDataFromFolder';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class DisplayPublicFolderLWC extends LightningElement {
     @api folderId;
 
     @track showspinner = false;
     @track folderWrap = {};
+    @track folderDetails = {};
     @track noFiles = false;
 
     connectedCallback(){
@@ -19,6 +19,7 @@ export default class DisplayPublicFolderLWC extends LightningElement {
             .then(result => {
                 console.log('Result ==> ',result);
                 this.folderWrap = result;
+                this.folderDetails = result.publicFolder;
 
                 if (result.publicFolder.buildertek__File_Count__c == 0) {
                     this.noFiles = true;

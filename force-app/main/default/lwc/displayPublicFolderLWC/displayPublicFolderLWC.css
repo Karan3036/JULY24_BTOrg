@@ -1,9 +1,12 @@
 .detail-div{
-    
+    padding: 10px;
+    font-size: 18px;
+    color: black;
 }
 
 table {
     width: 100%;
+    min-width: 35rem;
     border-collapse: collapse;
     background-color: #fff;
     box-shadow: rgba(185, 188, 191, 0.2) 0px 0px 24px 5px;
@@ -17,6 +20,7 @@ table thead th {
     text-align: left;
     background-color: #009ddc;
     color: #fff;
+    border-right: 1px solid #eee;
 }
 
 table tbody tr td {

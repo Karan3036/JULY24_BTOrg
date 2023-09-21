@@ -53,16 +53,39 @@ public with sharing class NewQuoteComponentController {
         return pickListValuesList;
     }
 
+    public class masterQuoteWrapper{
+        @AuraEnabled
+        public  List<buildertek__Quote__c> quoteList;
+        @AuraEnabled
+        public Integer totalQuotes;
+    }
+
     @AuraEnabled
-    public static string saveRecord(String data){
-        System.debug('In save method');
+    public static masterQuoteWrapper getAllMasterQuote(Integer recordLimit, Integer recordOffset){
+        masterQuoteWrapper  masterQuoteWrapperRecords= new masterQuoteWrapper();
+        masterQuoteWrapperRecords.quoteList= new List<buildertek__Quote__c>();
+        masterQuoteWrapperRecords.quoteList=[SELECT Id, Name , buildertek__Status__c, buildertek__Description__c , buildertek__Type__c  From buildertek__Quote__c WHERE buildertek__Type__c = 'Master' ORDER BY Name ASC LIMIT :recordLimit Offset :recordOffset ];
+       
+       
+        AggregateResult results = [SELECT Count(Id) TotalQuotes  From buildertek__Quote__c WHERE buildertek__Type__c = 'Master' ];
+        Integer totalQuotesRec = (Integer)results.get('TotalQuotes');
+
+        masterQuoteWrapperRecords.totalQuotes=totalQuotesRec;
+        return masterQuoteWrapperRecords;
+    }
+
+    @AuraEnabled
+    public static string saveRecord(String data , String masterQuoteId){
         buildertek__Quote__c QuoteToInsert = (buildertek__Quote__c)JSON.deserialize(data, buildertek__Quote__c.class);
-        System.debug('QuoteToInsert-->>'+QuoteToInsert);
         if(QuoteToInsert.Name.length() > 79){
             QuoteToInsert.Name = QuoteToInsert.Name.left(78);
         }
-        System.debug('QuoteToInsert ==? '+QuoteToInsert);
         insert QuoteToInsert;
+
+        if(masterQuoteId !=null && QuoteToInsert.Id !=null){
+            NewQuoteComponentController.cloneQuoteSection(QuoteToInsert.Id , masterQuoteId);
+            NewQuoteComponentController.cloneQuoteLines(QuoteToInsert.Id , masterQuoteId);
+        }
         return QuoteToInsert.ID;
     }
 
@@ -71,4 +94,39 @@ public with sharing class NewQuoteComponentController {
         String sObjName = recordId.getSObjectType().getDescribe().getName();  
         return sObjName;
     }
+
+    // @future
+    public static void cloneQuoteLines(String quoteId , String masterQuoteId){
+        Set<String> SobjectFields = Schema.getGlobalDescribe().get('buildertek__Quote_Item__c').getDescribe().fields.getMap().keySet();  
+        List<String> fieldsInList = new List<String>(SobjectFields);
+        String query = 'SELECT ' + String.join(fieldsInList, ',') + ' FROM buildertek__Quote_Item__c WHERE buildertek__Quote__c=:masterQuoteId'; 
+        System.debug(query);
+        List<buildertek__Quote_Item__c> quoteItemList = Database.query(query);
+        list<buildertek__Quote_Item__c> newQuoteItemList= new List<buildertek__Quote_Item__c>();
+        for(buildertek__Quote_Item__c quoteItem:quoteItemList){
+
+            buildertek__Quote_Item__c newQuoteItemRec=quoteItem.clone(false, false, false, false);
+            newQuoteItemRec.buildertek__Quote__c=quoteId;
+            newQuoteItemList.add(newQuoteItemRec);
+        
+        }
+        if(newQuoteItemList.size() >0){
+
+            insert newQuoteItemList;
+        }
+    
+    }
+
+    public static void cloneQuoteSection(String quoteId , String masterQuoteId){
+
+        buildertek__Quote__c quoteList=[SELECT Id,buildertek__Memo__c, buildertek__Email_Body__c, buildertek__Section_I__c, buildertek__Section_II__c, buildertek__Section_III__c, buildertek__Section_IV__c , buildertek__Section_IX__c, buildertek__Section_V__c, buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c ,buildertek__Footer__c FROM buildertek__Quote__c WHERE Id=:masterQuoteId LIMIT 1 ];
+
+        buildertek__Quote__c quoteRec= quoteList.clone(false, false, false, false);
+        quoteRec.Id=quoteId;
+        update quoteRec;
+    
+
+    
+    }
+
 }

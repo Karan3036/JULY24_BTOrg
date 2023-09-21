@@ -13,7 +13,7 @@ public with sharing class bryntumGanttController {
 
         String strQuery = 'SELECT ';
 
-        strQuery += 'Id,Name,buildertek__Type__c,buildertek__Indent_Task__c,buildertek__Reference_for_Import__c,buildertek__Lag__c,buildertek__Schedule__c,buildertek__Budget__c,buildertek__ConstraintType__c,buildertek__ConstraintDate__c,buildertek__DependencyStatus__c,buildertek__Add_To_All_Active_Schedules__c,buildertek__Notes__c,buildertek__Schedule__r.Name,buildertek__Schedule__r.buildertek__Description__c,buildertek__Start__c,buildertek__Finish__c,buildertek__Duration__c,buildertek__Contractor__c,buildertek__Contractor__r.Name,buildertek__Phase__c,buildertek__Completion__c, buildertek__Dependency__c,buildertek__Dependency__r.Name,buildertek__Contractor_Resource__c,buildertek__Contractor_Resource__r.Name,buildertek__Resource__c, buildertek__Resource__r.Name,buildertek__Milestone__c,buildertek__Order__c,buildertek__Budget_Line__c,CreatedDate FROM buildertek__Project_Task__c where buildertek__Schedule__c = :  scheduleid Order By buildertek__Order__c NULLS LAST,CreatedDate';
+        strQuery += 'Id,Name,buildertek__Type__c,buildertek__Indent_Task__c,buildertek__Reference_for_Import__c,buildertek__Lag__c,buildertek__Schedule__c,buildertek__Budget__c,buildertek__ConstraintType__c,buildertek__ConstraintDate__c,buildertek__DependencyStatus__c,buildertek__Add_To_All_Active_Schedules__c,buildertek__Notes__c,buildertek__Schedule__r.Name,buildertek__Schedule__r.buildertek__Description__c,buildertek__Start__c,buildertek__Finish__c,buildertek__Duration__c,buildertek__Contractor__c,buildertek__Contractor__r.Name,buildertek__Phase__c,buildertek__Completion__c, buildertek__Dependency__c,buildertek__Dependency__r.Name,buildertek__Contractor_Resource__c,buildertek__Contractor_Resource__r.Name,buildertek__Resource__c, buildertek__Resource__r.Name,buildertek__Contractor_Resource_1__c,buildertek__Contractor_Resource_1__r.Name,buildertek__Contractor_Resource_2__c,buildertek__Contractor_Resource_2__r.Name,buildertek__Contractor_Resource_3__c,buildertek__Contractor_Resource_3__r.Name,buildertek__Internal_Resource_1__c,buildertek__Internal_Resource_1__r.Name,buildertek__Internal_Resource_3__c,buildertek__Internal_Resource_3__r.Name,buildertek__Internal_Resource_4__c,buildertek__Internal_Resource_4__r.Name,buildertek__Milestone__c,buildertek__Order__c,buildertek__Budget_Line__c,CreatedDate FROM buildertek__Project_Task__c where buildertek__Schedule__c = :  scheduleid Order By buildertek__Order__c NULLS LAST,CreatedDate';
         //CreatedDate//Order by buildertek__Milestone__c , Order__c ASC NULLS LAST, Auto_Number__c ASC
         system.debug('strQuery---' + strQuery);
 
@@ -199,7 +199,8 @@ public with sharing class bryntumGanttController {
         dataTableDtls.profileName = profileName;
         System.debug('dataTable :: ' + dataTableDtls);
 
-        dataTableDtls.listOfContractorAndResources = getContractorsAndResourcesToPick();
+        dataTableDtls.listOfContractorAndResources = [SELECT Id, Name, (SELECT Id, Name, LastName, FirstName FROM Contacts) FROM Account WHERE buildertek__BT_Account_Type__c = 'Vendor' ORDER BY Name ASC];
+        dataTableDtls.listOfInternalResources = [SELECT Id, Name FROM User ORDER BY Name ASC LIMIT 10000];
 
         return dataTableDtls;
     }
@@ -499,21 +500,6 @@ public with sharing class bryntumGanttController {
         }
     }
 
-    /* @Author        Nishit Suthar
-     * Date           14-8-23
-     * Description :  This method is used to get Contractors(Account) of the current Org.
-     */
-    @AuraEnabled(Cacheable=true)
-    public static List<Account> getContractorsAndResourcesToPick(){
-        List<Account> contractorList = new List<Account>();
-        try {
-            contractorList = [SELECT Id, Name, (SELECT Id, Name, LastName, FirstName FROM Contacts) FROM Account WHERE buildertek__BT_Account_Type__c = 'Vendor' ORDER BY Name ASC];
-        } catch (Exception e) {
-            System.debug('Error Line '+e.getLineNumber());
-            System.debug('Error Message from contactorList method '+e.getMessage());
-        }
-        return contractorList;
-    }
 
     /* @Author        Nishit Suthar
      * Date           24-08-2023
@@ -540,6 +526,8 @@ public with sharing class bryntumGanttController {
         public buildertek__Schedule__c scheduleObj = new buildertek__Schedule__c();
         @AuraEnabled
         public Map<String, NotesAttachmet> filesandattacmentList = new Map<String, NotesAttachmet>();
+        @AuraEnabled
+        public List<User> listOfInternalResources = new List<User>();
         @AuraEnabled
         public List<Account> listOfContractorAndResources = new List<Account>();
         @AuraEnabled
