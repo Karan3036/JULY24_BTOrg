@@ -31,6 +31,7 @@
                     component.set("v.Spinner", false);
                     component.set('v.offset', result.offst);
                     component.set('v.checkIns', result.checkInList);
+                    console.log('checkin Records >> ', JSON.parse(JSON.stringify(result.checkInList)));
                     component.set('v.next', result.hasnext);
                     component.set('v.prev', result.hasprev);
                     component.set('v.orgBaseURL', result.orgBaseUrl);

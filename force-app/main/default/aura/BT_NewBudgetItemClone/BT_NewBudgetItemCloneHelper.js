@@ -2871,7 +2871,7 @@
         }
     },
     collapeRecordsHelper : function(component, event, helper, spanGroupId){
-        console.log('in expandrec');
+        console.log('in collaperec');
         let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
         let collapeallIcon = document.getElementById("collapeseGroupBtn_" + spanGroupId);
         let expandallIcon = document.getElementById("expandGroupBtn_" + spanGroupId);
