@@ -54,6 +54,7 @@
 					action.setParams({
 						htmlBody: component.get("v.invoiceLines"),
 						recordPId: component.get("v.recordId"),
+						SelectedTemplateId: component.get("v.selectedTemplate"),
 						to: toIds,
 						cc: ccIds
 					});

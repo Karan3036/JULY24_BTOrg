@@ -6,7 +6,7 @@ public with sharing class CloseoutProjectController {
         if (Schema.sObjectType.Emailtemplate.fields.Id.isAccessible() && Schema.sObjectType.Emailtemplate.fields.Name.isAccessible() && Schema.sObjectType.Emailtemplate.fields.folderid.isAccessible() && Schema.sObjectType.Folder.fields.Name.isAccessible()){
             temrec = [Select Id, Name, folder.name, DeveloperName
                       from Emailtemplate
-                      where folder.name = 'Closeout Project' AND DeveloperName LIKE 'SiftonInvoice_%'];
+                      where folder.name = 'Closeout Project'];
         }
         System.debug('Template ========>>>>>'+temrec);
         return temrec;
@@ -67,15 +67,17 @@ public with sharing class CloseoutProjectController {
     }
 
     @AuraEnabled
-    public static String sendProposal(String htmlBody, String recordPId, List<String> to, List<String> cc){
+    public static String sendProposal(String htmlBody, String SelectedTemplateId, String recordPId, List<String> to, List<String> cc){
         try{
 
-            buildertek__Billings__c oldAR = [SELECT Id, Name FROM buildertek__Billings__c WHERE buildertek__Project__c =: recordPId AND Name =: 'Closeout-Project-Invoice' LIMIT 1];
+            EmailTemplate eTemp = [SELECT Id, Name FROM EmailTemplate WHERE Id =: SelectedTemplateId];
+            String templateId = eTemp.Id;
+            String templateName = eTemp.Name;
+            buildertek__Billings__c oldAR = [SELECT Id, Name FROM buildertek__Billings__c WHERE buildertek__Project__c =: recordPId AND Name =: templateName LIMIT 1];
             String recordId = oldAR.Id;
 
-            String emailLabel = System.label.CloseOutProjectTemplate;
-            EmailTemplate eTemp = [SELECT Id, Name FROM EmailTemplate WHERE Name =: emailLabel LIMIT 1];
-            String templateId = eTemp.Id;
+            // String emailLabel = System.label.CloseOutProjectTemplate;
+            // EmailTemplate eTemp = [SELECT Id, Name FROM EmailTemplate WHERE Name =: emailLabel LIMIT 1];
 
             List<Contact> conToList =  [Select Id,Name,email,MailingStreet,MailingCity, MailingState,MailingPostalCode,MailingCountry from Contact where Id IN :to and email != null];
 

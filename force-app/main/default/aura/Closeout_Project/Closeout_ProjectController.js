@@ -1,6 +1,8 @@
 ({  
 	init: function(component, event, helper) {
-        component.set("v.Spinner", true);
+        $A.get("e.c:BT_SpinnerEvent").setParams({
+            "action": "SHOW"
+        }).fire();
         var dbAction = component.get("c.getTemplatesOptions");
         dbAction.setParams({
             recordId: component.get("v.recordId")
@@ -9,7 +11,19 @@
             var state = response.getState();
             if (state === "SUCCESS") {
                 component.set("v.templates", response.getReturnValue());
-                component.set("v.Spinner", false);
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "HIDE"
+                }).fire();
+            } else{
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "type": 'error',
+                    "message": 'Something went wrong'
+                });
+                toastEvent.fire();
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "HIDE"
+                }).fire();
             }
         });
 
