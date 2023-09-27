@@ -602,7 +602,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
 
     let contractorComboData = makeComboBoxDataForContractor(this.contractorAndResources);
 
-    const gantt = new bryntum.gantt.Gantt({
+    let gantt = new bryntum.gantt.Gantt({
       project,
       appendTo: this.template.querySelector(".container"),
       // startDate: "2019-07-01",
@@ -747,6 +747,20 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
               type: "Combo",
               items: contractorComboData,
               name: "contractorId",
+              listeners:{
+                change : (event) => {
+                  // Use a debounce mechanism to delay execution
+                  if (this.debouncedChange) {
+                    clearTimeout(this.debouncedChange);
+                  }
+                  this.debouncedChange = setTimeout(() => {
+                    if (event.value != event.oldValue) {
+                      console.log('event ', event);
+                    }
+                  }, 300);
+                    // project.taskStore.getById(event.source.record.id).assignments = [];
+                }
+              },
             },
           ],
           renderer: (record) => {
@@ -1114,18 +1128,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           this.selectedResourceContact = "";
         }
       }
-
-      if (event.column.data.text == "Contractor") {
-        console.log('event.target.id ',event);
-        if (event.record.type == "Task") {
-          try {
-            event.record.resources = {};
-            console.log('event.target.id ',event.record.resources);
-          } catch (error) {
-            console.log('error ',error);
-          }
-        }
-      }
     });
 
     gantt.on("expandnode", (source) => {
@@ -1295,6 +1297,12 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     // Set isLoading to true to show the spinner
     // this.isLoading = false;
     this.spinnerDataTable = false;
+  }
+
+  resetResourceColumnValue(bryntumInstance, recordId) {
+    console.log('lets see you recordId ',recordId);
+    console.log('lets see you bryntumInstance ',bryntumInstance.taskStore);
+    bryntumInstance.taskStore.getById(recordId).assignments = [];
   }
 
   openMasterSchedule() {

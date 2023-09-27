@@ -2365,6 +2365,7 @@
         component.set('v.newBudgetLine.buildertek__Sub_Grouping__c', null);
         component.set('v.options', '');
         component.set('v.newBudgetLine.buildertek__Sales_Price__c', '');
+        component.set('v.newBudgetLine.buildertek__Markup__c', '');
         component.set('v.newBudgetLine.buildertek__Unit_Price__c', '');
         component.set('v.newBudgetLine.buildertek__Quantity__c', '1');
         component.set('v.newBudgetLine.buildertek__Cost_Code__c', '');
@@ -2882,6 +2883,25 @@
             recordDivList[index].style.display = 'none';
         }
     },
+    getGroupingLevels:function(component, event, helper){
+        var action = component.get("c.groupingLevels");
+        action.setCallback(this, function(response) {
+
+            if(response.getState() == 'SUCCESS'){
+                console.log('Testing');
+                console.log(response.getReturnValue());
+                let groupingLevel=response.getReturnValue();
+
+                component.set('v.valueofField1' , groupingLevel[0]);
+                component.set('v.valueofField2' , groupingLevel[1]);
+
+               
+            }else{
+                console.log(response.getError());
+            }
+        });
+        $A.enqueueAction(action);
     
+    }
     
 })
