@@ -1,0 +1,72 @@
+<aura:component controller="BT_SyncProductsController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="quoteLineList" type="List"/>
+    <aura:attribute name="editMode" type="Boolean" default="false"/>
+    <aura:attribute name="selectedRecId" type="String" default=""/>
+    <ltng:require styles="{!$Resource.MOdalPreviewWidth72}"/>
+
+<div class="slds-modal__header" style="font-size:17px;">
+        Sync Products
+    </div>
+    <div class="slds-modal__content slds-p-around--large">
+        <div class="slds slds-scope">
+    		<table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
+    		    <thead>
+    				<tr class="slds-text-title_caps">
+                        <th width="60%" style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
+                            Quote Line Name
+    					</th>
+    					<th width="40%" style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
+                            <span style="padding-left:98px"> Product</span>
+    					</th>
+    				</tr>
+    			</thead>
+    			<tbody>
+    			    <aura:iteration items="{!v.quoteLineList}" var="rec">
+    			        <tr class="slds-hint-parent">
+                            <td width="60%" role="gridcell">
+                                <ui:outputText value="{!rec.Name}" />
+                            </td>
+                            <td width="40%" role="gridcell">
+                                        <div class="slds-form slds-form_inline">
+                                            <div class="slds-form-element">
+                                                <aura:if isTrue="{!rec.Id != v.selectedRecId}">
+                                                    <lightning:input type="text" data-index="{!rec.Id}" Id="{!rec.Id}" value="{!rec.buildertek__Product__c}"  disabled="true" label=""/>
+                                                </aura:if>
+                                                <aura:if isTrue="{!rec.Id == v.selectedRecId}">
+                                                    <lightning:input type="text" data-index="{!rec.Id}" Id="{!rec.Id}" value="{!rec.buildertek__Product__c}" disabled="false" label="" />
+                                                </aura:if>
+                                                <span data-iconattr="{!rec.Id}" onclick="{!c.editProduct}" Id="{!rec.Id}">
+                                                    <lightning:buttonIcon iconName="utility:edit" variant="border-filled"  class="slds-m-left_xx-small"  alternativeText="Edit" title="Edit" />
+                                                </span>
+                                    <!-- </div> -->
+                                    </div>
+                                    </div>
+                                <!-- </div> -->
+                            </td>
+                            
+                            <!-- <td width="3%"> -->
+                            <!-- </td> -->
+    			        </tr>
+    			    </aura:iteration>
+    			</tbody>
+    		</table>
+    		<br/>
+
+        </div>
+        <c:BT_Spinner/>
+    </div>
+    <div class="slds-modal__footer">
+        <div class="slds-clearfix">
+            <div class="slds-float_right">
+                <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}" >Cancel</button>
+                <button class="slds-button slds-button--brand" onclick="{!c.importBudget}">Save</button>
+            </div>
+        </div>
+
+        <!-- <lightning:notificationsLibrary aura:Id="notifLib" />
+        <lightning:overlayLibrary aura:Id="overlayLib" /> -->
+
+
+    </div>
+</aura:component>

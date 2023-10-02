@@ -4579,13 +4579,25 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 var action1 = component.get("c.doInit");
                 $A.enqueueAction(action1);
             } else {
-                var toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
-                    type: 'ERROR',
-                    message: 'Something Went Wrong',
-                    duration: '5000',
-                });
-                toastEvent.fire();
+                var Error = response.getError();
+                var ErrorMessage = Error[0].pageErrors[0].message
+                if(ErrorMessage.includes('You cannot update this Purchase Order')){
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        type: 'ERROR',
+                        message: 'You cannot update this Purchase Order because there is a Contract Innvoice associated with it, if you would like to add this Purchase Order to a Budget Line, please remove the Contrat Innvoice first.',
+                        duration: '5000',
+                    });
+                    toastEvent.fire();
+                }else{
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        type: 'ERROR',
+                        message: 'Something Went Wrong',
+                        duration: '5000',
+                    });
+                    toastEvent.fire();
+                }
             }
             // $A.get('e.force:refreshView').fire();
             // window.location.reload();
@@ -4871,6 +4883,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             var opts = [
                 {label: "Phase", value:"buildertek__Group__c"},
                 {label: "Sub Group", value:"buildertek__Sub_Grouping__c"},
+                {label: "Cost Code", value:"buildertek__Cost_Code_Name__c"},
             ]
             component.set("v.GroupingOptions", opts);
         }
@@ -4887,8 +4900,8 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
 
      },
      returnToNormalVIew: function(component, event, helper){
-        component.set("v.valueofField1", '');
-        component.set("v.valueofField2", '');
+        // component.set("v.valueofField1", '');
+        // component.set("v.valueofField2", '');
         // component.set("v.valueofField3", '');
         // component.set("v.valueofField4", '');
         

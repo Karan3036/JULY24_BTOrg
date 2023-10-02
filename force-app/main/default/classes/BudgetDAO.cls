@@ -220,11 +220,11 @@ public with sharing class BudgetDAO{
                                                            buildertek__Estimated_Cost_To_Complete__c, buildertek__Profit_Loss__c, buildertek__Projected_Costs__c, buildertek__Amount_Out__c, buildertek__Amount_In__c,
                                                            buildertek__Budget_Modification__c, buildertek__Regional_Factor__c, buildertek__Auto_Number1__c, buildertek__Cost_Code_Name__c, buildertek__Contractor__c, buildertek__Trade_Type__c, buildertek__Notes__c, buildertek__Contingency__c, buildertek__Budget_Line_Group__c, buildertek__Cost_Type__c, buildertek__Total_Approvals_CO__c,buildertek__CO_Total__c,
                                                            buildertek__Variance__c, buildertek__Expense_Amount__c, buildertek__Variance_Percentage__c, buildertek__Additional_Costs__c,
-                                                           buildertek__Bought_Out__c, buildertek__Gross_Profit_Percemtage__c, buildertek__Upgrades__c, buildertek__Total_Cost__c, buildertek__Cost_P__c, buildertek__Discount__c, buildertek__Sales_Price__c, buildertek__Proj_Profit_Loss__c, buildertek__Projected_Gross_Profit__c, buildertek__Eligible_Contingency_Amount__c
+                                                           buildertek__Bought_Out__c, buildertek__Gross_Profit_Percemtage__c, buildertek__Upgrades__c, buildertek__Total_Cost__c, buildertek__Cost_P__c, buildertek__Discount__c, buildertek__Sales_Price__c,buildertek__Markup__c, buildertek__Proj_Profit_Loss__c, buildertek__Projected_Gross_Profit__c, buildertek__Eligible_Contingency_Amount__c
                                                            From buildertek__Budget_Item__c
                                                            where (buildertek__Budget__c = :recordId and buildertek__Contingency__c = false)
                                                            ORDER BY Name ASC];
-        List<buildertek__Budget_Item__c> contingencyItemList = [select ID, Name, buildertek__Amount_Out_2__c, buildertek__Eligible_Amount__c, buildertek__Product_Name__c, buildertek__Group__c, buildertek__Quantity__c, buildertek__Unit_Price__c, buildertek__Original_Budget__c, buildertek__Budget__c, buildertek__Group_Name__c,buildertek__Cost_Code__c, buildertek__Total_CO__c, buildertek__Description__c, buildertek__Product__c, buildertek__Approved_CO__c, buildertek__Pending_CO__c, buildertek__Committed_Costs__c, buildertek__Direct_Costs__c, buildertek__Pending_Costs__c, buildertek__Total_Costs__c, buildertek__Auto_Number__c, buildertek__Revised_Budget__c, buildertek__Base_Sq_Feet__c, buildertek__Projected_Budget__c, buildertek__Forecast_To_Complete__c, buildertek__Estimated_Cost_To_Complete__c, buildertek__Profit_Loss__c, buildertek__Projected_Costs__c, buildertek__Amount_Out__c, buildertek__Amount_In__c, buildertek__Budget_Modification__c, buildertek__Regional_Factor__c, buildertek__Auto_Number1__c, buildertek__Cost_Code_Name__c, buildertek__Contractor__c, buildertek__Trade_Type__c, buildertek__Notes__c, buildertek__Contingency__c, buildertek__Budget_Line_Group__c, buildertek__Cost_Type__c, buildertek__Total_Approvals_CO__c,buildertek__CO_Total__c, buildertek__Variance__c, buildertek__Expense_Amount__c, buildertek__Variance_Percentage__c, buildertek__Additional_Costs__c, buildertek__Bought_Out__c, buildertek__Gross_Profit_Percemtage__c, buildertek__Upgrades__c, buildertek__Total_Cost__c, buildertek__Cost_P__c, buildertek__Discount__c, buildertek__Sales_Price__c, buildertek__Proj_Profit_Loss__c, buildertek__Projected_Gross_Profit__c, buildertek__Eligible_Contingency_Amount__c
+        List<buildertek__Budget_Item__c> contingencyItemList = [select ID, Name, buildertek__Amount_Out_2__c, buildertek__Eligible_Amount__c, buildertek__Product_Name__c, buildertek__Group__c, buildertek__Quantity__c, buildertek__Unit_Price__c, buildertek__Original_Budget__c, buildertek__Budget__c, buildertek__Group_Name__c,buildertek__Cost_Code__c, buildertek__Total_CO__c, buildertek__Description__c, buildertek__Product__c, buildertek__Approved_CO__c, buildertek__Pending_CO__c, buildertek__Committed_Costs__c, buildertek__Direct_Costs__c, buildertek__Pending_Costs__c, buildertek__Total_Costs__c, buildertek__Auto_Number__c, buildertek__Revised_Budget__c, buildertek__Base_Sq_Feet__c, buildertek__Projected_Budget__c, buildertek__Forecast_To_Complete__c, buildertek__Estimated_Cost_To_Complete__c, buildertek__Profit_Loss__c, buildertek__Projected_Costs__c, buildertek__Amount_Out__c, buildertek__Amount_In__c, buildertek__Budget_Modification__c, buildertek__Regional_Factor__c, buildertek__Auto_Number1__c, buildertek__Cost_Code_Name__c, buildertek__Contractor__c, buildertek__Trade_Type__c, buildertek__Notes__c, buildertek__Contingency__c, buildertek__Budget_Line_Group__c, buildertek__Cost_Type__c, buildertek__Total_Approvals_CO__c,buildertek__CO_Total__c, buildertek__Variance__c, buildertek__Expense_Amount__c, buildertek__Variance_Percentage__c, buildertek__Additional_Costs__c, buildertek__Bought_Out__c, buildertek__Gross_Profit_Percemtage__c, buildertek__Upgrades__c, buildertek__Total_Cost__c, buildertek__Cost_P__c, buildertek__Discount__c, buildertek__Sales_Price__c,buildertek__Markup__c, buildertek__Proj_Profit_Loss__c, buildertek__Projected_Gross_Profit__c, buildertek__Eligible_Contingency_Amount__c
                                                                 from buildertek__Budget_Item__c
                                                                 where buildertek__Budget__c = :recordId and buildertek__Contingency__c = true
                                                                 ORDER BY Name ASC];
@@ -758,6 +758,7 @@ budgetRec.buildertek__Budget_Line_Group__c = budGroup.Id;
         // BudgetLineToInsert.buildertek__Trade_Type__c = tradeType;
         BudgetLineToInsert.buildertek__Unit_Price__c = budgetRec.buildertek__Unit_Price__c;
         BudgetLineToInsert.buildertek__Sales_Price__c = budgetRec.buildertek__Sales_Price__c;
+        BudgetLineToInsert.buildertek__Markup__c = budgetRec.buildertek__Markup__c;
         BudgetLineToInsert.buildertek__Quantity__c = budgetRec.buildertek__Quantity__c;
         BudgetLineToInsert.buildertek__Budget__c = budgetRec.buildertek__Budget__c;
         BudgetLineToInsert.buildertek__Cost_Code__c = budgetRec.buildertek__Cost_Code__c;
@@ -1245,7 +1246,7 @@ budgetGroup = Database.query('Select Id, Name,('+soql+') from budget_line_group_
     public static list<Budget_Item__c> BudgetItemList(list<string> BudgetIds){
         list<Budget_Item__c> BudgetItemList;
         //if (Schema.sObjectType.buildertek__Budget_Item__c.fields.Id.isAccessible() && Schema.sObjectType.buildertek__Budget_Item__c.fields.Name.isAccessible() && Schema.sObjectType.buildertek__Budget_Item__c.fields.buildertek__Product__c.isAccessible() && Schema.sObjectType.buildertek__Budget_Item__c.fields.buildertek__Quantity__c.isAccessible() && Schema.sObjectType.buildertek__Budget_Item__c.fields.buildertek__Amount_In__c.isAccessible() && Schema.sObjectType.buildertek__Budget_Item__c.fields.buildertek__Unit_Price__c.isAccessible() && Schema.sObjectType.buildertek__Budget_Item__c.fields.buildertek__Description__c.isAccessible() && Schema.sObjectType.buildertek__Budget_Item__c.fields.buildertek__Budget__c.isAccessible()){
-        BudgetItemList = [select Id, Name, buildertek__Product__c, buildertek__Description__c, buildertek__Quantity__c, buildertek__Unit_Price__c, buildertek__Gross_Profit_Percemtage__c,buildertek__Trade_Type__c, buildertek__Sales_Price__c
+        BudgetItemList = [select Id, Name, buildertek__Product__c, buildertek__Description__c, buildertek__Quantity__c, buildertek__Unit_Price__c, buildertek__Gross_Profit_Percemtage__c,buildertek__Trade_Type__c, buildertek__Sales_Price__c,buildertek__Markup__c
                           from buildertek__Budget_Item__c
                           where id IN :BudgetIds
                           ORDER BY Name ASC];
@@ -2001,7 +2002,7 @@ insert s;*/
     public static List<buildertek__Budget_Item__c> fetchAccount(String searchKeyWord){
         String searchKey = searchKeyWord + '%';
         List<buildertek__Budget_Item__c> returnList = new List<buildertek__Budget_Item__c>();
-        List<buildertek__Budget_Item__c> lstOfAccount = [select id, Name, buildertek__Group__c, buildertek__Group__r.name, buildertek__Sales_Price__c, buildertek__Unit_Price__c, buildertek__Quantity__c
+        List<buildertek__Budget_Item__c> lstOfAccount = [select id, Name, buildertek__Group__c, buildertek__Group__r.name, buildertek__Sales_Price__c,buildertek__Markup__c, buildertek__Unit_Price__c, buildertek__Quantity__c
                                                          from buildertek__Budget_Item__c
                                                          where Name like :searchKey OR buildertek__Group__r.name like :searchKey
                                                          ORDER BY Name ASC
@@ -2514,6 +2515,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
                         // BudgetLineToInsert.buildertek__Trade_Type__c = tradeType;
                         BudgetLineToInsert.buildertek__Unit_Price__c = budgetRec.buildertek__Unit_Price__c;
                         BudgetLineToInsert.buildertek__Sales_Price__c = budgetRec.buildertek__Sales_Price__c;
+                        BudgetLineToInsert.buildertek__Markup__c = budgetRec.buildertek__Markup__c;
                         BudgetLineToInsert.buildertek__Quantity__c = budgetRec.buildertek__Quantity__c;
                         //BudgetLineToInsert.buildertek__Budget__c = budgetRec.buildertek__Budget__c;
                         BudgetLineToInsert.buildertek__Cost_Code__c = budgetRec.buildertek__Cost_Code__c;
@@ -2604,7 +2606,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
 
                 budgetGroupId = budgetGroup.Id;
             }
-            List<buildertek__Budget_Item__c> budgetItemList = [SELECT Id, Name,buildertek__Sales_Price__c, buildertek__Unit_Price__c, buildertek__Total_Costs__c, buildertek__Budget__c FROM buildertek__Budget_Item__c WHERE Id IN :strList ORDER BY Name ASC];
+            List<buildertek__Budget_Item__c> budgetItemList = [SELECT Id, Name,buildertek__Sales_Price__c, buildertek__Unit_Price__c, buildertek__Total_Costs__c,buildertek__Markup__c, buildertek__Budget__c FROM buildertek__Budget_Item__c WHERE Id IN :strList ORDER BY Name ASC];
 
             List<buildertek__CO_Item_To_Budget_Item_Link__c> BudgetCoLinkList = new List<buildertek__CO_Item_To_Budget_Item_Link__c>();
 
@@ -3208,6 +3210,10 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
 
     @AuraEnabled
     public static budgetLineWrapperClass getBudgetLineData(String budgetId, Integer pageNumber, Integer recordToDisply, List<String> groupingList){
+        //debug groupingList by iterating
+        for(String s : groupingList){
+            System.debug('Jaimin: groupingList => ' + s);
+        }
         budgetLineWrapperClass mainWrapper = new budgetLineWrapperClass();
         Integer pageSize = recordToDisply;
         Integer offset = (pageNumber - 1) * pageSize;
@@ -3232,7 +3238,9 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         if (groupingList.size() > 3) {
             query += ', '+groupingList[3];
         }
-        query += ' NULLS LAST';
+        query += ' NULLS LAST';        
+
+        System.debug('Jaimin: query => ' + query);
 
         List<buildertek__Budget_Item__c> budgetLineList = Database.query(query);
 
@@ -3269,6 +3277,26 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         @AuraEnabled
         public Integer total{ get; set; }
     }
+
+    @AuraEnabled
+    public static List<String> groupingLevels(){
+        buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id, buildertek__Budget_Grouping_Level_1__c,
+        buildertek__Budget_Grouping_Level_2__c  from buildertek__Admin_Interface_Node_Configuration__c   WHERE Name = :'Budget Configuration'];
+
+        String groupingLevel1= adminInterfaceNodeConfigurations.buildertek__Budget_Grouping_Level_1__c;
+        if(groupingLevel1 == null){
+            groupingLevel1='';
+        }
+        String groupingLevel2= adminInterfaceNodeConfigurations.buildertek__Budget_Grouping_Level_2__c;
+        if(groupingLevel2 == null){
+            groupingLevel2='';
+        }
+
+
+        List<String> groupingLevels = new List<String>{groupingLevel1, groupingLevel2};
+        return groupingLevels;
+    }   
+
 
 
 

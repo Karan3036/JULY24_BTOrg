@@ -754,11 +754,10 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                     clearTimeout(this.debouncedChange);
                   }
                   this.debouncedChange = setTimeout(() => {
-                    if (event.value != event.oldValue) {
-                      console.log('event ', event);
+                    if (event.value != event.oldValue && this.taskRecordId != null && this.taskRecordId != undefined) {
+                      project.taskStore.getById(this.taskRecordId).assignments = [];
                     }
                   }, 300);
-                    // project.taskStore.getById(event.source.record.id).assignments = [];
                 }
               },
             },
@@ -1128,6 +1127,9 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           this.selectedResourceContact = "";
         }
       }
+      if (event.column.text == "Contractor") {
+        this.taskRecordId = event.record.id;
+      }
     });
 
     gantt.on("expandnode", (source) => {
@@ -1297,12 +1299,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     // Set isLoading to true to show the spinner
     // this.isLoading = false;
     this.spinnerDataTable = false;
-  }
-
-  resetResourceColumnValue(bryntumInstance, recordId) {
-    console.log('lets see you recordId ',recordId);
-    console.log('lets see you bryntumInstance ',bryntumInstance.taskStore);
-    bryntumInstance.taskStore.getById(recordId).assignments = [];
   }
 
   openMasterSchedule() {
