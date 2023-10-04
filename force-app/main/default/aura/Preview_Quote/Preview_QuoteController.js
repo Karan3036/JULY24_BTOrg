@@ -142,11 +142,7 @@
         console.log('ccIds', ccIds);
         // debugger;
         if (toIds.length != 0 || emailIds.length != 0) {
-            if(component.get("v.selectedfilesFill").length>0) {
-                helper.uploadHelper(component, event, component.get("v.recordId"),helper);    
-            }else{
-                helper.sendemailhelper(component, event, helper);
-            }
+            helper.sendemailhelper(component, event, helper);
         } else {
             component.set("v.Spinner", false);
             var toastEvent = $A.get("e.force:showToast");
@@ -221,12 +217,7 @@
         });
         if (toIds.length != 0 || emailIds.length != 0) {
             if (!signaturePad.isEmpty()) {
-                if(component.get("v.selectedfilesFill").length>0) {
-                    component.set("v.sendEmailBool",false);
-                    helper.uploadHelper(component, event, component.get("v.recordId"),helper);    
-                }else{
-                    helper.AcceptSignature(component, event);
-                }
+                helper.AcceptSignature(component, event);
             } else {
                 component.set("v.Spinner", false);
                 var toastEvent = $A.get("e.force:showToast");
@@ -275,39 +266,36 @@
         $A.get("e.force:closeQuickAction").fire();*/
 
     },
-    handleFilesChange: function(component, event, helper) {
+    handleFilesChange: function (component, event, helper) {
         console.log('handleFilesChange');
         var fileName = 'No File Selected..';
-        component.set("v.selectedfileslist",event.getSource().get("v.files"));
-        var fileCount=event.getSource().get("v.files").length;
-        var files='';
+        component.set("v.selectedfileslist",event.getParam('files'));
+        var fileCount = event.getParam('files').length;
+        var files = '';
         var mapData = [];
+
         if (fileCount > 0) {
-            for (var i = 0; i < fileCount; i++) 
-            {
-                fileName = event.getSource().get("v.files")[i]["name"];
+            var filesList = event.getParam('files');
+            for (var i = 0; i < fileCount; i++) {
+                fileName = filesList[i]['name'];
                 var obj = {};
-                obj['Name'] = fileName;                
-                if(i == 0){
-                	files=fileName;    
-                }else{
-                    files=files+','+fileName;
+                obj['Name'] = fileName;
+                if (i === 0) {
+                    files = fileName;
+                } else {
+                    files = files + ',' + fileName;
                 }
-                mapData.push(obj);                
+                mapData.push(obj);
             }
+        } else {
+            files = fileName;
         }
-        else
-        {
-            files=fileName;
-        }
-        component.set("v.fileName", files);            
-        component.set("v.selectedfilesFill",mapData);
 
-        console.log(component.get("v.fileName"));
-        console.log(component.get("v.selectedfilesFill"));
+        component.set('v.selectedfilesFill', mapData);
 
+        console.log(component.get('v.selectedfilesFill'));
     },
-    clear :function(component,event,heplper){
+    clear :function(component,event,helper){
         var selectedPillId = event.getSource().get("v.name");
         var AllPillsList = component.get("v.selectedfilesFill"); 
         

@@ -66,7 +66,6 @@
                             ele.value = element.Name;
                         }
                     })
-                    console.log('after select product >> ', JSON.parse(JSON.stringify(QuoteLine_modified)));
                     console.log('QuoteLine_modified------9090909 >. ', component.get('v.QuoteLine_modified'));
                 }
             });
@@ -106,6 +105,18 @@
     hideList : function(component, event, helper) {
         console.log("Method Called");
         component.set('v.displayProduct', false);
+    },
+    callChildMethod: function(component, event, helper) {
+        console.log("METHOD CHILE CALLED");
+        // Get a reference to the child component using aura:id
+        var childComponent = component.find("childCmp");
+
+        // Check if the child component exists
+        for(var i = 0;i < childComponent.length;i++){
+            console.log("asd", childComponent[i].compid);
+            childComponent[i].hideProductList();
+        }
+            // Call the child method
     }
 
     
