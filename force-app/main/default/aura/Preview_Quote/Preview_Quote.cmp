@@ -21,6 +21,11 @@
     <aura:attribute name="parentId" type="string" />
     <aura:attribute name="fileimageId" type="string" />
     <aura:attribute name="memoquote" type="string" />
+    <aura:attribute name="selectedfilesFill" type="list"/>
+    <aura:attribute name="selectedfileslist" type="Object"/>
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="selectedFillIds" type="sObject[]" default="[]"/>
+    <aura:attribute name="sendEmailBool" type="Boolean" default="true" />
 
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
@@ -123,6 +128,20 @@
                                         <lightning:input aura:id="memo" name="input1" value="{!v.memoquote}" class="slds-size--1-of-1" />
                                     </div>
                                 </div>
+                            </div>
+                            <div style="padding:10px;" class="slds-form-element slds-email-composer__combobox">
+                                <lightning:layout multipleRows = "true">                                        
+                                    <div>
+                                        <lightning:input aura:id="fuploader" onchange="{!c.handleFilesChange}" type="file" variant="label-hidden" name="file" label=""  multiple="true" accept="image/png,image/jpeg,image/jpg,.zip, .doc, .docx, .rtf, .ppt, .pptx, .xls, .xlsx, .pdf, .txt"/>
+                                        <aura:iteration items="{!v.selectedfilesFill}" var="sr">
+                                            <lightning:pill class="slds-m-around_xx-small slds-text-body_small slds-text-color_error" label="{!sr.Name}" name="{!sr.Name}" onremove="{! c.clear }">
+                                                <aura:set attribute="media">
+                                                    <lightning:icon iconName="standard:file" size="x-small" alternativeText="icon"/>
+                                                </aura:set>
+                                            </lightning:pill>
+                                        </aura:iteration>
+                                    </div>                                        
+                                </lightning:layout>
                             </div>
 
                             <p class="slds-text-longform tile__title red-txt">

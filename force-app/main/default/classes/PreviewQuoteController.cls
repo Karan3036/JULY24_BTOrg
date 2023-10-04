@@ -5,7 +5,7 @@ public without sharing class PreviewQuoteController{
         if (Schema.sObjectType.Emailtemplate.fields.Id.isAccessible() && Schema.sObjectType.Emailtemplate.fields.Name.isAccessible() && Schema.sObjectType.Emailtemplate.fields.folderid.isAccessible() && Schema.sObjectType.Folder.fields.Name.isAccessible()){
             temrec = [Select Id, Name, folder.name, DeveloperName
                       from Emailtemplate
-                      where folder.name = 'BT Quote' AND DeveloperName != 'quote_top' AND DeveloperName != 'quote_bottom'];
+                      where folder.name = 'BT Quote' AND DeveloperName != 'quote_top' AND DeveloperName != 'quote_bottom' ORDER BY Name ASC];
         }
         System.debug('Template ========>>>>>'+temrec);
         return temrec;
@@ -123,8 +123,9 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, List<String> emailIds, string memovalue){
+    public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, List<String> emailIds, string memovalue, List<String> files){
        // try{
+        system.debug('files-->'+files);
             String fileid = '';
             String body = '';
             String subject='';
@@ -282,9 +283,44 @@ public without sharing class PreviewQuoteController{
             efa.setFileName(quoterecbody[0].Name+'.pdf');
             Blob b = setAttachmentBody(recordId, templateId, fileid);
             system.debug('Blob ---> ' + b);
-            
             efa.setBody(b);
             fileAttachments.add(efa);
+
+            List<ContentVersion> docList;
+            list<Id> contentVersionIds = new list<Id>();
+
+            docList = [Select Id, ContentDocumentId, Title, VersionData
+                       from ContentVersion
+                       where Id IN :files];
+
+
+            system.debug('docList -----------> ' + docList);
+            system.debug('docList size -------> ' + docList.size());
+            if (docList.size() > 0){
+                for (ContentVersion docs : docList){
+                    Messaging.Emailfileattachment efa1 = new Messaging.Emailfileattachment();
+                    efa1.setFileName(docs.Title);
+                    efa1.setBody(docs.VersionData);
+                    fileAttachments.add(efa1);
+                    //fileAttachments.add(docs);
+                    contentVersionIds.add(docs.Id);
+                }
+            }
+
+            List<Attachment> attList;
+            attList = [Select Id, Name, Body from Attachment where Id IN :files];
+            system.debug('attList -----------> ' + attList);
+            system.debug('attList size -------> ' + attList.size());
+            if (docList.size() > 0){
+                for (Attachment att : attList){
+                    Messaging.Emailfileattachment efa2 = new Messaging.Emailfileattachment();
+                    efa2.setFileName(att.Name);
+                    efa2.setBody(att.Body);
+                    fileAttachments.add(efa2);
+                }
+            }
+            
+            mail.setEntityAttachments(contentVersionIds);
             mail.setFileAttachments(fileAttachments);
             mail.setUseSignature(useSignature);
             mails.add(mail);
@@ -397,7 +433,7 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static String acceptandsendProposal(string signName, String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, string fileid, List<String> emailIds, string memovalue){
+    public static String acceptandsendProposal(string signName, String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, string fileid, List<String> emailIds, string memovalue, List<String> files){
 
         try{
             String body = '';
@@ -519,6 +555,42 @@ public without sharing class PreviewQuoteController{
 
             efa.setBody(setAttachmentBody(recordId, templateId, fileid));
             fileAttachments.add(efa);
+
+            List<ContentVersion> docList;
+            list<Id> contentVersionIds = new list<Id>();
+
+            docList = [Select Id, ContentDocumentId, Title, VersionData
+                       from ContentVersion
+                       where Id IN :files];
+
+
+            system.debug('docList -----------> ' + docList);
+            system.debug('docList size -------> ' + docList.size());
+            if (docList.size() > 0){
+                for (ContentVersion docs : docList){
+                    Messaging.Emailfileattachment efa1 = new Messaging.Emailfileattachment();
+                    efa1.setFileName(docs.Title);
+                    efa1.setBody(docs.VersionData);
+                    fileAttachments.add(efa1);
+                    //fileAttachments.add(docs);
+                    contentVersionIds.add(docs.Id);
+                }
+            }
+
+            List<Attachment> attList;
+            attList = [Select Id, Name, Body from Attachment where Id IN :files];
+            system.debug('attList -----------> ' + attList);
+            system.debug('attList size -------> ' + attList.size());
+            if (docList.size() > 0){
+                for (Attachment att : attList){
+                    Messaging.Emailfileattachment efa2 = new Messaging.Emailfileattachment();
+                    efa2.setFileName(att.Name);
+                    efa2.setBody(att.Body);
+                    fileAttachments.add(efa2);
+                }
+            }
+            
+            mail.setEntityAttachments(contentVersionIds);
             mail.setFileAttachments(fileAttachments);
             mail.setUseSignature(useSignature);
             mails.add(mail);
@@ -732,6 +804,62 @@ public without sharing class PreviewQuoteController{
                    WHERE Id = :recordId];
         }
         return qut;
+    }
+
+    @AuraEnabled
+    public static String uploadFile(String parentId, String fileName, String base64Data, String contentType, String fileId) {
+        // check if fileId id ''(Always blank in first chunk), then call the saveTheFile method,
+        //  which is save the check data and return the attachemnt Id after insert,
+        //  next time (in else) we are call the appentTOFile() method
+        //   for update the attachment with reamins chunks
+        System.debug(' parentId  ++++++++++++++++++++++++++++++++++'+parentId);
+        if (fileId == '') {
+            fileId = saveTheFile(parentId, fileName, base64Data, contentType);
+            system.debug('****'+fileId);
+        } else {
+            appendToFile(fileId, base64Data);
+        }
+        return string.valueOf(fileId);
+    }
+    public static Id saveTheFile(String parentId, String fileName, String base64Data, String contentType) {
+        system.debug('parentId--->'+parentId);
+        base64Data = EncodingUtil.urlDecode(base64Data, 'UTF-8');
+        ContentVersion conVer = new ContentVersion();
+        Set<SObjectField> ContentVersionFields = new set<SObjectField>{ContentVersion.ContentLocation,
+        ContentVersion.PathOnClient,
+        ContentVersion.Title,
+        ContentVersion.VersionData};
+        conVer.ContentLocation = 'S'; // to use S specify this document is in Salesforce, to use E for external files
+        conVer.PathOnClient = fileName; // The files name, extension is very important here which will help the file in preview.
+        conVer.Title = fileName; // Display name of the files
+        conVer.VersionData = EncodingUtil.base64Decode(base64Data); // converting your binary string to Blog
+        insert conVer;    //Insert ContentVersion
+        // First get the Content Document Id from ContentVersion Object
+        Id conDoc = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:conVer.Id].ContentDocumentId;
+        //create ContentDocumentLink  record
+        ContentDocumentLink conDocLink = New ContentDocumentLink();
+        Set<SObjectField> ContentDocumentLinkFields = new set<SObjectField>{ContentDocumentLink.LinkedEntityId,
+        ContentDocumentLink.ContentDocumentId,
+        ContentDocumentLink.shareType};
+        conDocLink.LinkedEntityId = parentId; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
+        conDocLink.ContentDocumentId = conDoc;  //ContentDocumentId Id from ContentVersion
+        conDocLink.shareType = 'I';
+        insert conDocLink;
+        system.debug('inserted--------------'+conDocLink.Id);
+        return conVer.Id;
+    }
+
+    private static void appendToFile(Id fileId, String base64Data) {
+        base64Data = EncodingUtil.urlDecode(base64Data, 'UTF-8');        
+        Attachment a = [
+            SELECT Id, Body
+            FROM Attachment
+            WHERE Id = : fileId
+        ];
+        
+        String existingBody = EncodingUtil.base64Encode(a.Body);        
+        a.Body = EncodingUtil.base64Decode(existingBody + base64Data);        
+        update a;
     }
 
 }
