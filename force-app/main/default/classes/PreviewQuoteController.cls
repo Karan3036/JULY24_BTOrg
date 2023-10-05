@@ -123,7 +123,7 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, List<String> emailIds, string memovalue){
+    public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, List<String> emailIds, string memovalue, String emailBodyValue){
        try {
             String fileid = '';
             String body = '';
@@ -173,7 +173,7 @@ public without sharing class PreviewQuoteController{
         system.debug('recordId----' + recordId);
             system.debug('templateId----' + templateId);
             list<buildertek__Quote__c> quoterecbody = new list<buildertek__Quote__c>();
-            quoterecbody = [select id, Name, buildertek__Status__c, buildertek__TemplateId__c,buildertek__Template_Name__c, buildertek__To_Emails__c,buildertek__Date_Sent_To_Customer__c,buildertek__Memo__c
+            quoterecbody = [select id, Name, buildertek__Status__c, buildertek__TemplateId__c,buildertek__Template_Name__c, buildertek__To_Emails__c,buildertek__Date_Sent_To_Customer__c,buildertek__Memo__c,buildertek__Preview_Email_Body__c
                             from buildertek__Quote__c
                             where Id = :recordId
                             limit 1];
@@ -183,6 +183,7 @@ public without sharing class PreviewQuoteController{
                    quoterecbody[0].buildertek__Template_Name__c	 = et[0].Name;
                 }
                 quoterecbody[0].buildertek__Memo__c = memovalue;
+                quoterecbody[0].buildertek__Preview_Email_Body__c = emailBodyValue;
 
                 string toemail = string.join(to,',');
 
@@ -402,7 +403,7 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static String acceptandsendProposal(string signName, String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, string fileid, List<String> emailIds, string memovalue){
+    public static String acceptandsendProposal(string signName, String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, string fileid, List<String> emailIds, string memovalue, String emailBodyValue){
 
         try{
             String body = '';
@@ -596,7 +597,7 @@ public without sharing class PreviewQuoteController{
             }
             list<buildertek__Quote__c> quoterec;
 
-            quoterec = [select id, Name, buildertek__Status__c, buildertek__Date_Sent_To_Customer__c, buildertek__Date_Accepted_by_Customer__c
+            quoterec = [select id, Name, buildertek__Status__c, buildertek__Date_Sent_To_Customer__c, buildertek__Date_Accepted_by_Customer__c, buildertek__Preview_Email_Body__c
                         from buildertek__Quote__c
                         where Id = :recordId
                         limit 1];
@@ -608,6 +609,7 @@ public without sharing class PreviewQuoteController{
                 quoterec[0].buildertek__Date_Accepted_by_Customer__c = system.now();
                 quoterec[0].buildertek__Date_Sent_To_Customer__c = System.today();
                 quoterec[0].buildertek__Memo__c = memovalue;
+                quoterec[0].buildertek__Preview_Email_Body__c = emailBodyValue;
                 update quoterec;
 
             }
@@ -732,7 +734,7 @@ public without sharing class PreviewQuoteController{
         buildertek__Quote__c qut;
         if (Schema.sObjectType.buildertek__Quote__c.fields.Id.isAccessible() && Schema.sObjectType.buildertek__Quote__c.fields.buildertek__Primary_Contact__c.isAccessible()){
 
-            qut = [SELECT Id, buildertek__Memo__c
+            qut = [SELECT Id, buildertek__Memo__c, buildertek__Email_Body__c, TemplateId__c, buildertek__Sales_Rep__r.Name
                    FROM buildertek__Quote__c
                    WHERE Id = :recordId];
         }

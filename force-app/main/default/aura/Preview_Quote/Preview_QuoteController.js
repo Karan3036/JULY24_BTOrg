@@ -16,6 +16,13 @@
 
         $A.enqueueAction(dbAction);
         helper.getmemovalue(component, event, helper);
+        var confirmationsiteurl = $A.get("$Label.buildertek__ConfirmationSiteURL__c");
+        var siteurl = $A.get("$Label.buildertek__Sites_URL__c");
+        var companywebsite = $A.get("$Label.buildertek__company_website");
+        console.log('confirmationsiteurl-->',confirmationsiteurl);
+        console.log('siteurl--->',siteurl);
+        console.log('companywebsite--->',companywebsite);
+        
     },
     scrolldown: function(component, event, helper) {
 
@@ -140,7 +147,7 @@
         });
         console.log('toIds', toIds);
         console.log('ccIds', ccIds);
-        debugger;
+        // debugger;
         if (toIds.length != 0 || emailIds.length != 0) {
             var action = component.get("c.sendProposal");
             action.setParams({
@@ -151,6 +158,7 @@
                 cc: ccIds,
                 emailIds: emailIds,
                 memovalue: component.get("v.memoquote"),
+                emailBodyValue: component.get("v.templateEmailBody")
             });
             action.setCallback(this, function(response) {
                 var state = response.getState();
@@ -158,7 +166,7 @@
                 if (state === "SUCCESS") {
                     var result = response.getReturnValue();
                     if (result === 'Success') {
-                        debugger;
+                        // debugger;
                         component.set("v.Spinner", false);
                         $A.get("e.force:closeQuickAction").fire();
                         var toastEvent = $A.get("e.force:showToast");

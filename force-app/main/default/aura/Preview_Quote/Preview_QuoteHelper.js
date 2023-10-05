@@ -128,7 +128,9 @@
             cc: ccIds,
             fileid: signid,
             emailIds: emailIds,
-            memovalue: component.get("v.memoquote")
+            memovalue: component.get("v.memoquote"),
+            emailBodyValue: component.get("v.templateEmailBody")
+
         });
         action.setCallback(this, function(response) {
             var state = response.getState();
@@ -218,6 +220,8 @@
             var result = response.getReturnValue();
             if (state === "SUCCESS") {
                 component.set("v.memoquote", result.buildertek__Memo__c);
+                component.set("v.templateEmailBody", result.buildertek__Email_Body__c);
+                component.set("v.templateId", result.TemplateId__c);
             }
         });
 

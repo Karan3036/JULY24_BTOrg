@@ -21,6 +21,9 @@
     <aura:attribute name="parentId" type="string" />
     <aura:attribute name="fileimageId" type="string" />
     <aura:attribute name="memoquote" type="string" />
+    <aura:attribute name="templateEmailBody" type="string" />
+    <aura:attribute name="templateId" type="string" />
+    
 
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
@@ -114,6 +117,15 @@
                                             </aura:set>
                                         </lightning:pill>
                                     </aura:iteration>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-email-composer__combobox" style="padding-top: 10px;padding-bottom: 10px;">
+                                <label class="slds-form-element__label" for="recipients-memo">Email<br/> Body</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-combobox_container slds-has-inline-listbox emailBodyrk" style="padding-left: 2rem;">
+                                        <lightning:inputRichText aura:id="bodyId" placeholder="Email Body" value="{!v.templateEmailBody}" class="slds-size--1-of-1"/>
+                                        <p>Please <a href="">click here</a> to view and accept your proposal.</p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="slds-form-element slds-email-composer__combobox" style="padding-top: 10px;padding-bottom: 10px;">
