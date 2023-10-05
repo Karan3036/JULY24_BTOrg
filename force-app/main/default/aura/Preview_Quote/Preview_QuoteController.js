@@ -140,9 +140,53 @@
         });
         console.log('toIds', toIds);
         console.log('ccIds', ccIds);
-        // debugger;
+        debugger;
         if (toIds.length != 0 || emailIds.length != 0) {
-            helper.sendemailhelper(component, event, helper);
+            var action = component.get("c.sendProposal");
+            action.setParams({
+                htmlBody: component.get("v.quoteLines"),
+                recordId: component.get("v.recordId"),
+                templateId: component.get("v.selectedTemplate"),
+                to: toIds,
+                cc: ccIds,
+                emailIds: emailIds,
+                memovalue: component.get("v.memoquote"),
+            });
+            action.setCallback(this, function(response) {
+                var state = response.getState();
+                var subject = 'Quote[ref:' + component.get("v.recordId") + ']';
+                if (state === "SUCCESS") {
+                    var result = response.getReturnValue();
+                    if (result === 'Success') {
+                        debugger;
+                        component.set("v.Spinner", false);
+                        $A.get("e.force:closeQuickAction").fire();
+                        var toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams({
+                            "title": "Success!",
+                            "type": 'success',
+                            "message": "Email Sent Successfully"
+                        });
+                        toastEvent.fire();
+                        /* var taskaction = component.get("c.createTask");
+    		              taskaction.setParams({
+    		                "whatId" : component.get("v.recordId"),
+    		                "emailSubject" : subject
+    		            });
+    		            $A.enqueueAction(taskaction);*/
+                    } else {
+                        $A.get("e.force:closeQuickAction").fire();
+                        var toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams({
+                            "type": 'error',
+                            "message": result
+                        });
+                        toastEvent.fire();
+                    }
+                    $A.get('e.force:refreshView').fire();
+                }
+            });
+            $A.enqueueAction(action);
         } else {
             component.set("v.Spinner", false);
             var toastEvent = $A.get("e.force:showToast");
@@ -265,45 +309,5 @@
         toastEvent.fire();
         $A.get("e.force:closeQuickAction").fire();*/
 
-    },
-    handleFilesChange: function (component, event, helper) {
-        console.log('handleFilesChange');
-        var fileName = 'No File Selected..';
-        component.set("v.selectedfileslist",event.getParam('files'));
-        var fileCount = event.getParam('files').length;
-        var files = '';
-        var mapData = [];
-
-        if (fileCount > 0) {
-            var filesList = event.getParam('files');
-            for (var i = 0; i < fileCount; i++) {
-                fileName = filesList[i]['name'];
-                var obj = {};
-                obj['Name'] = fileName;
-                if (i === 0) {
-                    files = fileName;
-                } else {
-                    files = files + ',' + fileName;
-                }
-                mapData.push(obj);
-            }
-        } else {
-            files = fileName;
-        }
-
-        component.set('v.selectedfilesFill', mapData);
-
-        console.log(component.get('v.selectedfilesFill'));
-    },
-    clear :function(component,event,helper){
-        var selectedPillId = event.getSource().get("v.name");
-        var AllPillsList = component.get("v.selectedfilesFill"); 
-        
-        for(var i = 0; i < AllPillsList.length; i++){
-            if(AllPillsList[i].Name == selectedPillId){
-                AllPillsList.splice(i, 1);
-                component.set("v.selectedfilesFill", AllPillsList);
-            }  
-        }
-    }, 
+    }
 })

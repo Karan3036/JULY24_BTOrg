@@ -104,15 +104,6 @@
 
     acceptandsendemailhelper: function(component, event) {
         //alert('hi2');
-        var fileInput = '';
-        var contentVersionIds = []; 
-        if(component.get("v.selectedfilesFill").length>0) {
-            fileInput = component.get("v.selectedfileslist");   
-            for (var i = 0; i < fileInput.length; i++) {
-                var contentVersionId = fileInput[i].contentVersionId;
-                contentVersionIds.push(contentVersionId);
-            }    
-        }
         var toIds = [];
         var ccIds = [];
         var to = component.get("v.selectedToContact");
@@ -127,7 +118,6 @@
         });
 
         var signid = component.get("v.fileimageId");
-        console.log('signid===>',signid);
         // alert('imageId'+component.get("v.fileimageId"));
         var action = component.get("c.acceptandsendProposal");
         action.setParams({
@@ -138,8 +128,7 @@
             cc: ccIds,
             fileid: signid,
             emailIds: emailIds,
-            memovalue: component.get("v.memoquote"),
-            files: contentVersionIds
+            memovalue: component.get("v.memoquote")
         });
         action.setCallback(this, function(response) {
             var state = response.getState();
@@ -233,69 +222,6 @@
         });
 
         $A.enqueueAction(action);
-    },
-    sendemailhelper: function(component, event, helper) {
-        try {
-            var fileInput = [];
-            var contentVersionIds = []; 
-            var toIds = [];
-            var ccIds = [];
-            if(component.get("v.selectedfilesFill").length>0) {
-                fileInput = component.get("v.selectedfileslist");   
-                for (var i = 0; i < fileInput.length; i++) {
-                    var contentVersionId = fileInput[i].contentVersionId;
-                    contentVersionIds.push(contentVersionId);
-                }    
-            }
-            var emailIds = component.get('v.emailIds');
-            var to = component.get("v.selectedToContact");
-            var cc = component.get("v.selectedCcContact");
-            to.forEach(function(v) { toIds.push(v.Id) });
-            cc.forEach(function(v) { ccIds.push(v.Id) });
-            var action = component.get("c.sendProposal");
-                action.setParams({
-                    htmlBody: component.get("v.quoteLines"),
-                    recordId: component.get("v.recordId"),
-                    templateId: component.get("v.selectedTemplate"),
-                    to: toIds,
-                    cc: ccIds,
-                    emailIds: emailIds,
-                    memovalue: component.get("v.memoquote"),
-                    files: contentVersionIds
-                });
-                action.setCallback(this, function(response) {
-                    var state = response.getState();
-                    var subject = 'Quote[ref:' + component.get("v.recordId") + ']';
-                    if (state === "SUCCESS") {
-                        var result = response.getReturnValue();
-                        if (result === 'Success') {
-                            // debugger;
-                            component.set("v.Spinner", false);
-                            $A.get("e.force:closeQuickAction").fire();
-                            var toastEvent = $A.get("e.force:showToast");
-                            toastEvent.setParams({
-                                "title": "Success!",
-                                "type": 'success',
-                                "message": "Email Sent Successfully"
-                            });
-                            toastEvent.fire();
-                        } else {
-                            $A.get("e.force:closeQuickAction").fire();
-                            var toastEvent = $A.get("e.force:showToast");
-                            toastEvent.setParams({
-                                "type": 'error',
-                                "message": result
-                            });
-                            toastEvent.fire();
-                        }
-                        $A.get('e.force:refreshView').fire();
-                    }
-                });
-                $A.enqueueAction(action);
-        } catch (error) {
-            console.log(error);
-        }
-        
     },
 
 })

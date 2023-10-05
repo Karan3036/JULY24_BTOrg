@@ -123,9 +123,8 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, List<String> emailIds, string memovalue, List<String> files){
+    public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, List<String> emailIds, string memovalue){
        try {
-        system.debug('files-->'+files);
             String fileid = '';
             String body = '';
             String subject='';
@@ -193,6 +192,8 @@ public without sharing class PreviewQuoteController{
             }
 
             List<Contact> conList = [SELECT Id, email FROM Contact WHERE Id IN :to AND Email != null];
+
+            system.debug('random contact id '+conList[0]);
             List<Messaging.SingleEmailMessage> msgList = new List<Messaging.SingleEmailMessage>();
             List<Messaging.SingleEmailMessage> msgList1 = new List<Messaging.SingleEmailMessage>();
             Savepoint sp = Database.setSavepoint();
@@ -281,22 +282,9 @@ public without sharing class PreviewQuoteController{
             efa.setFileName(quoterecbody[0].Name+'.pdf');
             Blob b = setAttachmentBody(recordId, templateId, fileid);
             system.debug('Blob ---> ' + b);
+            
             efa.setBody(b);
             fileAttachments.add(efa);
-
-            List<ContentVersion> docList;
-            list<Id> contentVersionIds = new list<Id>();
-            docList = [Select Id, ContentDocumentId, Title, VersionData from ContentVersion where Id IN :files];
-            if (docList.size() > 0){
-                for (ContentVersion docs : docList){
-                    Messaging.Emailfileattachment efa1 = new Messaging.Emailfileattachment();
-                    efa1.setFileName(docs.Title);
-                    efa1.setBody(docs.VersionData);
-                    contentVersionIds.add(docs.Id);
-                }
-            }
-            
-            mail.setEntityAttachments(contentVersionIds);
             mail.setFileAttachments(fileAttachments);
             mail.setUseSignature(useSignature);
             mails.add(mail);
@@ -414,7 +402,7 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static String acceptandsendProposal(string signName, String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, string fileid, List<String> emailIds, string memovalue, List<String> files){
+    public static String acceptandsendProposal(string signName, String htmlBody, String recordId, String templateId, List<String> to, List<String> cc, string fileid, List<String> emailIds, string memovalue){
 
         try{
             String body = '';
@@ -536,20 +524,6 @@ public without sharing class PreviewQuoteController{
 
             efa.setBody(setAttachmentBody(recordId, templateId, fileid));
             fileAttachments.add(efa);
-
-            List<ContentVersion> docList;
-            list<Id> contentVersionIds = new list<Id>();
-            docList = [Select Id, ContentDocumentId, Title, VersionData from ContentVersion where Id IN :files];
-            if (docList.size() > 0){
-                for (ContentVersion docs : docList){
-                    Messaging.Emailfileattachment efa1 = new Messaging.Emailfileattachment();
-                    efa1.setFileName(docs.Title);
-                    efa1.setBody(docs.VersionData);
-                    contentVersionIds.add(docs.Id);
-                }
-            }
-            
-            mail.setEntityAttachments(contentVersionIds);
             mail.setFileAttachments(fileAttachments);
             mail.setUseSignature(useSignature);
             mails.add(mail);

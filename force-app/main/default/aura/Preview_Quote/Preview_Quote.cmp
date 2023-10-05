@@ -21,9 +21,6 @@
     <aura:attribute name="parentId" type="string" />
     <aura:attribute name="fileimageId" type="string" />
     <aura:attribute name="memoquote" type="string" />
-    <aura:attribute name="selectedfilesFill" type="list"/>
-    <aura:attribute name="selectedfileslist" type="Object"/>
-    <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg',  '.zip', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.pdf', '.txt']" />
 
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
@@ -126,26 +123,6 @@
                                         <lightning:input aura:id="memo" name="input1" value="{!v.memoquote}" class="slds-size--1-of-1" />
                                     </div>
                                 </div>
-                            </div>
-                            <div style="padding:10px;" class="slds-form-element slds-email-composer__combobox">
-                                <lightning:layout multipleRows = "true">                                        
-                                    <div>
-                                        <lightning:fileUpload label="Attach receipt"
-                                                              name="fileUploader"
-                                                              multiple="true"
-                                                              accept="{!v.filetype}"
-                                                              recordId="{!v.recordId}"
-                                                              aura:id="fuploader"
-                                                              onuploadfinished="{!c.handleFilesChange}" />
-                                        <aura:iteration items="{!v.selectedfilesFill}" var="sr">
-                                            <lightning:pill class="slds-m-around_xx-small slds-text-body_small slds-text-color_error" label="{!sr.Name}" name="{!sr.Name}" onremove="{!c.clear}">
-                                                <aura:set attribute="media">
-                                                    <lightning:icon iconName="standard:file" size="x-small" alternativeText="icon" />
-                                                </aura:set>
-                                            </lightning:pill>
-                                        </aura:iteration>
-                                    </div>                                       
-                                </lightning:layout>
                             </div>
 
                             <p class="slds-text-longform tile__title red-txt">
