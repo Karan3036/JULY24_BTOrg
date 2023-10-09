@@ -16,12 +16,6 @@
 
         $A.enqueueAction(dbAction);
         helper.getmemovalue(component, event, helper);
-        var confirmationsiteurl = $A.get("$Label.buildertek__ConfirmationSiteURL__c");
-        var siteurl = $A.get("$Label.buildertek__Sites_URL__c");
-        var companywebsite = $A.get("$Label.buildertek__company_website");
-        console.log('confirmationsiteurl-->',confirmationsiteurl);
-        console.log('siteurl--->',siteurl);
-        console.log('companywebsite--->',companywebsite);
         
     },
     scrolldown: function(component, event, helper) {
