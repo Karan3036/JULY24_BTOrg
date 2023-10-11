@@ -1527,18 +1527,22 @@
      applyCSSBasedOnURL: function(component) {
         var isproject = component.get("v.isproject");
         console.log('isproject',isproject);
-        var headerDiv = component.find("headerDiv");
-        console.log('headerDiv',headerDiv);
+        // var headerDiv = component.find("headerDiv");
+        // console.log('headerDiv',headerDiv);
+        var slds_scrollable = component.find("slds_scrollable");
+
         var totalPage = component.get("v.total");
         console.log('totalPage',totalPage);
 
         // Check if the current URL contains a specific keyword or phrase
         if (isproject) {
             console.log('in if');
-            $A.util.addClass(headerDiv, "divcont1");
+            // $A.util.addClass(headerDiv, "divcont1");
+            $A.util.addClass(slds_scrollable, "divcont1");
         } else if(!isproject){
             console.log('in else');
-            $A.util.removeClass(headerDiv, "divcont1");
+            // $A.util.removeClass(headerDiv, "divcont1");
+            $A.util.removeClass(slds_scrollable, "divcont1");
 
             // if(totalPage < 50){
             //     $A.util.addClass(headerDiv, "divcont2");
@@ -1598,6 +1602,29 @@
         });
         $A.enqueueAction(action1);
     },
+
+    getGroupingLevels:function(component, event, helper){
+        var action = component.get("c.groupingLevels");
+        action.setCallback(this, function(response) {
+
+            if(response.getState() == 'SUCCESS'){
+                console.log('Testing');
+                console.log(response.getReturnValue());
+                let groupingLevel=response.getReturnValue();
+
+                component.set('v.valueofField1' , groupingLevel[0]);
+                component.set('v.valueofField2' , groupingLevel[1]);
+                component.set('v.valueofField3' , groupingLevel[2]);
+                component.set('v.valueofField4' , groupingLevel[3]);
+
+               
+            }else{
+                console.log(response.getError());
+            }
+        });
+        $A.enqueueAction(action);
+    
+    }
 
 
 })

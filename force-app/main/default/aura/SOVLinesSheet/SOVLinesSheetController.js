@@ -1,9 +1,9 @@
 ({
     doInit : function(component, event, helper) {
-        debugger;
+        
         var action = component.get("c.getUser");
         action.setCallback(this, function(response){
-            debugger;
+            
             
             if(response.getState() === "SUCCESS"){
                 var result = response.getReturnValue();

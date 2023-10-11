@@ -109,11 +109,16 @@ export default class PublickFileManageLWC extends NavigationMixin(LightningEleme
     handle_SaveChanges(event){
         try {
             console.log('this.EditedRecords', JSON.parse(JSON.stringify(this.EditedRecords)));
+            if(this.EditedRecords.length == 0){
+                this.showToast('success', 'Everything up to date', '');
+                return;
+            }
             UpdateFileName({UpdatedRecords : this.EditedRecords})
             .then(result => {
                 console.log('result >. ', result);
                 this.EditedRecords.splice(0, this.EditedRecords.length);
                 console.log('afetr update this.EditedRecords', JSON.parse(JSON.stringify(this.EditedRecords)));
+                this.showToast('success', 'File Name Updated Successfully', '');
             })
             .catch(error => {
                 console.log('error >> ', error);
@@ -198,6 +203,7 @@ export default class PublickFileManageLWC extends NavigationMixin(LightningEleme
                 
             }
             else{
+                this.loadFileFolderJunctionData();
                 this.spinnerDataTable=false;
                 this.showToast('error', 'Please Select at least one Record', '');
             }
@@ -227,6 +233,7 @@ export default class PublickFileManageLWC extends NavigationMixin(LightningEleme
         this.spinnerDataTable = true
         this.showfiles = true;
         this.showtable = false;
+        this.selectedDocuments = [];
         this.getFilesforselectedRecord()
     }
 
@@ -300,7 +307,8 @@ export default class PublickFileManageLWC extends NavigationMixin(LightningEleme
         .then((response) =>{
             console.log("Response on confirm click:- ",response);
             if(response == 'Success'){
-                this.template.querySelector('c-toast-component').showToast('success', 'Files are added to the selected folders and ready to be viewed publicly', 3000);
+                // this.template.querySelector('c-toast-component').showToast('success', 'Files are added to the selected folders and ready to be viewed publicly', 3000);
+                this.showToast('success', 'Files are added to the selected folders and ready to be viewed publicly', 'Success!');
                 this.showfiles=false;
                 this.showfiletable = false;
                 this.showfilemessage = false;

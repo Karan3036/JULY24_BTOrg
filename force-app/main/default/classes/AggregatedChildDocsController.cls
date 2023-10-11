@@ -14,18 +14,12 @@ public without sharing class AggregatedChildDocsController {
     public class contntDocumentLinkWrapp {
         @AuraEnabled
         public String ContentDocumentId;
-        // @AuraEnabled
-        // public String Name;
         @AuraEnabled
         public String ParentId;
         @AuraEnabled
         public String ParentName;
-        // @AuraEnabled public List<ContentDocumentLink> records;
-        // @AuraEnabled public Integer totalPages;
-        @AuraEnabled public  String orgBaseURL;
-
-
-        
+        @AuraEnabled 
+        public  String orgBaseURL;
     } 
     
     @AuraEnabled
@@ -48,12 +42,7 @@ public without sharing class AggregatedChildDocsController {
                 }
             }
             if (projectReferenceFieldApiName != null) {
-
-                System.debug(projectReferenceFieldApiName);
-                System.debug(objectApiName);
-
                 String query = 'SELECT Id, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN (SELECT Id FROM ' + objectApiName + ' WHERE ' + projectReferenceFieldApiName + ' = :projectId)';
-                System.debug(query);
                 List<sObject> lstOfRecords = Database.query(query);
                 List<contntDocumentLinkWrapp> documentWrapList = new List<contntDocumentLinkWrapp>();
                 List<Id> cntDocLinkIdList= new List<Id>();
@@ -64,14 +53,9 @@ public without sharing class AggregatedChildDocsController {
                 }
                 if(cntDocLinkIdList.size() > 0){
                     List<ContentDocumentLink> cntDocumentList=[Select Id , ContentDocumentId ,LinkedEntity.Type,  ContentDocument.Title, LinkedEntityId , ContentDocument.FileType, LinkedEntity.Name   FROM ContentDocumentLink  WHERE LinkedEntityId IN:cntDocLinkIdList  AND ContentDocumentId NOT IN(SELECT Id FROM ContentDocument WHERE Title LIKE 'Signature%')];
-                    // contntDocumentLinkWrapp wrap= new contntDocumentLinkWrapp();
-                    // wrap.records = cntDocumentList;
-                    // wrap.totalPages = (Integer)Math.ceil([SELECT count() FROM ContentDocumentLink WHERE LinkedEntityId IN: cntDocLinkIdList AND ContentDocumentId NOT IN(SELECT Id FROM ContentDocument WHERE Title LIKE 'Signature%')] / (Decimal)pageSize);
-                    // wrap.orgBaseURL= URL.getSalesforceBaseUrl().toExternalForm();
                     for(ContentDocumentLink cntDocLink:cntDocumentList){
                         contntDocumentLinkWrapp wrap= new contntDocumentLinkWrapp();
                         wrap.ContentDocumentId=cntDocLink.ContentDocumentId;
-                        // wrap.Name=cntDocLink.
                         wrap.ParentId=cntDocLink.LinkedEntityId;
                         wrap.ParentName=cntDocLink.LinkedEntity.Name;
                         wrap.orgBaseURL=URL.getSalesforceBaseUrl().toExternalForm();
@@ -90,6 +74,7 @@ public without sharing class AggregatedChildDocsController {
         }else{
             return null;
         }
+        
     }
 
 }

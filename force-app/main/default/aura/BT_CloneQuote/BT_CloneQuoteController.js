@@ -8,6 +8,7 @@
         action.setCallback(this, function (response) {
             if (response.getState() === "SUCCESS"){
                 var result = response.getReturnValue();
+				console.log(response.getError());
             	if(result.Message == 'Success') {
             		$A.get("e.force:closeQuickAction").fire();
             		component.find('notifLib').showNotice({

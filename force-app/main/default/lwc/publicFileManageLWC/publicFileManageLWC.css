@@ -131,6 +131,19 @@ table tbody tr td {
     margin-bottom: 12px;
 }
 
+.document1 {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+.document2{
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+    margin-top: -2px;
+}
+
 input[type="checkbox"] {
     margin-right: 10px;
 }

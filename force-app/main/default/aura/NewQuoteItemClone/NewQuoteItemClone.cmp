@@ -228,10 +228,11 @@
             height: fit-content !important;
         }
 
-        .slds-tabs_default{
+        <!-- .slds-tabs_default{
             min-height: fit-content !important;
             height: fit-content;
-        }
+        } -->
+        
     </aura:HTML>
 
 
@@ -671,8 +672,8 @@
 
             <div aura:id="quoteItem" />
             <!-- <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:50vh;padding:0px !important;"> -->
-            <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:54vh;padding:0px !important;" aura:id="av">
-                <div style="min-height: 60vh; height: 61vh;">
+            <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:fit-content;padding:0px !important;" aura:id="av">
+                <div style="min-height: fit-content;">
                     <aura:if isTrue="{!!v.removeSingleQuoteLineOption}">
                         <div id='Tablebox' style="margin-top: -5px;padding-inline: 10px;padding-block: 0px;">
                             <br />
@@ -957,7 +958,7 @@
 
 
                         <!-- <div class="slds mainTablediv"> -->
-                        <div class="slds-scrollable">
+                        <div class="slds-scrollable slds_scrollable" aura:id="slds_scrollable">
 
                             <aura:if isTrue="{!v.total > 50}">
                                 <div class="slds-align_absolute-center" style="background-color: white; padding-block: 5px">
@@ -1311,14 +1312,23 @@
                                                                                     value="{!value.originalValue}"
                                                                                     class="inputCss" />
                                                                             </aura:if>
-                                                                            <aura:if
-                                                                                isTrue="{!value.fieldType == 'string'}">
+                                                                            <aura:if isTrue="{!value.fieldType == 'string'}">
+                                                                                <aura:if isTrue="{!value.fieldName == 'buildertek__Item_Name__c'}">
+                                                                                    <div class="textAreaDiv">
+                                                                                        <lightning:formattedRichText
+                                                                                            value="{!value.originalValue}"
+                                                                                            class="textAreaCss" />
+                                                                                    </div>
+                                                                                    <aura:set attribute="else">
+                                                                                        <lightning:formattedNumber
+                                                                                            value="{!value.originalValue/100}"
+                                                                                            style="percent"
+                                                                                            minimumFractionDigits="2"
+                                                                                            class="inputCss" />
+                                                                                    </aura:set>
+                                                                                </aura:if>
 
-                                                                                <lightning:formattedNumber
-                                                                                    value="{!value.originalValue/100}"
-                                                                                    style="percent"
-                                                                                    minimumFractionDigits="2"
-                                                                                    class="inputCss" />
+                                                                                
                                                                             </aura:if>
                                                                             <aura:if isTrue="{!value.fieldType == 'textarea'}">
                                                                                 <div class="textAreaDiv">

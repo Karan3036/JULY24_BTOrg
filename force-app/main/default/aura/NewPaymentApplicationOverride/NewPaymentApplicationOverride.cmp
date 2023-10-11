@@ -23,11 +23,10 @@
     <aura:attribute name="checkBoxValue" type="string" default=""/>
     <aura:attribute name="options" type="string[]" default="[]"/>
     
-    <!--  {'label': 'New Payment Application', 'value': 'option1'},
+<!--{'label': 'New Payment Application', 'value': 'option1'},
 {'label': 'Import Master SOVs', 'value': 'option2'},
 {'label': 'Import Customer Approved SOVs', 'value': 'option6'}
- -->
-    <!--  Brian asked to hide this field  -->
+    Brian asked to hide this field  -->
     
     
     <aura:attribute name="applicationValues" type="Object" />
@@ -441,7 +440,7 @@
                             <span class="slds-assistive-text">Close</span>
                         </button>
                         <span class="slds-assistive-text">Close</span>
-                        <h4 class="title slds-text-heading--medium">Please Select an option</h4>
+                        <h4 class="title slds-text-heading--medium">Please Selects adfdsafdsfdn option</h4>
                     </div>
                     <!--End Modal Header-->  
                     

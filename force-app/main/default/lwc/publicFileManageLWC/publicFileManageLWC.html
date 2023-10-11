@@ -64,11 +64,11 @@
                     <h1>All Content Documents</h1>
                     <br>
                     <template for:each={contentDocuments} for:item="doc">
-                        <div key={doc.ContentDocument.Id} class="document">
+                        <div key={doc.ContentDocument.Id} class="document1">
                             <input type="checkbox" 
                             value={doc.ContentDocument.Id} 
                             onchange={handleCheckboxChange} />
-                            <div class="document"><p>{doc.ContentDocument.Title}</p> <lightning-button 
+                            <div class="document2"><p>{doc.ContentDocument.Title}</p> <lightning-button 
                                 variant="base"
                                 label="Preview" 
                                 data-id={doc.ContentDocument.Id}

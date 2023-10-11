@@ -73,8 +73,8 @@ public with sharing class ImportMasterQuotes {
             if(Schema.sObjectType.buildertek__Quote_Item__c.fields.Id.isAccessible()&&
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.Name.isAccessible() &&
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Cost_Code__c.isAccessible() &&
-                                Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Notes__c.isAccessible() &&
-                                Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Priority__c.isAccessible() &&
+                Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Notes__c.isAccessible() &&
+                Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Priority__c.isAccessible() &&
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Additional_Discount__c.isAccessible() &&
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Description__c.isAccessible() &&
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Applied_Markup__c.isAccessible() &&
@@ -87,17 +87,26 @@ public with sharing class ImportMasterQuotes {
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__UOM__c.isAccessible() &&
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Vendor__c.isAccessible() && 
                 Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Quote__c.isAccessible()){
-                        quoteItemList= [SELECT Id, Name, buildertek__Cost_Code__c, buildertek__Notes__c, buildertek__Priority__c, buildertek__Additional_Discount__c,
-                                        buildertek__Description__c, buildertek__Applied_Markup__c, buildertek__Grouping__c,
-                                        buildertek__Markup__c, buildertek__Product__c, buildertek__Quantity__c, buildertek__Unit_Cost__c,
-                                        buildertek__Unit_Price__c, buildertek__UOM__c, buildertek__Vendor__c, buildertek__Quote__c, 
-                                        buildertek__Quote__r.buildertek__Memo__c, buildertek__Quote__r.buildertek__Email_Body__c, 
-                                        buildertek__Quote__r.buildertek__Section_I__c, buildertek__Quote__r.buildertek__Section_II__c, 
-                                        buildertek__Quote__r.buildertek__Section_III__c, buildertek__Quote__r.buildertek__Section_IV__c, 
-                                        buildertek__Quote__r.buildertek__Section_V__c, buildertek__Quote__r.buildertek__Section_VI__c, 
-                                        buildertek__Quote__r.buildertek__Section_VII__c, buildertek__Quote__r.buildertek__Section_VIII__c, 
-                                        buildertek__Quote__r.buildertek__Section_X__c, buildertek__Quote__r.buildertek__Section_IX__c, 
-                                        buildertek__Quote__r.buildertek__Footer__c FROM buildertek__Quote_Item__c WHERE buildertek__Quote__c IN: quoteIds]; 
+                
+                quoteItemList= [SELECT Id, Name, buildertek__Cost_Code__c, buildertek__Notes__c, buildertek__Priority__c, buildertek__Additional_Discount__c,
+                                    buildertek__Description__c, buildertek__Applied_Markup__c, buildertek__Grouping__c,
+                                    buildertek__Markup__c, buildertek__Product__c, buildertek__Quantity__c, buildertek__Unit_Cost__c,
+                                    buildertek__Unit_Price__c, buildertek__UOM__c, buildertek__Vendor__c, buildertek__Quote__c, 
+                                    buildertek__Quote__r.buildertek__Memo__c, buildertek__Quote__r.buildertek__Email_Body__c, 
+                                    buildertek__Quote__r.buildertek__Section_I__c, buildertek__Quote__r.buildertek__Section_II__c, 
+                                    buildertek__Quote__r.buildertek__Section_III__c, buildertek__Quote__r.buildertek__Section_IV__c, 
+                                    buildertek__Quote__r.buildertek__Section_V__c, buildertek__Quote__r.buildertek__Section_VI__c, 
+                                    buildertek__Quote__r.buildertek__Section_VII__c, buildertek__Quote__r.buildertek__Section_VIII__c, 
+                                    buildertek__Quote__r.buildertek__Section_X__c, buildertek__Quote__r.buildertek__Section_IX__c, 
+                                    buildertek__Quote__r.buildertek__Section_XI__c, buildertek__Quote__r.buildertek__Section_XII__c, 
+                                    buildertek__Quote__r.buildertek__Section_XIII__c, buildertek__Quote__r.buildertek__Section_XIV__c,                     
+                                    buildertek__Quote__r.buildertek__Section_XV__c, buildertek__Quote__r.buildertek__Section_XVI__c,                     
+                                    buildertek__Quote__r.buildertek__Section_XVII__c, buildertek__Quote__r.buildertek__Section_XVIII__c,                     
+                                    buildertek__Quote__r.buildertek__Section_XIX__c, buildertek__Quote__r.buildertek__Section_XX__c,                     
+                                    buildertek__Quote__r.buildertek__Section_XXI__c, buildertek__Quote__r.buildertek__Section_XXII__c,                     
+                                    buildertek__Quote__r.buildertek__Footer__c 
+                                FROM buildertek__Quote_Item__c 
+                                WHERE buildertek__Quote__c IN: quoteIds]; 
             } 
 
             List<buildertek__Master_Quote_Item__c> masterQuoteItemList;
@@ -116,7 +125,8 @@ public with sharing class ImportMasterQuotes {
                 Schema.sObjectType.buildertek__Master_Quote_Item__c.fields.buildertek__UOM__c.isAccessible() &&
                 Schema.sObjectType.buildertek__Master_Quote_Item__c.fields.buildertek__Vendor__c.isAccessible() && 
                 Schema.sObjectType.buildertek__Master_Quote_Item__c.fields.buildertek__Master_Quote__c.isAccessible()){ 
-                        masterQuoteItemList= [SELECT Id, Name, buildertek__Cost_Code__c, buildertek__Additional_Discount__c,
+                
+                masterQuoteItemList= [SELECT Id, Name, buildertek__Cost_Code__c, buildertek__Additional_Discount__c,
                                                 buildertek__Description__c, buildertek__Applied_Markup__c, buildertek__Quote_Line_Group__c,
                                                 buildertek__Markup__c, buildertek__Product__c, buildertek__Quantity__c, buildertek__Unit_Cost__c,
                                                 buildertek__Unit_Price__c, buildertek__UOM__c, buildertek__Vendor__c, buildertek__Master_Quote__c, 
@@ -203,7 +213,11 @@ public with sharing class ImportMasterQuotes {
                     buildertek__Quote__c quote = [SELECT Id, Name, buildertek__Memo__c, buildertek__Email_Body__c, buildertek__Section_I__c, 
                                                     buildertek__Section_II__c, buildertek__Section_III__c, buildertek__Section_IV__c, buildertek__Section_V__c, 
                                                     buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c, 
-                                                    buildertek__Section_IX__c, buildertek__Footer__c FROM buildertek__Quote__c WHERE Id =:recordId];
+                                                    buildertek__Section_IX__c, buildertek__Section_XI__c, buildertek__Section_XII__c, buildertek__Section_XIII__c,
+                                                    buildertek__Section_XIV__c, buildertek__Section_XV__c, buildertek__Section_XVI__c, buildertek__Section_XVII__c,
+                                                    buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XXI__c, buildertek__Section_XXII__c,
+                                                    buildertek__Footer__c 
+                                                  FROM buildertek__Quote__c WHERE Id =:recordId];
 
                                                     
 
@@ -219,7 +233,20 @@ public with sharing class ImportMasterQuotes {
                         quote.buildertek__Section_VII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_VII__c;
                         quote.buildertek__Section_VIII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_VIII__c;
                         quote.buildertek__Section_X__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_X__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_IX__c;
+                        
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XI__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XII__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XII__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XIV__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XV__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVI__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVII__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVIII__c;  
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XIX__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XX__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XXI__c;
+                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XXII__c;                                                
+                                                                                                                                                                                                                                              
                         quote.buildertek__Footer__c = quoteItemList[0].buildertek__Quote__r.buildertek__Footer__c;
                     } else if(!masterQuoteItemList.isEmpty()) {
                         quote.buildertek__Email_Body__c = masterQuoteItemList[0].buildertek__Master_Quote__r.buildertek__Email_Body__c;
@@ -238,11 +265,21 @@ public with sharing class ImportMasterQuotes {
                 buildertek__Quote__c quote = [SELECT Id, Name, buildertek__Memo__c, buildertek__Email_Body__c, buildertek__Section_I__c, 
                                                     buildertek__Section_II__c, buildertek__Section_III__c, buildertek__Section_IV__c, buildertek__Section_V__c, 
                                                     buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c, 
-                                                    buildertek__Section_IX__c, buildertek__Footer__c FROM buildertek__Quote__c WHERE Id =:recordId];
+                                                    buildertek__Section_IX__c, buildertek__Section_XI__c, buildertek__Section_XII__c, buildertek__Section_XIII__c,
+                                                    buildertek__Section_XIV__c, buildertek__Section_XV__c, buildertek__Section_XVI__c, buildertek__Section_XVII__c,
+                                                    buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XXI__c, buildertek__Section_XXII__c,
+                                                    buildertek__Footer__c 
+                                              FROM buildertek__Quote__c WHERE Id =:recordId];
+                                                    
                 List<buildertek__Quote__c> quote1 = [SELECT Id, Name, buildertek__Memo__c, buildertek__Email_Body__c, buildertek__Section_I__c, 
-                                                    buildertek__Section_II__c, buildertek__Section_III__c, buildertek__Section_IV__c, buildertek__Section_V__c, 
-                                                    buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c, 
-                                                    buildertek__Section_IX__c, buildertek__Footer__c FROM buildertek__Quote__c WHERE Id =:quoteIds];
+                                                        buildertek__Section_II__c, buildertek__Section_III__c, buildertek__Section_IV__c, buildertek__Section_V__c, 
+                                                        buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c, 
+                                                        buildertek__Section_IX__c, buildertek__Section_XI__c, buildertek__Section_XII__c, buildertek__Section_XIII__c,
+                                                        buildertek__Section_XIV__c, buildertek__Section_XV__c, buildertek__Section_XVI__c, buildertek__Section_XVII__c,
+                                                        buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XXI__c, buildertek__Section_XXII__c,
+                                                        buildertek__Footer__c 
+                                                     FROM buildertek__Quote__c WHERE Id =:quoteIds];
+                                                     
                     // if(!quoteItemList.isEmpty()){
                         system.debug('new to complete');
                         quote.buildertek__Memo__c = quote1[0].buildertek__Memo__c;
@@ -257,6 +294,19 @@ public with sharing class ImportMasterQuotes {
                         quote.buildertek__Section_VIII__c = quote1[0].buildertek__Section_VIII__c;
                         quote.buildertek__Section_X__c = quote1[0].buildertek__Section_X__c;
                         quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_IX__c;
+                        
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XI__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XII__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XII__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XIV__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XV__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XVI__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XVII__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XVIII__c;  
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XIX__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XX__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XXI__c;
+                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XXII__c; 
                         quote.buildertek__Footer__c = quote1[0].buildertek__Footer__c;
                     // } 
                     // else if(!masterQuoteItemList.isEmpty()) {

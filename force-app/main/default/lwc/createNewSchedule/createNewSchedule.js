@@ -252,20 +252,8 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
                     this.dispatchEvent(event);
                 })
                 .finally(() => {
-                    const form = this.template.querySelector('form');
-                    const inputs = form.querySelectorAll('input, textarea, select, radio');
-                    inputs.forEach((input) => {
-                        if (input.name !== 'searchProjectName') {
-                            if (input.type === 'radio') {
-                                input.checked = false; 
-                            } else {
-                                input.value = '';
-                            }
-                        }
-                    });
-                    
+                    this.template.querySelector('form').reset();
                     if (!this.projectSchedule) {
-                        console.log('projectSchedule:',this.projectSchedule);
                         this.searchProjectName = '';
                         this.showProjectIcon = false;
                         this.isInputEnabledForProject = false;

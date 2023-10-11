@@ -1,123 +1,185 @@
 ({
     doInit : function(component, event, helper) {
-        var action = component.get("c.getQuoteLineRecordList");
-        action.setParams({
-            recordId: component.get("v.recordId")
-        });
-        action.setCallback(this, function (response) {
-            if (response.getState() == 'SUCCESS') {
-                var QuoteLineList = response.getReturnValue();
-                console.log('QuoteLine_modified ',QuoteLineList);
-                component.set("v.quoteLineList", QuoteLineList);
-                // console.log(' QuoteLine-->',JSON.parse(JSON.stringify(component.get("v.quoteLineList"))));
-                var QuoteLine_modified = QuoteLineList;
-                for(var item of QuoteLine_modified){
-                    item.value = '';
-                    console.log(item);
-                }
-                component.set('v.QuoteLine_modified', QuoteLine_modified);
-                console.log('QuoteLine_modified >. ', JSON.parse(JSON.stringify(component.get("v.QuoteLine_modified"))));
-            }
-        });
-        $A.enqueueAction(action);
+        component.set("v.Spinner", true);
+        var recordId = component.get("v.pageReference.state.buildertek__parentId");
+        component.set('v.recordId', recordId);
+        helper.getQuoteLinesRecords(component, event, helper);
     },
     closeModel : function (component,event,helper) {
-        $A.get("e.force:closeQuickAction").fire();
+        component.set("v.showModel",false);
+        var checkboxes = component.find("checkboxInput");
+        checkboxes.forEach(function(checkbox) {
+            checkbox.set("v.checked", false);
+        });
+        component.set("v.selectedRecords", []);
+        component.set("v.selectedPricebookId", '');
     },
-    editProduct: function(component, event, helper) {
-        var Id=  event.currentTarget.dataset.iconattr;
-        console.log('id-->',Id);
-        component.set("v.selectedRecId", Id); 
-        component.set('v.displayProduct', false);
-        component.set("v.isFieldDisabled", false);
-        console.log(component.get("v.selectedRecId"));
-
-    },
-    save:function(component, event, helper) {
-        var Id=  event.currentTarget.dataset.value;
-        console.log('id New-->',Id);
-
-    },
-    clickHandlerProduct: function(component, event, helper){
-        try{
-
-            console.log("Select Product---->");
-            var prodName = '';
-            component.set('v.displayProduct', false);   
-            var recordId = event.currentTarget.dataset.value;
-            console.log('clickHandlerProduct---->',recordId);
-            var qutLineId =  component.get("v.selectedRecId");
     
-            console.log('clickHandlerProduct---->',qutLineId);
-            // component.set('v.selectedProductId', recordId);
-            var productList = component.get("v.productList");
-            var QuoteLine_modified = component.get('v.QuoteLine_modified');
-           
-            productList.forEach(element => {
-                if (recordId == element.Id) {
-                    prodName = element.Name;
-                    component.set('v.selectedProductId', element.Id);
-                    component.set('v.selectedProductName', element.Name);
-                    console.log('idd --> ', qutLineId);
-                    QuoteLine_modified.forEach(ele => {
-                        // console.log("aq" , ele.Id);
-                        if(ele.Id == qutLineId){
-                            console.log('indise >> ');
-                            ele.value = element.Name;
+    openPopupModel:function(component, event, helper) {
+        component.set("v.Spinner", true);
+        var Id=  event.currentTarget.dataset.iconattr;
+        component.set("v.quoteLineId",Id);
+        component.set("v.selectedPricebookId", '');
+        component.set("v.tableDataList", []);
+        component.set("v.showModel",true);
+        helper.getPricebookRecords(component, event, helper);
+    },
+    changePricebook: function(component, event, helper) {
+        var selected = [];
+        component.set("v.selectedRecords", selected);
+        helper.changePricebookHelper(component, event, helper);
+    },
+    changeProductFamily: function(component, event, helper) {
+        var checkboxes = component.find("checkboxInput");
+        checkboxes.forEach(function(checkbox) {
+            checkbox.set("v.checked", false);
+        });
+        component.set("v.selectedRecords", []);
+        var priceBookId = component.find("selectedPricebook").get("v.value");
+        var selectedProductFamily = component.find("selectedProductFamily").get("v.value");
+        helper.changeProductFamilyHelper(component, event, helper , priceBookId, selectedProductFamily);
+    },
+    searchInDatatable: function(component, event, helper){
+        var checkboxes = component.find("checkboxInput");
+        checkboxes.forEach(function(checkbox) {
+            checkbox.set("v.checked", false);
+        });
+        component.set("v.selectedRecords", []);
+        var inputElement = event.getSource().get('v.value');
+            var prevInput = component.get('v.prevInput');
+            var searchTimeout = component.get('v.searchTimeout');
+            
+            clearTimeout(searchTimeout);
+                if (inputElement === prevInput) {
+                    helper.searchDatatableHelper(component, event, helper);
+                } else {
+                    searchTimeout = setTimeout($A.getCallback(function() {
+                        if (inputElement === component.get('v.sProductName')) {
+                            helper.searchDatatableHelper(component, event, helper);
                         }
-                    })
-                    console.log('QuoteLine_modified------9090909 >. ', component.get('v.QuoteLine_modified'));
+                    }), 2000);
+                    component.set('v.searchTimeout', searchTimeout);
                 }
+            component.set('v.prevInput', inputElement);
+        
+    }, 
+    checkboxChange: function(component, event, helper) {
+        var selectedRecords = [];
+        var tableDataList = component.get("v.tableDataList");
+        var selectedCheckbox = event.getSource(); // Get the checkbox that fired the event
+        var productId = selectedCheckbox.get("v.id");
+        var isChecked = selectedCheckbox.get("v.checked");
+        var selectedRecord = tableDataList.find(record => record.Id === productId);
+    
+        if (isChecked) {
+            selectedRecords.push(selectedRecord);
+        }
+    
+        component.set("v.selectedRecords", selectedRecords);       
+        // Uncheck all other checkboxes
+        var checkboxes = component.find("checkboxInput");
+        checkboxes.forEach(function(checkbox) {
+            var checkboxId = checkbox.get("v.id");
+            if (checkboxId !== productId) {
+                checkbox.set("v.checked", false);
+            }
+        });
+    },
+    saveProduct: function(component, event, helper){
+        component.set("v.Spinner", true);
+        var onlyUpdatedQuoteLines = [];
+        var quoteLineList = component.get("v.quoteLineList");
+        var updatedquoteLineList = [];
+        var  quoteLineNeedToUpdateId= component.get("v.quoteLineId"); // The ID you want to match for the update
+        var product = component.get("v.selectedRecords"); // The new value you want to set
+        if (product.length == 0) {
+            component.set('v.Spinner', false);
+            var toastEvent = $A.get("e.force:showToast");
+            if(toastEvent){
+            toastEvent.setParams({
+                "title": "Error",
+                "message": "Please select at least one Product.",
+                "type": "error",
+                "duration": 5000
             });
-            var productId = recordId; 
-            console.log("INPUT Name--->", prodName);
+            toastEvent.fire();
         }
-        catch(error){
-            console.log('error in click >> ', error.stack);
         }
-    },
-    searchProductData: function(component, event, helper) {
-        console.log("Search for Product---->");
-        component.set('v.displayProduct', true);
-        var searchFilter = '';
-        console.log('id ==> ', event.getSource().get("v.id"));
-        helper.getPricebooksProduct(component, event, helper, searchFilter);
-        // event.stopPropagation();
-    },
-    keyupProductData:function(component, event, helper) {
-        console.log("Search Enterd prod NAme---->");
-        component.set('v.displayProduct', true);
-
-            var allRecords = component.get("v.productList");
-            var searchFilter = event.getSource().get("v.value").toUpperCase();
-            var tempArray = [];
-            var i;
-            for (i = 0; i < allRecords.length; i++) {
-                if ((allRecords[i].Name && allRecords[i].Name.toUpperCase().indexOf(searchFilter) != -1)) {
-                    tempArray.push(allRecords[i]);
-                }else{
-                    component.set('v.selectedProductId' , ' ')
+            for (var i = 0; i < quoteLineList.length; i++) {
+                var record = quoteLineList[i];
+                if (record.Id === quoteLineNeedToUpdateId) { // Check if the ID matches
+                    record.buildertek__Product__r = {Id : product[0].Id , Name : product[0].Name}; // Update the specific field
+                    record.buildertek__Product__c = product[0].Id;
+                    updatedquoteLineList.push(record); // Add the updated record to the updatedList
+                } else {
+                    updatedquoteLineList.push(record); // Add the unmodified record to the updatedList
                 }
             }
-            component.set("v.productList", tempArray);
-            helper.getPricebooksProduct(component, event, helper , searchFilter);
-    },
-    hideList : function(component, event, helper) {
-        console.log("Method Called");
-        component.set('v.displayProduct', false);
-    },
-    callChildMethod: function(component, event, helper) {
-        console.log("METHOD CHILE CALLED");
-        // Get a reference to the child component using aura:id
-        var childComponent = component.find("childCmp");
 
-        // Check if the child component exists
-        for(var i = 0;i < childComponent.length;i++){
-            console.log("asd", childComponent[i].compid);
-            childComponent[i].hideProductList();
+            component.set("v.quoteLineList", updatedquoteLineList);
+            for (var i = 0; i < updatedquoteLineList.length; i++) {
+                var record = updatedquoteLineList[i];
+                if (record.buildertek__Product__r) {
+                    onlyUpdatedQuoteLines.push(record);
+                }
+            }
+            component.set("v.onlyUpdatedQuoteLines",onlyUpdatedQuoteLines);
+            if (onlyUpdatedQuoteLines.length > 0 ) {
+                component.set("v.MassSaveButtonDisabled", false);
+            } else {
+                component.set("v.MassSaveButtonDisabled", true );  
+            }
+            var checkboxes = component.find("checkboxInput");
+            checkboxes.forEach(function(checkbox) {
+                checkbox.set("v.checked", false);
+            });
+            component.set("v.selectedRecords", []);
+            component.set("v.Spinner", false);
+            component.set("v.showModel",false);
+    },
+    onMassUpdate: function(component, event, helper){
+        component.set("v.Spinner", true);
+        helper.UpdateQuoteLineList(component,event,helper);
+    },
+    onMassUpdateCancel: function(component, event, helper){
+        var workspaceAPI = component.find("workspace");
+	    workspaceAPI.getFocusedTabInfo().then(function(response) {
+
+		    var focusedTabId = response.tabId;
+		    workspaceAPI.closeTab({tabId: focusedTabId});
+		});
+    },
+    removeProduct: function(component, event, helper){
+        var removeQlId=  event.currentTarget.dataset.iconattr;
+        var updatedquoteLineList =[];
+        var onlyUpdatedQuoteLines =[];
+        var removeProd = component.get("v.quoteLineList");
+
+        for (var i = 0; i < removeProd.length; i++) {
+            var record = removeProd[i];
+            if (record.Id === removeQlId) { 
+                delete  record.buildertek__Product__r 
+                delete  record.buildertek__Product__c
+                updatedquoteLineList.push(record); // Add the updated record to the updatedList
+            } else {
+                updatedquoteLineList.push(record); // Add the unmodified record to the updatedList
+            }
         }
-            // Call the child method
+        component.set("v.quoteLineList" , updatedquoteLineList);
+            for (var i = 0; i < updatedquoteLineList.length; i++) {
+                var record = updatedquoteLineList[i];
+                if (record.buildertek__Product__r) {
+                    onlyUpdatedQuoteLines.push(record);
+                }
+            }
+            component.set("v.onlyUpdatedQuoteLines",onlyUpdatedQuoteLines);
+            if (onlyUpdatedQuoteLines.length > 0 ) {
+                component.set("v.MassSaveButtonDisabled", false);
+            } else {
+                component.set("v.MassSaveButtonDisabled", true );  
+            }
     }
-
     
+    
+
 })

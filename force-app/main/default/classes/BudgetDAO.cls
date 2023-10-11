@@ -3210,10 +3210,6 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
 
     @AuraEnabled
     public static budgetLineWrapperClass getBudgetLineData(String budgetId, Integer pageNumber, Integer recordToDisply, List<String> groupingList){
-        //debug groupingList by iterating
-        for(String s : groupingList){
-            System.debug('Jaimin: groupingList => ' + s);
-        }
         budgetLineWrapperClass mainWrapper = new budgetLineWrapperClass();
         Integer pageSize = recordToDisply;
         Integer offset = (pageNumber - 1) * pageSize;
@@ -3238,9 +3234,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         if (groupingList.size() > 3) {
             query += ', '+groupingList[3];
         }
-        query += ' NULLS LAST';        
-
-        System.debug('Jaimin: query => ' + query);
+        query += ' NULLS LAST';
 
         List<buildertek__Budget_Item__c> budgetLineList = Database.query(query);
 

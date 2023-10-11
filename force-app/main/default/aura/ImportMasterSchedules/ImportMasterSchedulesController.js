@@ -6,7 +6,7 @@
         action2.setCallback(this, function (response) {
             if (response.getState() == 'SUCCESS') {
                 let result = response.getReturnValue();
-                console.log('oldGantt::', result);
+                console.log('oldGantt::',result);
                 component.set("v.isOldGantt", result);
             } else {
                 let toastEvent = $A.get("e.force:showToast");
@@ -23,14 +23,13 @@
 
     handleFilterChange: function (component, event) {
         var workspaceAPI = component.find("workspace");
-        workspaceAPI.getFocusedTabInfo()
-        .then(function (response) {
+        workspaceAPI.getFocusedTabInfo().then(function (response) {
             var focusedTabId = response.tabId;
             workspaceAPI.closeTab({ tabId: focusedTabId });
         })
-        .catch(function (error) {
-            console.log(error);
-        });
+            .catch(function (error) {
+                console.log(error);
+            });
     },
 
 })

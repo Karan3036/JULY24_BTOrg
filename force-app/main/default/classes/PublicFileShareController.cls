@@ -224,6 +224,7 @@ public without sharing class PublicFileShareController {
     @AuraEnabled
     public static string UpdateFileName(List<Map<String, String>> UpdatedRecords){
         try {
+            system.debug('UpdatedRecords >> ' + UpdatedRecords);
             list<buildertek__Public_File__c> fileRecordsToUpdate = new list<buildertek__Public_File__c>();
 
             for(Map<String, String> obj : UpdatedRecords){
