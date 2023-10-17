@@ -23,7 +23,6 @@ public with sharing class ImportTakeOffLinesBasic{
 				String strFileData;
 				Blob fileContent = EncodingUtil.base64Decode(fileData);
 				try{
-					//strFileData = EncodingUtil.base64Encode(EncodingUtil.base64Decode(fileData));
 					strFileData = fileContent.toString();
 				} catch (Exception ex){
 					try{
@@ -46,65 +45,30 @@ public with sharing class ImportTakeOffLinesBasic{
 					buildPhase = wrapper.buildPhase;
 					tradeType = wrapper.tradeType;
 					costCode = wrapper.costCode;
+
 					Map<String, Product2> existingProductMap = new Map<String, Product2>();
-					Map<String, Product2> newProductMap = new Map<String, Product2>();
-					for (Product2 prod : [Select Id, Name FROM Product2 Limit 1]){
+					Map<String, buildertek__Build_Phase__c> buildPhasemap = new Map<String, buildertek__Build_Phase__c>();
+					Map<String, buildertek__Trade_Type__c> existingTradeTypeMap = new Map<String, buildertek__Trade_Type__c>();
+					Map<String, buildertek__Cost_Codes__c> existingCostCodeMap = new Map<String, buildertek__Cost_Codes__c>();
+
+					// Find existing products
+					for (Product2 prod : [SELECT Id, Name FROM Product2]) {
 						existingProductMap.put(prod.Name, prod);
 					}
-					for (String prodName : productNames){
-						if (!existingProductMap.containsKey(prodName)){
-							Product2 newProd = new Product2();
-							newProd.Name = prodName;
-							newProductMap.put(prodName, newProd);
-						}
+
+					// Find existing build phases
+					for (buildertek__Build_Phase__c newbuildphase : [SELECT Id, Name FROM buildertek__Build_Phase__c]) {
+						buildPhasemap.put(newbuildphase.Name, newbuildphase);
 					}
-					if (newProductMap.size() > 0){
-						insert newProductMap.values();
+
+					// Find existing trade types
+					for (buildertek__Trade_Type__c tradeTypeRec : [SELECT Id, Name FROM buildertek__Trade_Type__c]) {
+						existingTradeTypeMap.put(tradeTypeRec.Name, tradeTypeRec);
 					}
-					Map<String, buildertek__Build_Phase__c> buildPhasemap = new Map<String, buildertek__Build_Phase__c>();
-					Map<String, buildertek__Build_Phase__c> newbuildPhasemap = new Map<String, buildertek__Build_Phase__c>();
-					for (buildertek__Build_Phase__c buildpase : [Select Id, Name FROM buildertek__Build_Phase__c]){
-						buildPhasemap.put(buildpase.Name, buildpase);
-					}
-					for (String buildphas : buildPhase){
-						if (!buildPhasemap.containsKey(buildphas)){
-							buildertek__Build_Phase__c newbp = new buildertek__Build_Phase__c();
-							newbp.Name = buildphas;
-							newbuildPhasemap.put(buildphas, newbp);
-						}
-					}
-					if (newbuildPhasemap.size() > 0){
-						insert newbuildPhasemap.values();
-					}
-					Map<String, buildertek__Trade_Type__c> existingtradetype = new Map<String, buildertek__Trade_Type__c>();
-					Map<String, buildertek__Trade_Type__c> newtradetype = new Map<String, buildertek__Trade_Type__c>();
-					for (buildertek__Trade_Type__c prod : [Select Id, Name FROM buildertek__Trade_Type__c]){
-						existingtradetype.put(prod.Name, prod);
-					}
-					for (String prodName : tradeType){
-						if (!existingtradetype.containsKey(prodName)){
-							buildertek__Trade_Type__c newProd = new buildertek__Trade_Type__c();
-							newProd.Name = prodName;
-							newtradetype.put(prodName, newProd);
-						}
-					}
-					if (newtradetype.size() > 0){
-						insert newtradetype.values();
-					}
-					Map<String, buildertek__Cost_Codes__c> existingcostCode = new Map<String, buildertek__Cost_Codes__c>();
-					Map<String, buildertek__Cost_Codes__c> newcostCode = new Map<String, buildertek__Cost_Codes__c>();
-					for (buildertek__Cost_Codes__c prod : [Select Id, Name FROM buildertek__Cost_Codes__c]){
-						existingcostCode.put(prod.Name, prod);
-					}
-					for (String prodName : costCode){
-						if (!existingcostCode.containsKey(prodName)){
-							buildertek__Cost_Codes__c newProd = new buildertek__Cost_Codes__c();
-							newProd.Name = prodName;
-							newcostCode.put(prodName, newProd);
-						}
-					}
-					if (newcostCode.size() > 0){
-						insert newcostCode.values();
+
+					// Find existing cost codes
+					for (buildertek__Cost_Codes__c costCodeRec : [SELECT Id, Name FROM buildertek__Cost_Codes__c]) {
+						existingCostCodeMap.put(costCodeRec.Name, costCodeRec);
 					}
 
 					for (Integer intIndex = 1; intIndex < listCSVData.size(); intIndex++){
@@ -117,9 +81,7 @@ public with sharing class ImportTakeOffLinesBasic{
 										String tempProductNames  = listCSVData.get(intIndex).get(intInnerIndex).replace('\n', '');
 										if (existingProductMap.containsKey(tempProductNames)){
 											takeoffLines.buildertek__Product__c = existingProductMap.get(tempProductNames).Id;
-										} else if (newProductMap.containsKey(listCSVData.get(intIndex).get(intInnerIndex))){
-											takeoffLines.buildertek__Product__c = newProductMap.get(tempProductNames).Id;
-										}
+										} 
 									}
 									
 								}
@@ -141,9 +103,7 @@ public with sharing class ImportTakeOffLinesBasic{
 										String tempbuildphase = listCSVData.get(intIndex).get(intInnerIndex);
 										if (buildPhasemap.containsKey(tempbuildphase)){
 											takeoffLines.buildertek__Build_Phase__c = buildPhasemap.get(tempbuildphase).Id;
-										} else if (newbuildPhasemap.containsKey(listCSVData.get(intIndex).get(intInnerIndex))){
-											takeoffLines.buildertek__Build_Phase__c = newbuildPhasemap.get(tempbuildphase).Id;
-										}
+										} 
 									}
 								}
 
@@ -156,11 +116,9 @@ public with sharing class ImportTakeOffLinesBasic{
 								when 'Trade Type'{
 									if (String.isNotBlank(listCSVData.get(intIndex).get(intInnerIndex))){
 										String temptradetype = listCSVData.get(intIndex).get(intInnerIndex);
-										if (existingtradetype.containsKey(temptradetype)){
-											takeoffLines.buildertek__Trade_Type__c = existingtradetype.get(temptradetype).Id;
-										} else if (newtradetype.containsKey(listCSVData.get(intIndex).get(intInnerIndex))){
-											takeoffLines.buildertek__Trade_Type__c = newtradetype.get(temptradetype).Id;
-										}
+										if (existingTradeTypeMap.containsKey(temptradetype)){
+											takeoffLines.buildertek__Trade_Type__c = existingTradeTypeMap.get(temptradetype).Id;
+										} 
 									}
 								}
 
@@ -172,7 +130,8 @@ public with sharing class ImportTakeOffLinesBasic{
 
 								when 'Quantity'{
                                     if (String.isNotBlank(listCSVData.get(intIndex).get(intInnerIndex))){
-									    takeoffLines.buildertek__Quantity__c = Decimal.valueOf(listCSVData.get(intIndex).get(intInnerIndex));
+									    String quantityString = listCSVData.get(intIndex).get(intInnerIndex).replaceAll('[^0-9.]', '');
+                                        takeoffLines.buildertek__Quantity__c = Decimal.valueOf(quantityString);
                                     }
 								}
 
@@ -185,11 +144,9 @@ public with sharing class ImportTakeOffLinesBasic{
                                 when 'Cost Code'{
 									if (String.isNotBlank(listCSVData.get(intIndex).get(intInnerIndex))){
 										String tempcostcode = listCSVData.get(intIndex).get(intInnerIndex);
-										if (existingcostCode.containsKey(tempcostcode)){
-											takeoffLines.buildertek__Cost_Code__c = existingcostCode.get(tempcostcode).Id;
-										} else if (newcostCode.containsKey(listCSVData.get(intIndex).get(intInnerIndex))){
-											takeoffLines.buildertek__Cost_Code__c = newcostCode.get(tempcostcode).Id;
-										}
+										if (existingCostCodeMap.containsKey(tempcostcode)){
+											takeoffLines.buildertek__Cost_Code__c = existingCostCodeMap.get(tempcostcode).Id;
+										} 
 									}
 								}
 

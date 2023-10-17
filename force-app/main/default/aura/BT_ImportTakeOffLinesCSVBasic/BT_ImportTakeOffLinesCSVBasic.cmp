@@ -1,7 +1,7 @@
 <aura:component implements="force:appHostable,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,flexipage:availableForAllPageTypes,lightning:actionOverride,force:hasRecordId,forceCommunity:availableForAllPageTypes"
                 controller="ImportTakeOffLinesBasic" access="global">
     <aura:attribute name="recordId" type="Id" />
-	 <lightning:workspaceAPI aura:id="workspace"/>
+	<lightning:workspaceAPI aura:id="workspace"/>
     <aura:attribute name="Spinner" type="boolean" default="false" />
     <ltng:require styles="{!$Resource.MOdalPreviewWidth72}" />
     
