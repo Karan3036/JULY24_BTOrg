@@ -4,8 +4,6 @@ public with sharing class ImportTakeOffLinesBasic{
 		public Boolean isSuccess;
 		@AuraEnabled
 		public String strMessage;
-		@AuraEnabled
-		public String strRecordId;
 	}
 
 	@AuraEnabled
@@ -14,9 +12,6 @@ public with sharing class ImportTakeOffLinesBasic{
 		response.isSuccess = true;
 		WrapperClass wrapper = new WrapperClass();
 		Set<String> productNames = new Set<String>();
-		Set<String> buildPhase = new Set<String>();
-		Set<String> tradeType = new Set<String>();
-		Set<String> costCode = new Set<String>();
 		try{
 			if (fileData != null){
 				List<List<String>> listCSVData;
@@ -36,15 +31,12 @@ public with sharing class ImportTakeOffLinesBasic{
 						System.debug('Line:1:' + iex.getLineNumber());
 					}
 				}
-
+				System.debug('strFileData--->'+strFileData);
 				if (!String.isBlank(strFileData) && response.isSuccess){
 					List<buildertek__Project_Takeoff_Lines__c> schItemToInsert = new List<buildertek__Project_Takeoff_Lines__c>();
 					wrapper = getListOfFileContentsAsStrings(strFileData);
 					listCSVData = wrapper.listOfFileContentsAsStrings;
 					productNames = wrapper.productNames;
-					buildPhase = wrapper.buildPhase;
-					tradeType = wrapper.tradeType;
-					costCode = wrapper.costCode;
 
 					Map<String, Product2> existingProductMap = new Map<String, Product2>();
 					Map<String, buildertek__Build_Phase__c> buildPhasemap = new Map<String, buildertek__Build_Phase__c>();
@@ -79,9 +71,18 @@ public with sharing class ImportTakeOffLinesBasic{
 								when 'Product'{
 									if (String.isNotBlank(listCSVData.get(intIndex).get(intInnerIndex))){
 										String tempProductNames  = listCSVData.get(intIndex).get(intInnerIndex).replace('\n', '');
-										if (existingProductMap.containsKey(tempProductNames)){
-											takeoffLines.buildertek__Product__c = existingProductMap.get(tempProductNames).Id;
-										} 
+										if (tempProductNames.startsWith('"') && tempProductNames.endsWith('"')) {
+											String withoutOuterQuotes = tempProductNames.replaceAll('^"|"$', '');
+											String finalString = withoutOuterQuotes.replaceAll('""', '"');
+											if (existingProductMap.containsKey(finalString)){
+												takeoffLines.buildertek__Product__c = existingProductMap.get(finalString).Id;
+											}
+										} else {
+											if (existingProductMap.containsKey(tempProductNames)){
+												takeoffLines.buildertek__Product__c = existingProductMap.get(tempProductNames).Id;
+											}
+										}
+										 
 									}
 									
 								}
@@ -193,9 +194,6 @@ public with sharing class ImportTakeOffLinesBasic{
 		WrapperClass wrapper = new WrapperClass();
 		List<List<String>> listOfFileContentsAsStrings;
 		Set<String> productNames = new Set<String>();
-		Set<String> buildPhase = new Set<String>();
-		Set<String> tradeType = new Set<String>();
-		Set<String> costCode = new Set<String>();
 		if (String.isNotBlank(strContents)){
 			List<String> listLines;
 
@@ -236,9 +234,6 @@ public with sharing class ImportTakeOffLinesBasic{
 
 		wrapper.listOfFileContentsAsStrings = listOfFileContentsAsStrings;
 		wrapper.productNames = productNames;
-		wrapper.buildPhase = buildPhase;
-		wrapper.tradeType = tradeType;
-		wrapper.costCode = costCode;
 		return wrapper;
 	}
 
@@ -347,8 +342,5 @@ public with sharing class ImportTakeOffLinesBasic{
 	public class WrapperClass{
 		public List<List<String>> listOfFileContentsAsStrings;
 		public Set<String> productNames;
-		public Set<String> buildPhase;
-		public Set<String> tradeType;
-		public Set<String> costCode;
 	}
 }

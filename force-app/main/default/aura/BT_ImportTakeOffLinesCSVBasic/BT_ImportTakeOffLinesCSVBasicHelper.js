@@ -4,10 +4,10 @@
         var fileInput = component.find("file").getElement();
         var file = fileInput.files[0];
         if (file != undefined) {
-            if (file.size > this.MAX_FILE_SIZE) {
+            if (file.size > MAX_FILE_SIZE) {
             alert(
                 "File size cannot exceed " +
-                this.MAX_FILE_SIZE +
+                MAX_FILE_SIZE +
                 " bytes.\n" +
                 "Selected file size: " +
                 file.size
