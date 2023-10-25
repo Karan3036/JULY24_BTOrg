@@ -497,11 +497,8 @@ function convertJSONtoApexData(data, taskData, dependenciesData, resourceData) {
 
     if (data) {
         data.forEach(element => {
-            console.log('element:- ',element._data);
             if(element.hasOwnProperty('NewPhase')){
-                console.log('element new Phase:- ',element._data.NewPhase);
-                phasedatamap.set(element.id, element._data.NewPhase);
-                console.log('phasedatamap :- ',phasedatamap);
+                phasedatamap.set(element.id, element.NewPhase);
             }
             if(element._data.hasOwnProperty('contractorId')){
                 contractordatamap.set(element.id, element._data.contractorId);
@@ -605,11 +602,10 @@ function convertJSONtoApexData(data, taskData, dependenciesData, resourceData) {
                         updateData['buildertek__Dependency__c'] = null;
                     }
                 }
-                console.log('hasownproperty updateData -->', updateData.Id );
+
                 if(phasedatamap.has(updateData.Id)){
                     updateData['buildertek__Phase__c'] = phasedatamap.get(updateData.Id);
                 }
-const keys = phasedatamap.keys();
 
                 if(contractordatamap.has(updateData.Id)){
                     updateData['buildertek__Contractor__c'] = contractordatamap.get(updateData.Id);

@@ -22,29 +22,33 @@
   },
 
    searchInDatatable: function(component, event, helper){
-    console.log('in method');
-    var inputElement = event.getSource().get('v.value');
-        var prevInput = component.get('v.prevInput');
-        var searchTimeout = component.get('v.searchTimeout');
-        
-        clearTimeout(searchTimeout);
+     console.log('in method');
+        if (component.get("v.selectedPricebookId") != '') {
+            var inputElement = event.getSource().get('v.value');
+                var prevInput = component.get('v.prevInput');
+                var searchTimeout = component.get('v.searchTimeout');
+                
+                clearTimeout(searchTimeout);
 
-        // if (inputElement.trim() !== '') {
-            // console.log('in if');
-            if (inputElement === prevInput) {
-                helper.searchDatatableHelper(component, event, helper);
-            } else {
-                searchTimeout = setTimeout($A.getCallback(function() {
-                    if (inputElement === component.get('v.sProductName')) {
+                // if (inputElement.trim() !== '') {
+                    // console.log('in if');
+                    if (inputElement === prevInput) {
                         helper.searchDatatableHelper(component, event, helper);
+                    } else {
+                        searchTimeout = setTimeout($A.getCallback(function() {
+                            if (inputElement === component.get('v.sProductName')) {
+                                helper.searchDatatableHelper(component, event, helper);
+                            }
+                        }), 2000);
+                        component.set('v.searchTimeout', searchTimeout);
                     }
-                }), 2000);
-                component.set('v.searchTimeout', searchTimeout);
-            }
-            component.set('v.prevInput', inputElement);
-        // } 
+                    component.set('v.prevInput', inputElement);
+            // } 
+        }else{
+            var inputElement = event.getSource().get('v.value');
+        }
     
-   }, 
+    },  
 
    goToEditModal: function(component, event, helper) {
        helper.goToEditModalHelper(component, event, helper);
@@ -85,8 +89,6 @@
 },
 
 
-
-
    checkAllProduct: function(component, event, helper){
        var value = event.getSource().get("v.checked"); 
        var tableDataList = component.get("v.tableDataList");
@@ -97,60 +99,60 @@
    }, 
 
    checkboxChange : function(component, event, helper) {
+ 
+    // var selectedRecordIds = component.get("v.selectedRecordIds");
+    // var tableDataList = component.get("v.tableDataList");
+    // var selectedCheckbox = event.getSource(); // Get the checkbox that fired the event
+    // var productId = selectedCheckbox.get("v.id");
+    // var isChecked = selectedCheckbox.get("v.checked");
+    // var selectedRows = component.get("v.selectedRows");
 
-        // var selectedRecordIds = component.get("v.selectedRecordIds");
-        // var tableDataList = component.get("v.tableDataList");
-        // var selectedCheckbox = event.getSource(); // Get the checkbox that fired the event
-        // var productId = selectedCheckbox.get("v.id");
-        // var isChecked = selectedCheckbox.get("v.checked");
-        // var selectedRows = component.get("v.selectedRows");
-
-        // console.log('tableDataList------>',tableDataList);
+    // console.log('tableDataList------>',tableDataList);
+    
+    // if (isChecked) {
         
-        // if (isChecked) {
-            
-        // } else {
-        //     var indexToRemove = selectedRecordIds.indexOf(productId);
-        //     if (indexToRemove !== -1) {
-        //         selectedRecordIds.splice(indexToRemove, 1);
-        //     }
-        // }
-        var selectedRecords = component.get("v.selectedRecords");
-    var tableDataList = component.get("v.tableDataList");
-    var selectedCheckbox = event.getSource(); // Get the checkbox that fired the event
-    var productId = selectedCheckbox.get("v.id");
-    var isChecked = selectedCheckbox.get("v.checked");
+    // } else {
+    //     var indexToRemove = selectedRecordIds.indexOf(productId);
+    //     if (indexToRemove !== -1) {
+    //         selectedRecordIds.splice(indexToRemove, 1);
+    //     }
+    // }
+    var selectedRecords = component.get("v.selectedRecords");
+var tableDataList = component.get("v.tableDataList");
+var selectedCheckbox = event.getSource(); // Get the checkbox that fired the event
+var productId = selectedCheckbox.get("v.id");
+var isChecked = selectedCheckbox.get("v.checked");
 
-    // Find the selected record by its ID
-    var selectedRecord = tableDataList.find(record => record.Id === productId);
+// Find the selected record by its ID
+var selectedRecord = tableDataList.find(record => record.Id === productId);
 
-    if (isChecked) {
-        selectedRecords.push(selectedRecord);
-    } else {
-        var indexToRemove = selectedRecords.indexOf(selectedRecord);
-        if (indexToRemove !== -1) {
-            selectedRecords.splice(indexToRemove, 1);
-        }
+if (isChecked) {
+    selectedRecords.push(selectedRecord);
+} else {
+    var indexToRemove = selectedRecords.indexOf(selectedRecord);
+    if (indexToRemove !== -1) {
+        selectedRecords.splice(indexToRemove, 1);
     }
+}
 
-    component.set("v.selectedRecords", selectedRecords);
+component.set("v.selectedRecords", selectedRecords);
 
-    // component.set("v.selectedRecordIds", selectedRecordIds);
-    console.log('selectedRecordIds------>',component.get("v.selectedRecords"));
-       var tableDataList = component.get("v.tableDataList");
-       var checkAll = true;
-       tableDataList.forEach(element => {
-           if (!element.Selected) {
-               checkAll = false
-           }
-       });
-    //    component.find("selectAll").set("v.checked", checkAll);
+// component.set("v.selectedRecordIds", selectedRecordIds);
+console.log('selectedRecordIds------>',component.get("v.selectedRecords"));
+   var tableDataList = component.get("v.tableDataList");
+   var checkAll = true;
+   tableDataList.forEach(element => {
+       if (!element.Selected) {
+           checkAll = false
+       }
+   });
+//    component.find("selectAll").set("v.checked", checkAll);
 
 
-   },
+},
 
    saveQuoteLine : function(component, event, helper){
-       component.set("v.Spinner", true); 
+       component.set("v.Spinner", true);
        console.log('saveQuoteLine');
        var listQlines = component.get("v.selectedProducts");
        var flag=false;
@@ -244,6 +246,5 @@
         }
     });
 },
-
 
 })

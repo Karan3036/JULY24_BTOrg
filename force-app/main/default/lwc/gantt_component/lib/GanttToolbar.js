@@ -235,47 +235,47 @@ export default base => class GanttToolbar extends base {
                                 ]
                             }
                         },
-                        {
-                            type       : 'button',
-                            color      : 'b-blue',
-                            ref        : 'settingsButton',
-                            icon       : 'b-fa b-fa-cogs',
-                            text       : 'Settings',
-                            tooltip    : 'Adjust settings',
-                            toggleable : true,
-                            menu       : {
-                                type        : 'popup',
-                                anchor      : true,
-                                cls         : 'settings-menu',
-                                layoutStyle : {
-                                    flexDirection : 'column'
-                                },
-                                onBeforeShow : 'up.onSettingsShow',
+                        // {
+                        //     type       : 'button',
+                        //     color      : 'b-blue',
+                        //     ref        : 'settingsButton',
+                        //     icon       : 'b-fa b-fa-cogs',
+                        //     text       : 'Settings',
+                        //     tooltip    : 'Adjust settings',
+                        //     toggleable : true,
+                        //     menu       : {
+                        //         type        : 'popup',
+                        //         anchor      : true,
+                        //         cls         : 'settings-menu',
+                        //         layoutStyle : {
+                        //             flexDirection : 'column'
+                        //         },
+                        //         onBeforeShow : 'up.onSettingsShow',
 
-                                items : [
-                                    {
-                                        type      : 'slider',
-                                        ref       : 'rowHeight',
-                                        text      : 'Row height',
-                                        width     : '12em',
-                                        showValue : true,
-                                        min       : 30,
-                                        max       : 70,
-                                        onInput   : 'up.onSettingsRowHeightChange'
-                                    },
-                                    {
-                                        type      : 'slider',
-                                        ref       : 'barMargin',
-                                        text      : 'Bar margin',
-                                        width     : '12em',
-                                        showValue : true,
-                                        min       : 0,
-                                        max       : 10,
-                                        onInput   : 'up.onSettingsMarginChange'
-                                    }
-                                ]
-                            }
-                        },
+                        //         items : [
+                        //             {
+                        //                 type      : 'slider',
+                        //                 ref       : 'rowHeight',
+                        //                 text      : 'Row height',
+                        //                 width     : '12em',
+                        //                 showValue : true,
+                        //                 min       : 30,
+                        //                 max       : 70,
+                        //                 onInput   : 'up.onSettingsRowHeightChange'
+                        //             },
+                        //             {
+                        //                 type      : 'slider',
+                        //                 ref       : 'barMargin',
+                        //                 text      : 'Bar margin',
+                        //                 width     : '12em',
+                        //                 showValue : true,
+                        //                 min       : 0,
+                        //                 max       : 10,
+                        //                 onInput   : 'up.onSettingsMarginChange'
+                        //             }
+                        //         ]
+                        //     }
+                        // },
                         {
                             type       : 'button',
                             color      : 'b-blue',
@@ -294,14 +294,6 @@ export default base => class GanttToolbar extends base {
                         },
                         {
                             type     : 'button',
-                            text     : 'Set Original Dates',
-                            color    : 'b-blue',
-                            ref      : 'editOriginalDate',
-                            icon     : 'b-fa-file-export',
-                            onAction : 'up.onEditOriginalDate'
-                        },
-                        {
-                            type     : 'button',
                             text     : 'Import Schedule',
                             color    : 'b-blue',
                             ref      : 'excelImportBtn',
@@ -316,38 +308,39 @@ export default base => class GanttToolbar extends base {
                             icon     : 'b-fa-file-import',
                             onAction : 'up.onImportMasterSchedule'
                         },
-                        {
-                            type       : 'button',
-                            color      : 'b-blue',
-                            ref        : 'criticalPathsButton',
-                            icon       : 'b-fa b-fa-fire',
-                            text       : 'Critical paths',
-                            tooltip    : 'Highlight critical paths',
-                            toggleable : true,
-                            onAction   : 'up.onCriticalPathsClick'
-                        },
-                        {
-                            type      : 'datefield',
-                            ref       : 'startDateField',
-                            label     : 'Project start',
-                            // required  : true, (done on load)
-                            flex      : '1 2 17em',
-                            listeners : {
-                                change : 'up.onStartDateChange'
-                            }
-                        },
+                        // {
+                        //     type       : 'button',
+                        //     color      : 'b-blue',
+                        //     ref        : 'criticalPathsButton',
+                        //     icon       : 'b-fa b-fa-fire',
+                        //     text       : 'Critical paths',
+                        //     tooltip    : 'Highlight critical paths',
+                        //     toggleable : true,
+                        //     onAction   : 'up.onCriticalPathsClick'
+                        // },
+                        // {
+                        //     type      : 'datefield',
+                        //     ref       : 'startDateField',
+                        //     label     : 'Project start',
+                        //     // required  : true, (done on load)
+                        //     flex      : '1 2 17em',
+                        //     width  : '17em',
+                        //     listeners : {
+                        //         change : 'up.onStartDateChange'
+                        //     }
+                        // },
                     ]
                 },
-                // {
-                //     type      : 'datefield',
-                //     ref       : 'startDateField',
-                //     label     : 'Project start',
-                //     // required  : true, (done on load)
-                //     flex      : '1 2 17em',
-                //     listeners : {
-                //         change : 'up.onStartDateChange'
-                //     }
-                // },
+                {
+                    type      : 'datefield',
+                    ref       : 'startDateField',
+                    label     : 'Project start',
+                    // required  : true, (done on load)
+                    flex      : '1 2 17em',
+                    listeners : {
+                        change : 'up.onStartDateChange'
+                    }
+                },
             ]
         };
     }
@@ -363,10 +356,6 @@ export default base => class GanttToolbar extends base {
 
         undoBtn.disabled = !stm.canUndo;
         redoBtn.disabled = !stm.canRedo;
-    }
-
-    onEditOriginalDate(){
-        this.gantt.callGanttComponent.openOriginDateModal()
     }
 
     updateStartDateField() {
@@ -386,7 +375,7 @@ export default base => class GanttToolbar extends base {
 
         const
             { gantt } = this,
-            added = gantt.taskStore.rootNode.children[0].appendChild({ name : 'New task', duration : 1, startDate: gantt.taskStore.rootNode.children[0].startDate, predecessorName: '' });
+            added = gantt.taskStore.rootNode.children[0].appendChild({ name : 'New task', duration : 1, startDate: gantt.taskStore.rootNode.children[0].startDate, endDate: gantt.taskStore.rootNode.children[0].startDate, predecessorName: '' });
             let see = gantt.taskStore;
             console.log('see ',JSON.parse(JSON.stringify(see)));
         // run propagation to calculate new task fields

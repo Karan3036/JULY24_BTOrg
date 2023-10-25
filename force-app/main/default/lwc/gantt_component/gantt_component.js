@@ -6,6 +6,7 @@ import { loadScript, loadStyle } from "lightning/platformResourceLoader";
 import GanttStyle from "@salesforce/resourceUrl/BT_Bryntum_NewGanttCss";
 import GANTTModule from "@salesforce/resourceUrl/BT_Bryntum_NewGantt_ModuleJS";
 import { NavigationMixin } from "lightning/navigation";
+import { refreshApex } from "@salesforce/apex";
 
 // import GanttStyle from "@salesforce/resourceUrl/BT_Bryntum_NewGanttCss";
 import GanttToolbarMixin from "./lib/GanttToolbar";
@@ -14,7 +15,6 @@ import scheduleWrapperDataFromApex from "@salesforce/apex/bryntumGanttController
 import saveResourceForRecord from "@salesforce/apex/bryntumGanttController.saveResourceForRecord";
 import upsertDataOnSaveChanges from "@salesforce/apex/bryntumGanttController.upsertDataOnSaveChanges";
 import getPickListValuesIntoList from "@salesforce/apex/bryntumGanttController.getPickListValuesIntoList";
-import changeOriginalDates from "@salesforce/apex/bryntumGanttController.changeOriginalDates";
 import {
   formatApexDatatoJSData,
   recordsTobeDeleted,
@@ -49,7 +49,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
 
   //Phase list
   @track phaseNameList;
-  @track showOriginalDateModal = false;
 
   //new
   @api showEditResourcePopup = false;
@@ -126,9 +125,13 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     console.log("Connected Callback new gantt chart");
     console.log("ReocrdID:- ", this.recordId);
 
+    // this.handleShowSpinner();
+
     if (this.SchedulerId == null || this.SchedulerId == undefined) {
       if (this.recordId == null || this.recordId == undefined) {
+        // this.SchedulerId = "a2zDm0000004bPuIAI"; // trail org
         this.SchedulerId = "a101K00000GobT6QAJ"; // New
+        // this.SchedulerId = 'a101K00000GobTCQAZ' // Old
       } else {
         this.SchedulerId = this.recordId;
       }
@@ -362,7 +365,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       .then((result) => {
         console.log("lib loaded");
         this.phaseNameList = result;
-        console.log("phase :- ",this.phaseNameList);
       })
       .catch((error) => {
         this.dispatchEvent(
@@ -1315,49 +1317,4 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       false
     );
   }
-
-  openOriginDateModal() {
-    this.showOriginalDateModal = true;
-  }
-
-  closeModal() {
-    this.showOriginalDateModal = false;
-  }
-
-  changeOriginalDate() {
-    this.spinnerDataTable = true;
-    this.showOriginalDateModal = false;
-    var that = this;
-    var recId = this.recordId;
-    changeOriginalDates({
-      recordId: recId,
-    })
-      .then(function (response) {
-        // console.log("response");
-        // console.log({ response });
-        that.dispatchEvent(
-          new ShowToastEvent({
-            title: "Success",
-            message: "Original Dates Changed Successfully.",
-            variant: "success",
-          })
-        );
-        that.spinnerDataTable = false;
-      })
-      .catch(function (error) {
-        console.log("error");
-        console.log({
-          error,
-        });
-        that.dispatchEvent(
-          new ShowToastEvent({
-            title: "Try Again",
-            message: "Something Went Wrong, Please Try Again",
-            variant: "warning",
-          })
-        );
-        that.spinnerDataTable = false;
-      });
-  }
-
 }
