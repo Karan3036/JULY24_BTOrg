@@ -97,7 +97,7 @@ public with sharing class QuoteItemTriggerHandler {
     public void OnAfterDelete(Quote_Item__c[] oldQuoteItems){
      
     }
-
+// Changes for BUIL-3608 starts from here
     public void insertCostCode(List<Quote_Item__c> newQuoteItems) {
 		try {
 			List<String> productIds = new List<String>();
@@ -127,5 +127,6 @@ public with sharing class QuoteItemTriggerHandler {
 			System.debug('error--->'+e.getMessage());
 			System.debug('error line--->'+e.getLineNumber());
 		}
-	}
+	}    // Changes for BUIL-3608 ends here
+
 }

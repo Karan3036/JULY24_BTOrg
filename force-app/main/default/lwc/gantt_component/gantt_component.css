@@ -90,7 +90,12 @@
     .container {
         height : 78vh;
     }
-  }
+}
+@media only screen and (max-width: 1920px) {
+    .container {
+        height : 68vh;
+    }
+}
 
 /* Spinner end */
 

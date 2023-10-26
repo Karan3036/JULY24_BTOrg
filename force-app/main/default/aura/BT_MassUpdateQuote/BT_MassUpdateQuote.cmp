@@ -61,7 +61,7 @@
             </aura:set>
         </lightning:card>
 
-        <div class="slds-border_top slds-box slds-box_xx-small" style="overflow: auto;" >
+        <div class="slds-border_top slds-box slds-box_xx-small" style="overflow: visible;" >
             <div class="slds slds-m-top_medium slds-p-horizontal_medium" >
                 <table class="slds-table slds-table--bordered':'slds-table--bordered'">
                     <thead>
@@ -79,7 +79,7 @@
                                 <div class="slds-truncate" title="Quote Line Description"> Description</div>
                             </th>
                             <th scope="col" class="table-Header">
-                                <div class="slds-truncate" title="Grouping">Group</div>
+                                <div class="slds-truncate" title="Grouping">Phase</div>
                             </th> 
                             <th scope="col" class="table-Header">
                                 <div class="slds-truncate" title="Notes">Notes</div>
@@ -135,11 +135,12 @@
                                             padding-top: 1.3% !important;
                                             padding-bottom: 1.3% !important;
                                         }
-                                        .subDiv{
+                                        <!-- .subDiv{
                                             width:100% !important;
                                             margin-top:0 !important;
-                                        }
+                                        } -->
                                     </aura:html>
+                                    <label class="slds-form-element__label" for="lookup-348"></label>
                                     <c:BT_LightningLookup objectAPIName="Product2"  IconName="standard:product" selectedRecord="{!quoteLineWrapper.selectedLookUpRecord}" aura:id="productId"   parentId="{!quoteLineWrapper.pricebookEntryId}" prodctfamly="{!quoteLineWrapper.productFamily != '' ? quoteLineWrapper.productFamily : 'All Families'}" />
                                     
                                 </td>

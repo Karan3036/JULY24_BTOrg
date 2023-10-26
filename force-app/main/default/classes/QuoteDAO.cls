@@ -1728,7 +1728,7 @@ public with sharing class QuoteDAO{
                 if (field.fieldName == 'id'){
                     Each_record_nested_List_Of_Fields.recordId = (Id)IndividualMember.get(field.fieldName);
                 } else{
-                    if (field.fieldName != null && field.fieldName != 'buildertek__Grouping__c' && field.fieldName != 'Name' && !field.fieldName.contains('__r.Name')){
+                    if (field.fieldName != null && field.fieldName != 'buildertek__Grouping__c' && !field.fieldName.contains('__r.Name')){
                         if (field.fieldType == 'currency'){
                             recList.add(new RecordsList(field.isEditable, (IndividualMember.get(field.fieldName) == null) ? '$0.00' : '$' + IndividualMember.get(field.fieldName), field.fieldName, (IndividualMember.get(field.fieldName) == null) ? '' : IndividualMember.get(field.fieldName), field.fieldType, ''));
                             temp.add((IndividualMember.get(field.fieldName) == null) ? '' : IndividualMember.get(field.fieldName));
@@ -2406,7 +2406,7 @@ public with sharing class QuoteDAO{
     public static List<productWrapper> getProductsthroughPriceBook2(string pbookId) {
 
 
-        List<PriceBookEntry> pEntries = [SELECT Id,Product2Id, Product2.buildertek__Quote_Group__c , Product2.Name, Product2.ProductCode, Product2.Description, toLabel(Product2.Family), 
+        List<PriceBookEntry> pEntries = [SELECT Id,Product2Id, Product2.buildertek__Quote_Group__c , Product2.Name, Product2.ProductCode,Product2.buildertek__Vendor__r.Name,Product2.buildertek__Cost_Code__r.Name, Product2.Description, toLabel(Product2.Family), 
                                             Product2.IsActive,buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure  //----
                                             FROM PricebookEntry WHERE Pricebook2Id=:pbookId AND IsActive = True 
                                             ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000];
@@ -2415,6 +2415,8 @@ public with sharing class QuoteDAO{
         for (PriceBookEntry pEntry: pEntries) {
             productWrapper aProduct = new productWrapper();
             aProduct.Id = pEntry.Product2Id;
+            aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
+            aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
             aProduct.Name = pEntry.Product2.Name;
             aProduct.ProductCode = pEntry.Product2.ProductCode;
             aProduct.Description = pEntry.Product2.Description;
@@ -2437,7 +2439,7 @@ public with sharing class QuoteDAO{
     public static List<productWrapper> getProductsthroughProductFamily(string pbookId, string pfId) {
 
 
-        List<PriceBookEntry> pEntries = [SELECT Id,Product2Id, Product2.buildertek__Quote_Group__c , Product2.Name, Product2.ProductCode, Product2.Description, toLabel(Product2.Family), 
+        List<PriceBookEntry> pEntries = [SELECT Id,Product2Id, Product2.buildertek__Quote_Group__c , Product2.Name, Product2.ProductCode, Product2.buildertek__Vendor__r.Name ,Product2.buildertek__Cost_Code__r.Name, Product2.Description, toLabel(Product2.Family), 
                                             Product2.IsActive,buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure  //----
                                             FROM PricebookEntry WHERE Pricebook2Id=:pbookId AND IsActive = True AND toLabel(Product2.Family)=:pfId
                                             ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000];
@@ -2447,6 +2449,8 @@ public with sharing class QuoteDAO{
             productWrapper aProduct = new productWrapper();
             aProduct.Id = pEntry.Product2Id;
             aProduct.Name = pEntry.Product2.Name;
+            aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
+            aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
             aProduct.ProductCode = pEntry.Product2.ProductCode;
             aProduct.Description = pEntry.Product2.Description;
             aProduct.Family = pEntry.Product2.Family;
@@ -2513,6 +2517,12 @@ public with sharing class QuoteDAO{
 
         @AuraEnabled
         public Decimal Discount;
+
+        @AuraEnabled
+        public String Vendor;
+
+        @AuraEnabled
+        public String CostCode;
 
         @AuraEnabled
         public String QuantityUnitOfMeasure;        //----
@@ -2595,7 +2605,7 @@ public with sharing class QuoteDAO{
         
         String searchKey = String.join(searchKeyParts, ' AND ');
         
-        String sQuery = 'SELECT Id, Product2Id, Product2.buildertek__Quote_Group__c, Product2.Name, Product2.ProductCode, Product2.Description, toLabel(Product2.Family), Product2.IsActive, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure FROM PricebookEntry WHERE Pricebook2Id = :pbookId AND IsActive = True AND (' + searchKey + ') ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000';
+        String sQuery = 'SELECT Id, Product2Id, Product2.buildertek__Quote_Group__c, Product2.Name, Product2.ProductCode,Product2.buildertek__Vendor__r.Name,Product2.buildertek__Cost_Code__r.Name, Product2.Description, toLabel(Product2.Family), Product2.IsActive, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure FROM PricebookEntry WHERE Pricebook2Id = :pbookId AND IsActive = True AND (' + searchKey + ') ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000';
         
         List<PriceBookEntry> pEntries = Database.query(sQuery);
     
@@ -2604,6 +2614,8 @@ public with sharing class QuoteDAO{
             productWrapper aProduct = new productWrapper();
             aProduct.Id = pEntry.Product2Id;
             aProduct.Name = pEntry.Product2.Name;
+            aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
+            aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
             aProduct.ProductCode = pEntry.Product2.ProductCode;
             aProduct.Description = pEntry.Product2.Description;
             aProduct.Family = pEntry.Product2.Family;
@@ -2633,7 +2645,7 @@ public with sharing class QuoteDAO{
         
         String searchKey = String.join(searchKeyParts, ' AND ');
         
-        String sQuery = 'SELECT Id, Product2Id, Product2.buildertek__Quote_Group__c, Product2.Name, Product2.ProductCode, Product2.Description, toLabel(Product2.Family), Product2.IsActive, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure FROM PricebookEntry WHERE Pricebook2Id = :pbookId AND IsActive = True AND toLabel(Product2.Family)=:pfId AND (' + searchKey + ') ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000';
+        String sQuery = 'SELECT Id, Product2Id, Product2.buildertek__Quote_Group__c, Product2.Name, Product2.ProductCode,Product2.buildertek__Vendor__r.Name,Product2.buildertek__Cost_Code__r.Name, Product2.Description, toLabel(Product2.Family), Product2.IsActive, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure FROM PricebookEntry WHERE Pricebook2Id = :pbookId AND IsActive = True AND toLabel(Product2.Family)=:pfId AND (' + searchKey + ') ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000';
         
         List<PriceBookEntry> pEntries = Database.query(sQuery);
     
@@ -2642,6 +2654,8 @@ public with sharing class QuoteDAO{
             productWrapper aProduct = new productWrapper();
             aProduct.Id = pEntry.Product2Id;
             aProduct.Name = pEntry.Product2.Name;
+            aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
+            aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
             aProduct.ProductCode = pEntry.Product2.ProductCode;
             aProduct.Description = pEntry.Product2.Description;
             aProduct.Family = pEntry.Product2.Family;
