@@ -741,7 +741,14 @@
                                                 </td> -->
                                                 
                                                 <td>
-                                                    <c:BT_LookUp aura:id="costCodeId" _field="buildertek__Cost_Code__c" _sobject="buildertek__Budget_Item__c" _value="{!v.newBudgetLine.buildertek__Cost_Code__c}" _label="" _filter="" />
+                                                    <!-- <c:BT_LookUp aura:id="costCodeId" _field="buildertek__Cost_Code__c" _sobject="buildertek__Budget_Item__c" _value="{!v.newBudgetLine.buildertek__Cost_Code__c}" _label="" _filter="" /> -->
+                                                    <div class="hidelabel">
+                                                        <lightning:select value="{!v.newBudgetLine.buildertek__Cost_Code__c}">
+                                                            <aura:iteration items="{!v.costCodeList}" var="costCodeOption">
+                                                                <option value="{!costCodeOption.value}">{!costCodeOption.label}</option>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                    </div>
                                                     <!--  <c:customLookup aura:id="costcodeId" objectAPIName="buildertek__Cost_Codes__c"
                                                                     IconName="standard:account" selectedRecord="{!v.selectedCostcode}" />-->
                                                     <!--<force:inputField aura:id="accountId" value="{!v.newBudgetLine.buildertek__Contractor__c}" />-->

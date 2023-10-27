@@ -3359,6 +3359,12 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         
         return compactLayoutWrapperList;
     }
+    
+    @AuraEnabled
+    public static List<buildertek__Cost_Codes__c> getCostCodes(){
+        List<buildertek__Cost_Codes__c> costCodes = [SELECT Id, Name FROM buildertek__Cost_Codes__c ORDER BY Name ASC];
+        return costCodes;
+    }
 
 
 }
