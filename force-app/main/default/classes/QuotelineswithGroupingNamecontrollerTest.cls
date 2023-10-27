@@ -54,7 +54,7 @@ public class QuotelineswithGroupingNamecontrollerTest {
         
         quoteListRef.add(quoteItem);
         insert quoteItem;
-        string fieldsnames = 'Name,buildertek__Quote__c,buildertek__Net_Total_Price__c';
+        string fieldsnames = 'buildertek__Quote__c,buildertek__Net_Total_Price__c';
        
         
         QuotelineswithGroupingNameController quotelinewithgrouping = new QuotelineswithGroupingNameController();
