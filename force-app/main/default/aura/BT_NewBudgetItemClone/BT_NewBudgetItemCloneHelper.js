@@ -1238,7 +1238,7 @@
             if (response.getState() == "SUCCESS") {
                 var result = response.getReturnValue();
                 console.log({result});
-                var projectHavePricebook=result[0].defaultValue;
+                let projectHavePricebook=result[0].defaultValue;
                 var pricebookOptions = [];
                 if(Object.keys(projectHavePricebook).length !=0){
                     pricebookOptions.push({ key: projectHavePricebook.Name, value: projectHavePricebook.Id });
@@ -2909,46 +2909,6 @@
         $A.enqueueAction(action);
     
     },
-
-    getCompactLayoutFields:function(component, event, helper){
-        let action = component.get("c.getCompactLayoutFields");
-        action.setParams({
-            budgetId: component.get("v.recordId")
-        });
-        action.setCallback(this, function(response) {
-            if(response.getState() == 'SUCCESS'){
-                let result = response.getReturnValue();
-                component.set("v.budgetFields", result);
-                console.log('compactLayout ==>',response.getReturnValue());
-            } else{
-                console.log('Error calling Apex method: ' + state);
-            }
-        });
-        $A.enqueueAction(action);
-    },
-    getCostCodes : function(component, event, helper) {
-        var action = component.get("c.getCostCodes");
-        action.setCallback(this, function(response) {
-            var state = response.getState();
-            if(state === "SUCCESS") {
-                var costCodes = response.getReturnValue();
-                var costCodeList = [];
-                costCodeList.push({
-                    label: 'Select CostCode',
-                    value: ''
-                });
-                for(var i = 0; i < costCodes.length; i++) {
-                    costCodeList.push({
-                        label: costCodes[i].Name,
-                        value: costCodes[i].Id
-                    });
-                }
-                component.set("v.costCodeList", costCodeList);
-            }
-        }
-        );
-        $A.enqueueAction(action);
-    },
     getCostCodes : function(component, event, helper) {
         var action = component.get("c.getCostCodes");
         action.setCallback(this, function(response) {
@@ -2967,6 +2927,8 @@
                     });
                 }
                 component.set("v.costCodeList", costCodeList);
+            } else{
+                console.log('error');
             }
         }
         );

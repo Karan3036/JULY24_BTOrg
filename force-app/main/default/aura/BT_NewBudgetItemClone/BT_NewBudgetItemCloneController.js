@@ -175,7 +175,6 @@
         helper.applyCSSBasedOnURL(component);
         helper.getCostCodes(component, event, helper);
 
-        helper.getCompactLayoutFields(component, event, helper);
     },
 
     checkToogle: function (component, event, helper) {

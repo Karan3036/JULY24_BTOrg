@@ -1176,9 +1176,6 @@ budgetGroup = Database.query('Select Id, Name,('+soql+') from budget_line_group_
 
         @AuraEnabled
         public pricebook2 defaultValue;
-
-        @AuraEnabled
-        public List<buildertek__Cost_Codes__c> costCodeList;
     }
 
    
@@ -1190,7 +1187,6 @@ budgetGroup = Database.query('Select Id, Name,('+soql+') from budget_line_group_
         pricebookWrapper priceWrap = new pricebookWrapper();
         priceWrap.defaultValue= new pricebook2();
         priceWrap.priceWrapList = new List<pricebook2>();
-        priceWrap.costCodeList = new List<buildertek__Cost_Codes__c>();
         List<pricebook2> PriceList = [select Id, Name from pricebook2 Where buildertek__BT_Visible__c = true AND isActive = true ORDER BY Name ASC];
         priceWrap.priceWrapList=PriceList;
 
@@ -3285,23 +3281,6 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         public Integer total{ get; set; }
     }
 
-    public class CompactLayoutFieldWrapper {
-        @AuraEnabled
-        public String fieldLabel;
-        
-        @AuraEnabled
-        public String fieldType;
-        
-        @AuraEnabled
-        public Object fieldValue;
-        
-        public CompactLayoutFieldWrapper(String label,String fieldType,Object value) {
-            fieldLabel = label;
-            this.fieldType = fieldType;
-            fieldValue = value;
-        }
-    }
-
     @AuraEnabled
     public static List<String> groupingLevels(){
         buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id, buildertek__Budget_Grouping_Level_1__c,
@@ -3322,49 +3301,12 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
     }   
 
     @AuraEnabled
-    public static List<CompactLayoutFieldWrapper> getCompactLayoutFields(String budgetId) {
-        List<CompactLayoutFieldWrapper> compactLayoutWrapperList = new List<CompactLayoutFieldWrapper>();
-        String ObjectName = 'buildertek__Budget__c';
-        String fieldSetName = 'buildertek__Budget_Compact_Layout';
-        Map<String, Schema.SObjectType> GlobalDescribeMap = Schema.getGlobalDescribe(); 
-        
-        Schema.SObjectType SObjectTypeObj = GlobalDescribeMap.get(ObjectName);
-        Schema.DescribeSObjectResult DescribeSObjectResultObj = SObjectTypeObj.getDescribe();
-        Schema.FieldSet fieldSetObj = DescribeSObjectResultObj.FieldSets.getMap().get(fieldSetName);
-        
-        List<Schema.FieldSetMember> fieldSetMemberList = fieldSetObj.getFields();
-    
-        String query = 'SELECT ';
-        for (Schema.FieldSetMember fieldSetMemberObj : fieldSetMemberList) {
-            query += fieldSetMemberObj.getFieldPath() + ', ';
-        }
-        query = query.removeEnd(', ');
-        query += ' FROM buildertek__Budget__c WHERE Id = :budgetId';
-        
-        List<buildertek__Budget__c> records = Database.query(query);
-       
-        
-        buildertek__Budget__c budgetRecord = records[0];
-        
-        for (Schema.FieldSetMember fieldSetMemberObj : fieldSetMemberList) {
-            String fieldLabel = fieldSetMemberObj.getLabel();
-            String fieldPath = fieldSetMemberObj.getFieldPath();
-            String fieldType = String.valueOf(fieldSetMemberObj.getType());
-            CompactLayoutFieldWrapper conWrapper = new CompactLayoutFieldWrapper(fieldLabel, fieldType, budgetRecord.get(fieldPath));
-            compactLayoutWrapperList.add(conWrapper);
-            System.debug('conWrapper: ' + conWrapper.fieldLabel);
-        }
-
-        System.debug('compactLayoutWrapperList: ' + compactLayoutWrapperList);
-        
-        return compactLayoutWrapperList;
-    }
-    
-    @AuraEnabled
     public static List<buildertek__Cost_Codes__c> getCostCodes(){
         List<buildertek__Cost_Codes__c> costCodes = [SELECT Id, Name FROM buildertek__Cost_Codes__c ORDER BY Name ASC];
         return costCodes;
     }
+
+
 
 
 }
