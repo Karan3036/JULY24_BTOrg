@@ -50,8 +50,8 @@
                             'font-size: 14px;padding: 5px 15px;color:black;text-align: left;border-bottom:  1px solid  #ccc;border-right:  1px solid  #ccc;',
                             'font-size: 14px;padding: 5px 15px;color:black;text-align: right;border-bottom:  1px solid  #ccc;border-right:  1px solid  #ccc;')}">
                                 <!-- <apex:outputfield value="{!quotelinesrecs[apiname]}"/> -->
-                                <apex:outputText rendered="{!apiname != 'buildertek__Item_Name__c' || NOT(ISBLANK(quotelinesrecs.Item_Name__c))}" value="{!quotelinesrecs[apiname]}" />
-                                <apex:outputText rendered="{!apiname == 'buildertek__Item_Name__c' && ISBLANK(quotelinesrecs.Item_Name__c)}" value="{!quotelinesrecs.Name}" />
+                                <apex:outputfield rendered="{!apiname != 'buildertek__Item_Name__c' || NOT(ISBLANK(quotelinesrecs.Item_Name__c))}" value="{!quotelinesrecs[apiname]}" />
+                                <apex:outputfield rendered="{!apiname == 'buildertek__Item_Name__c' && ISBLANK(quotelinesrecs.Item_Name__c)}" value="{!quotelinesrecs.Name}" />
                             </td>
                         </apex:repeat>
 

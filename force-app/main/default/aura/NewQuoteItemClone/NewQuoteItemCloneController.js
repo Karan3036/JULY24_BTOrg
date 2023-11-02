@@ -762,8 +762,7 @@
             component.set("v.newQuote.buildertek__Markup__c", markup);
     
     
-            if(getDescription!= undefined && getDescription!= ''){
-    
+            if(getDescription != undefined && getDescription != '' && getDescription.length <= 255){
                 var action = component.get("c.saveQuoteLineItem");
                 action.setParams({
                     "quoteLineRecord": JSON.stringify(quoteObject)
@@ -810,6 +809,20 @@
                         helper.getGroups(component, event, helper, page);
                         helper.fetchpricebooks(component, event, helper);
                         helper.fetchPickListVal(component, event, helper);
+                    } else {
+                        // Handle the error scenario
+                        var errorMessage = returnValue;
+                        console.log('Error message: ' + errorMessage);
+                        
+                        var toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams({
+                            mode: 'sticky',
+                            message: errorMessage,
+                            type: 'error',
+                            duration: '10000',
+                            mode: 'dismissible'
+                        });
+                        toastEvent.fire();
                     }
                 });
                 $A.enqueueAction(action);
@@ -821,7 +834,7 @@
                 var toastEvent = $A.get("e.force:showToast");
                 toastEvent.setParams({
                     mode: 'sticky',
-                    message: 'Please Enter Description',
+                    message: 'Ensure that the description is neither left empty nor excessively lengthy.',
                     type: 'error',
                     duration: '10000',
                     mode: 'dismissible'

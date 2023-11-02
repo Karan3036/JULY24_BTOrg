@@ -2934,5 +2934,20 @@
         );
         $A.enqueueAction(action);
     },
-    
+
+    getFieldsFromFieldset:function(component, event, helper){
+        let action = component.get("c.getFieldsFromFieldset");
+        action.setParams({
+            budgetId: component.get("v.recordId")
+        });
+        action.setCallback(this, function(response) {
+            if(response.getState() == 'SUCCESS'){
+                let result = response.getReturnValue();
+                component.set("v.budgetFields", result);
+            } else{
+                console.log('Error calling Apex method: ' + state);
+            }
+        });
+        $A.enqueueAction(action);
+    } 
 })

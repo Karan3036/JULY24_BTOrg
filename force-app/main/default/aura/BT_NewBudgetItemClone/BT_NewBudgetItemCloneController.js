@@ -174,6 +174,7 @@
 
         helper.applyCSSBasedOnURL(component);
         helper.getCostCodes(component, event, helper);
+        helper.getFieldsFromFieldset(component, event, helper);
 
     },
 
@@ -349,6 +350,7 @@
         component.set('v.newBudgetLine.buildertek__Unit_Price__c', '');
         component.set('v.newBudgetLine.buildertek__Sales_Price__c', '');
         component.set('v.newBudgetLine.buildertek__Markup__c', '');
+        component.set('v.newBudgetLine.buildertek__Cost_Code__c', '');
     },
 
     onContingency: function (component, event, helper) {

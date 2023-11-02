@@ -1,6 +1,19 @@
 <aura:component controller="ScheduleSummaryController" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
 
 <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+<aura:attribute name="tasks" type="Project_Task__c[]" />
+<aura:attribute name="pastDueTasks" type="Project_Task__c[]" />
+<aura:attribute name="dueThisWeekTasks" type="Project_Task__c[]" />
+<aura:attribute name="dueNextWeekTasks" type="Project_Task__c[]" />
+<aura:attribute name="selectedVendor" type="sObject" default="{}"/>
+
+<aura:html tag="style">
+    .buildertekCustomLookup .pillSize {
+        width: 100%;
+        padding-top: 0% !important;
+        padding-bottom: 0% !important;
+    }
+</aura:html>
     <div class="mainContainer">
         <header style="background: #1b5297;padding: 11px 20px;">
             <div class="left-box" style="display: inline-block;vertical-align: middle;width: 30%;">
@@ -17,42 +30,57 @@
                     </div>
 
                     <div class="slds-col slds-size_1-of-12">
-                    	<lightning:button class="slds-m-top_large" variant="brand" label="Filter" title="Filter" />
+                    	<lightning:button class="slds-m-top_large" variant="brand" label="Filter" title="Filter" onclick="{!c.Filter}" />
                     </div>
                 </div>
             </div>
         </div>
         <div class="container">
             <div class="subcontain">
-                <center>Pass Due</center>
+                <center>Past Due</center>
                 <div class="rkdiv">
-                    <div class="subrkdiv1">
-                        <p>Task Name : 0025</p>
-                        <p>Finish Date : 27 Oct 2023</p>
-                        <p>Completion(%) : 50 %</p>
-                    </div>
+                    <aura:iteration items="{!v.pastDueTasks}" var="task">
+                        <div class="subrkdiv1">
+                            <p class="poppins classss">Task Name: <ui:outputURL
+                                value="{!'/one/one.app?#/sObject/'+ task.Id + '/view'}"
+                                target="_blank"
+                                label="{!task.Name}" /></p>
+                            <p class="poppins">Finish Date: {!task.buildertek__Finish__c}</p>
+                            <p class="poppins">Completion(%): {!task.buildertek__Completion__c}%</p>
+                        </div>
+                    </aura:iteration>
                 </div>
             </div>
             <div class="subcontain">
                 <center>Due This Week</center>
                 <div class="rkdiv">
-                    <div class="subrkdiv2">
-                        <p>Task Name : 0025</p>
-                        <p>Finish Date : 27 Oct 2023</p>
-                        <p>Completion(%) : 50 %</p>
-                    </div>
+                    <aura:iteration items="{!v.dueThisWeekTasks}" var="task">
+                        <div class="subrkdiv2">
+                            <p class="poppins classss">Task Name: <ui:outputURL
+                                value="{!'/one/one.app?#/sObject/'+ task.Id + '/view'}"
+                                target="_blank"
+                                label="{!task.Name}"/></p>
+                            <p class="poppins">Finish Date: {!task.buildertek__Finish__c}</p>
+                            <p class="poppins">Completion(%): {!task.buildertek__Completion__c}%</p>
+                        </div>
+                    </aura:iteration>
                 </div>
             </div>
             <div class="subcontain">
                 <center>Due Next Week</center>
                 <div class="rkdiv">
-                    <div class="subrkdiv3">
-                        <p>Task Name : 0025</p>
-                        <p>Finish Date : 27 Oct 2023</p>
-                        <p>Completion(%) : 50 %</p>
-                    </div>
+                    <aura:iteration items="{!v.dueNextWeekTasks}" var="task">
+                        <div class="subrkdiv3">
+                            <p class="poppins classss">Task Name: <ui:outputURL
+                                value="{!'/one/one.app?#/sObject/'+ task.Id + '/view'}"
+                                target="_blank"
+                                label="{!task.Name}" /></p>
+                            <p class="poppins">Finish Date: {!task.buildertek__Finish__c}</p>
+                            <p class="poppins">Completion(%): {!task.buildertek__Completion__c}%</p>
+                        </div>
+                    </aura:iteration>
                 </div>
             </div>
         </div>
     </div>
-</aura:component>	
+</aura:component>
