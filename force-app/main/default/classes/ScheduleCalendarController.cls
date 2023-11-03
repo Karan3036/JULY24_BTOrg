@@ -40,7 +40,6 @@ public class ScheduleCalendarController {
         }else{
             query += ' WHERE buildertek__Schedule__r.buildertek__Type__c !=: scheduletype';
         }
-        // query += ' AND buildertek__Schedule__r.buildertek__Active__c = True';
         query += ' ORDER By Name ASC';
         system.debug('query-->'+query);
         List<buildertek__Project_Task__c> scheduleItemsList = Database.query(query);
