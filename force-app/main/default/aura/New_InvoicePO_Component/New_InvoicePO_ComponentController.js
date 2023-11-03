@@ -21,7 +21,6 @@
         });
         $A.enqueueAction(getFields);
         if (value != null) {
-            console.log('in if');
             context = JSON.parse(window.atob(value));
             parentRecordId = context.attributes.recordId;
             var isproject = context.attributes.objectApiName;
@@ -31,10 +30,8 @@
                 helper.handleChangeProjectHelper(component, event, helper);
             }
         } else {
-            console.log('in else');
             var relatedList = window.location.pathname;
             var stringList = relatedList.split("/");
-            console.log('stringList==>',stringList);
             parentRecordId = stringList[4];
             if (parentRecordId == 'related') {
                 var stringList = relatedList.split("/");

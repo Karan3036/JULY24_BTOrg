@@ -88,7 +88,7 @@
                                                             
                                                                     
                                                                     <aura:if isTrue="{!empty(v.poList)}">
-                                                                        <aura:if isTrue="{!empty(v.selectedPOName)}">
+                                                                        <aura:if isTrue="{!empty(v.parentRecordId)}">
                                                                             <span>
                                                                                 <p class="blank-lst" style="text-align: center; padding:10px">
                                                                                     Please select the Project first
