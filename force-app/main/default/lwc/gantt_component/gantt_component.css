@@ -90,16 +90,18 @@
     .container {
         height : 78vh;
     }
-}
-@media only screen and (max-width: 1920px) {
-    .container {
-        height : 68vh;
-    }
-}
+  }
 
 /* Spinner end */
 
 .b-pickerfield:not(.b-readonly):not(.b-disabled) input[readonly] {
     cursor: pointer;
     display: none;
+}
+
+/* Modal popup */
+
+.slds-modal__container {
+    max-width: 72rem !important;
+    width: 72% !important;
 }
