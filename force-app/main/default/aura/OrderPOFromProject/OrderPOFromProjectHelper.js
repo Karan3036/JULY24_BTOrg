@@ -156,9 +156,16 @@
         action.setCallback(this, function (response) {
             var state = response.getState();
             if (state === "SUCCESS") {
-                console.log('Success');
-            } else{
-                console.log('Fail')
+                console.log('Success--->',response);
+            } else if (state === "ERROR") {
+                var errors = response.getError();
+                if (errors && errors[0] && errors[0].message) {
+                    console.log('error-->',errors[0].message);
+                } else {
+                    console.log('Unknown error');
+                }
+            } else if (state === "INCOMPLETE") {
+                console.log('Server request incomplete');
             }
         });
         $A.enqueueAction(action);
