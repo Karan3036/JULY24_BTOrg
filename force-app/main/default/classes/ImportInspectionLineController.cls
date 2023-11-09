@@ -22,8 +22,6 @@ public with sharing class ImportInspectionLineController {
             if (!InspectionLineListtoInsert.isEmpty()) {
                 insert InspectionLineListtoInsert;
                 returnresponse = 'SUCCESS';
-            } else {
-                returnresponse = 'No valid data found for insertion';
             }
         } catch (Exception e) {
             returnresponse = 'ERROR: ' + e.getMessage();

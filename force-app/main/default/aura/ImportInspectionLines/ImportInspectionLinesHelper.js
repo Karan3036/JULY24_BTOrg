@@ -16,6 +16,9 @@
             console.log('headers-->',headers);
             if (arr.length > 1) {
                 for(var i = 1; i < arr.length; i++) {
+                    if (arr[i].trim() === '') {
+                        continue;
+                    }
                     var data = arr[i].split(',');
                     if (data.length > headers.length) {
                         this.showToast(component, "error", "Data row has more values than header columns.");
@@ -35,7 +38,7 @@
             }
         } catch (error) {
             console.log('error-->',error);
-            this.showToast(component, "error", "Something went wrong.");
+            this.showToast(component, "error", error);
             return '';
         }
         

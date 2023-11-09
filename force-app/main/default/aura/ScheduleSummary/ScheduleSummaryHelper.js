@@ -1,17 +1,17 @@
 ({
     loadTasks: function (component, recordId) {
-        // console.log("In MEthod");
         var action = component.get("c.gettaskOfSchedules");
-        action.setParams({ "recordId": recordId });
-
+        action.setParams({
+            "recordId": recordId
+        });
         action.setCallback(this, function (response) {
             var state = response.getState();
+
             if (state === "SUCCESS") {
                 var tasks = response.getReturnValue();
                 console.log('tasks---->', tasks);
                 if (tasks.length > 0) {
                     tasks.forEach(task => {
-                        // console.log('element => ',element);
                         if (!task.buildertek__Contractor__c) {
                             task.buildertek__Contractor__c = '';
                         }else{
@@ -19,15 +19,22 @@
                         }
                     });
                 }
-                console.log('tasks---->', tasks);
+
                 component.set("v.tasks", tasks);
                 component.set("v.taskListInit", tasks);
                 this.filterTasks(component);
+
             } else {
-                // console.log("Error: " + response.getError());
+                $A.get("e.force:closeQuickAction").fire() 
+                        var toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams({
+                            "title": "Error",
+                            "type": "error",
+                            "message": "Something went wrong."  
+                        });
+                toastEvent.fire();
             }
         });
-
         $A.enqueueAction(action);
     },
     filterTasks: function (component) {
@@ -48,6 +55,7 @@
                 tasks.push(task);
             }
         });
+        
         var today = new Date();
         today.setHours(0, 0, 0, 0); // Set the time to midnight
 
@@ -94,54 +102,35 @@
             });
             // Set the matching tasks list back to the original taskList
             component.set("v.tasks", matchingTasksList);
-            this.filterTasks(component);
-            
-            
-            // var action = component.get("c.getTaskDataByVendorAndProject");
-            // action.setParams({
-                //     "recordId": recordId,
-                //     "contractorId" : contractorId
-                // });
-                
-                // action.setCallback(this, function (response) {
-                    //     var state = response.getState();
-                    //     if (state === "SUCCESS") {
-                        //         var tasks = response.getReturnValue();
-                        //         // console.log('tasks---->', tasks);
-                        //         component.set("v.tasks", tasks);
-                        //         this.filterTasks(component);
-                        //     } else {
-                            //         // console.log("Error: " + response.getError());
-                            //     }
-                            // });
-                            
-                            // $A.enqueueAction(action);
-                
+            this.filterTasks(component);        
         } else {
             var taskListInit = component.get("v.taskListInit");
-            console.log('IN ELSE tsk',taskList);
-            console.log('IN ELSE INIT',taskListInit);
             component.set("v.tasks", taskListInit);
             this.filterTasks(component);
 
-            // this.loadTasks(component,recordId);
-            // console.log("Method after");
         }
     },
-    handleChangeContractorHelper: function(component, event, helper) {
+    getContractorListHelper: function(component, event, helper) {
 
         var action = component.get("c.getContractorRecords");
         component.set("v.Message" , 'Loading...');
         action.setCallback(this, function(response) {
             var state = response.getState();
-            // console.log(response.getError());
-            // console.log({state});
             var result= response.getReturnValue();
             if (state === "SUCCESS") {
-                // console.log({result});
-                component.set('v.contractorList' ,result);
+                if(result.length > 100){
+                    var contractorListLimited = [];
+                    for(var  i=0; i<=99; i++){
+                        contractorListLimited.push(result[i]);
+                    }
+                    component.set("v.contractorList", contractorListLimited);
+                    // console.log("contractorList => ", contractorListLimited);
+                }
+                else{
+                    component.set('v.contractorList' ,result);
+                }
+                
                 if (result.length > 0) {
-                    // console.log("RESULT--->",result);
                     component.set("v.Message" , '');  
                 }else{
                     component.set("v.Message" , 'There are No Contractor.');  
@@ -151,4 +140,19 @@
         });
         $A.enqueueAction(action);
     },
+
+    Cutout_ContractorRecords : function(component, event){
+        var result =  component.get('v.allContractorRecords');
+        if(result.length > 100){
+            var contractorListLimited = [];
+            for(var  i=0; i<=99; i++){
+                contractorListLimited.push(result[i]);
+            }
+            component.set("v.contractorList", contractorListLimited);
+            // console.log("contractorList => ", contractorListLimited);
+        }
+        else{
+            component.set('v.contractorList' ,result);
+        }
+    }
 })
