@@ -69,27 +69,10 @@ public class BT_SyncProductsController {
         return priceWrapper;
     }
     @AuraEnabled
-    public static List<buildertek__Quote_Line_Group__c> getQuoteLineGroups(){
-        List<buildertek__Quote_Line_Group__c> quoteLineGrouping = [SELECT Id, Name FROM buildertek__Quote_Line_Group__c ORDER BY Name ASC];
-        return quoteLineGrouping;
-        
-    }
-    @AuraEnabled
     public static List<buildertek__Quote_Item__c> getQuoteLineRecordList(String recordId) {
        
         List<buildertek__Quote_Item__c>  QuoteLineList = [SELECT Id, Name, buildertek__Product__r.Id ,buildertek__Product__r.Name,buildertek__Grouping__r.Name FROM buildertek__Quote_Item__c WHERE buildertek__Quote__c =:recordId AND buildertek__Product__c ='' ORDER BY Name ASC];
         return QuoteLineList;
-    }
-    @AuraEnabled
-    public static List<Product2> getProduct(String prodName){
-        String filterValue='%'+prodName+'%';
-        List<Product2> prodList = new List<Product2>();
-        if(prodName !=null ){
-            prodList= [SELECT Id, Name FROM Product2 WHERE  Product2.Name LIKE :filterValue ORDER BY Name ASC LIMIT 100  ];
-        }else{
-            prodList=[SELECT Id, Name FROM Product2 ORDER BY Name ASC LIMIT 100  ];
-        }
-        return prodList;
     }
     @AuraEnabled
     public static List<productWrapper> getProductsthroughPriceBook2(string pbookId) {
@@ -250,5 +233,15 @@ public class BT_SyncProductsController {
         }
         update UpdateQlList;
     }  
-
+    @AuraEnabled
+    public static Boolean checkQuoteLineItems(String quoteId){
+        Boolean allQuoteLineItemsHaveProducts = true;
+        List<buildertek__Quote_Item__c> quoteLineItems = [SELECT Id, buildertek__Product__c FROM buildertek__Quote_Item__c WHERE buildertek__Quote__c =:quoteId];
+        for(buildertek__Quote_Item__c quoteLineItem : quoteLineItems){
+            if(quoteLineItem.buildertek__Product__c == null){
+                allQuoteLineItemsHaveProducts = false;
+            }
+        }
+        return allQuoteLineItemsHaveProducts;
+    }
 }

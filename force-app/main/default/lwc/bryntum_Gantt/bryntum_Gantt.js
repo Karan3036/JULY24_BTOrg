@@ -2530,7 +2530,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
               indent: false,
               outdent: false,
               add: false,
-              milestone: false,
               convertToMilestone: false,
             },
           },
@@ -2561,7 +2560,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         },
         listeners: {
           beforeCellEditStart: ({ editorContext }) => {
-            console.log('event fired beforeCellEditStart');
             if (
               editorContext.column.field !== "percentDone" ||
               editorContext.record.isLeaf

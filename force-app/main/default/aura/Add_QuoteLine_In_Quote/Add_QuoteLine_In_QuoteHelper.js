@@ -70,6 +70,7 @@
         component.set('v.Spinner', true);
         component.set("v.sProductFamily", '');
         component.set("v.sProductName", '');
+        component.set("v.sVendorName", '');
         // var selectedPricebook = component.find("selectedPricebook").get("v.value");
         console.log('selectedPricebook => '+priceBookId);
         if (priceBookId != '') {
@@ -165,9 +166,12 @@
     changeProductFamilyHelper : function(component, event, helper , priceBookId, productFamilyId){
         console.log('method is calllll');
         component.set('v.Spinner', true);
+        component.set("v.sProductName", '');
+        component.set("v.sVendorName", '');
         console.log('selectedPricebook====>',priceBookId);
         console.log('selectedProductFamily=====>',productFamilyId);
         let sProductFamily = component.get("v.sProductFamily");
+        let sVendorName = component.get("v.sVendorName");
         console.log('sProductFamily=====>',sProductFamily);
         if (priceBookId != '' && productFamilyId != '') {
             
@@ -206,8 +210,6 @@
 
                     component.set("v.quoteLineList", updatedRows);
                     component.set("v.tableDataList", updatedRows);
-
-
                     //--------------------------------------------------------------------------
                 }
                 component.set('v.Spinner', false);
@@ -228,6 +230,7 @@
         console.log('searchDatatableHelper method is called------');
         component.set('v.Spinner', true);
         if (component.get("v.selectedPricebookId") != '') {
+            let sVendorName = component.get("v.sVendorName");
             let sProductFamily = component.get("v.sProductFamily");
             let sProductName = component.get("v.sProductName");
             let sPriceBook = component.get("v.selectedPricebookId");
@@ -256,7 +259,7 @@
                                     row.Selected = true;
                                 }
                             });
-
+                            
                             // Sort the records with selected ones on top
                             rows.sort(function(a, b) {
                                 if (a.Selected && !b.Selected) {
@@ -266,6 +269,16 @@
                                 }
                                 return 0; // no change in order
                             });
+
+                            if (sVendorName != '') {
+                                // rows.forEach(element => {
+                                //     if (element.Vendor == sVendorName) {
+                                //         tableDataList.push(element);
+                                //     }
+                                // });
+                                //make attribute of vendorName and set it to null
+                                component.set("v.sVendorName", '');
+                            } 
                             
                             component.set("v.quoteLineList", rows);
                             component.set("v.tableDataList", rows);
@@ -333,6 +346,7 @@
     }, 
 
     goToEditModalHelper: function(component, event, helper) {
+        console.log("CAAALING");
         
         var quoteLineList = component.get("v.selectedRecords");
         console.log('quoteLineList => ',{quoteLineList});
@@ -351,10 +365,12 @@
             console.log(phaseValue);
             console.log(phaseValue!= undefined);
             if(element.Selected){
+                console.log("ELEMENT----->" , element.CostCode);
                 selectedProducts.push({
                     'Id':element.Id,
                     'Name': element.Name,
                     'buildertek__Unit_Price__c': element.UnitPrice,
+                    'buildertek__Cost_Code__c': element.CostCode,
                     'buildertek__Grouping__c': element.Phase ? element.Phase : noGroupingId,
                     'buildertek__Quantity__c': '1',
                     'buildertek__Additional_Discount__c': element.Discount ? element.Discount : 0,
@@ -368,6 +384,7 @@
 
                 })
                 console.log('Quantity Unit Of Measure => ', element.QuantityUnitOfMeasure);
+                console.log('Quantity Unit Of Measure New => ', element.CostCode);
             }
 
             // =====BUIL-3198 ====

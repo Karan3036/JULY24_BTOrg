@@ -40,28 +40,33 @@
         helper.changeProductFamilyHelper(component, event, helper , priceBookId, selectedProductFamily);
     },
     searchInDatatable: function(component, event, helper){
-        var checkboxes = component.find("checkboxInput");
-        checkboxes.forEach(function(checkbox) {
-            checkbox.set("v.checked", false);
-        });
-        component.set("v.selectedRecords", []);
-        var inputElement = event.getSource().get('v.value');
-            var prevInput = component.get('v.prevInput');
-            var searchTimeout = component.get('v.searchTimeout');
-            
-            clearTimeout(searchTimeout);
-                if (inputElement === prevInput) {
-                    helper.searchDatatableHelper(component, event, helper);
-                } else {
-                    searchTimeout = setTimeout($A.getCallback(function() {
-                        if (inputElement === component.get('v.sProductName')) {
-                            helper.searchDatatableHelper(component, event, helper);
-                        }
-                    }), 2000);
-                    component.set('v.searchTimeout', searchTimeout);
-                }
-            component.set('v.prevInput', inputElement);
-        
+        if (component.get("v.selectedPricebookId") != '') {
+        //     if(component.get("v.tableDataList").length > 0){
+        //     var checkboxes = component.find("checkboxInput");
+        //     checkboxes.forEach(function(checkbox) {
+        //         checkbox.set("v.checked", false);
+        //     });
+        // }
+            component.set("v.selectedRecords", []);
+            var inputElement = event.getSource().get('v.value');
+                var prevInput = component.get('v.prevInput');
+                var searchTimeout = component.get('v.searchTimeout');
+                
+                clearTimeout(searchTimeout);
+                    if (inputElement === prevInput) {
+                        helper.searchDatatableHelper(component, event, helper);
+                    } else {
+                        searchTimeout = setTimeout($A.getCallback(function() {
+                            if (inputElement === component.get('v.sProductName')) {
+                                helper.searchDatatableHelper(component, event, helper);
+                            }
+                        }), 2000);
+                        component.set('v.searchTimeout', searchTimeout);
+                    }
+                component.set('v.prevInput', inputElement);
+        }else {
+            var inputElement = event.getSource().get('v.value');
+        }
     }, 
     checkboxChange: function(component, event, helper) {
         var selectedRecords = [];
@@ -92,19 +97,20 @@
         var updatedquoteLineList = [];
         var  quoteLineNeedToUpdateId= component.get("v.quoteLineId"); // The ID you want to match for the update
         var product = component.get("v.selectedRecords"); // The new value you want to set
-        if (product.length == 0) {
-            component.set('v.Spinner', false);
-            var toastEvent = $A.get("e.force:showToast");
-            if(toastEvent){
-            toastEvent.setParams({
-                "title": "Error",
-                "message": "Please select at least one Product.",
-                "type": "error",
-                "duration": 5000
-            });
-            toastEvent.fire();
-        }
-        }
+        
+            if (product.length == 0) {
+                component.set('v.Spinner', false);
+                var toastEvent = $A.get("e.force:showToast");
+                if(toastEvent){
+                    toastEvent.setParams({
+                        "title": "Error",
+                        "message": "Please select at least one Product.",
+                        "type": "error",
+                        "duration": 5000
+                    });
+                    toastEvent.fire();
+                }
+            }
             for (var i = 0; i < quoteLineList.length; i++) {
                 var record = quoteLineList[i];
                 if (record.Id === quoteLineNeedToUpdateId) { // Check if the ID matches

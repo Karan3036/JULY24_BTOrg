@@ -1,10 +1,12 @@
 ({
 	doInit : function(component, event, helper) {
+        console.log('METHOD');
         helper.getTemplates(component, event, helper);
 		var action = component.get("c.getQBConfigs");	
         action.setCallback(this, function(response){
             if(response.getState() === 'SUCCESS'){
             	var result = response.getReturnValue();
+                console.log(result);
                 component.set("v.qbConfigs", result);
             }   
         });

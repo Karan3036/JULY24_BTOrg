@@ -2,10 +2,11 @@
     <title>Public Folders</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <apex:includeLightning />    
-    <div id="LightningComponentid" style="width:100%; min-height:100vh;"/>    
+    <div id="LightningComponentid" style="width:100%; min-height:100vh; min-width:95%"/>    
     <script>
-    $Lightning.use("c:displayPublicFolderApp", function() {
-        $Lightning.createComponent("c:displayPublicFolderLWC",{ 
+    $Lightning.use("buildertek:displayPublicFolderApp", function() {
+        console.log('displayPublicFolderApp Open In VF Page');
+        $Lightning.createComponent("buildertek:displayPublicFolderLWC",{ 
             folderId: "{!$CurrentPage.parameters.Id}"
           },
           "LightningComponentid",

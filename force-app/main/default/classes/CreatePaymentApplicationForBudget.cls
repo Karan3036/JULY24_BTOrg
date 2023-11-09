@@ -2806,11 +2806,14 @@ InsertedConList = [Select id, name, buildertek__Item_No__c from buildertek__SOV_
     public static User getCommUser(){
         String portalCode = '';
         string userName = userInfo.getUserId();
-        string strQry = 'Select isPortalEnabled From User Where id=: userName';    
+        string strQry = 'Select isPortalEnabled From User Where id=: userName';  
+        System.debug('strQry-------->'+strQry);  
         list<User> userRec = Database.query(strQry);
+        System.debug('userRec-------->'+userRec);
         if(userRec.size() > 0){
             portalCode = userRec[0].get('isPortalEnabled').toString();
         }
+        System.debug('portalCode-------->'+portalCode);
         return  userRec[0] ;
     }
     

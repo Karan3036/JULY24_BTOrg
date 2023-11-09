@@ -234,18 +234,18 @@ public with sharing class ImportMasterQuotes {
                         quote.buildertek__Section_VIII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_VIII__c;
                         quote.buildertek__Section_X__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_X__c;
                         
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XI__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XII__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XII__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XIV__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XV__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVI__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVII__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVIII__c;  
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XIX__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XX__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XXI__c;
-                        quote.buildertek__Section_IX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XXII__c;                                                
+                        quote.buildertek__Section_XI__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XI__c;
+                        quote.buildertek__Section_XII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XII__c;
+                        quote.buildertek__Section_XIII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XII__c;
+                        quote.buildertek__Section_XIV__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XIV__c;
+                        quote.buildertek__Section_XV__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XV__c;
+                        quote.buildertek__Section_XVI__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVI__c;
+                        quote.buildertek__Section_XVII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVII__c;
+                        quote.buildertek__Section_XVIII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XVIII__c;  
+                        quote.buildertek__Section_XIX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XIX__c;
+                        quote.buildertek__Section_XX__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XX__c;
+                        quote.buildertek__Section_XXI__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XXI__c;
+                        quote.buildertek__Section_XXII__c = quoteItemList[0].buildertek__Quote__r.buildertek__Section_XXII__c;                                                
                                                                                                                                                                                                                                               
                         quote.buildertek__Footer__c = quoteItemList[0].buildertek__Quote__r.buildertek__Footer__c;
                     } else if(!masterQuoteItemList.isEmpty()) {
@@ -295,18 +295,18 @@ public with sharing class ImportMasterQuotes {
                         quote.buildertek__Section_X__c = quote1[0].buildertek__Section_X__c;
                         quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_IX__c;
                         
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XI__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XII__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XII__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XIV__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XV__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XVI__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XVII__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XVIII__c;  
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XIX__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XX__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XXI__c;
-                        quote.buildertek__Section_IX__c = quote1[0].buildertek__Section_XXII__c; 
+                        quote.buildertek__Section_XI__c = quote1[0].buildertek__Section_XI__c;
+                        quote.buildertek__Section_XII__c = quote1[0].buildertek__Section_XII__c;
+                        quote.buildertek__Section_XII__c = quote1[0].buildertek__Section_XIII__c;
+                        quote.buildertek__Section_XIV__c = quote1[0].buildertek__Section_XIV__c;
+                        quote.buildertek__Section_XV__c = quote1[0].buildertek__Section_XV__c;
+                        quote.buildertek__Section_XVI__c = quote1[0].buildertek__Section_XVI__c;
+                        quote.buildertek__Section_XVII__c = quote1[0].buildertek__Section_XVII__c;
+                        quote.buildertek__Section_XVIII__c = quote1[0].buildertek__Section_XVIII__c;  
+                        quote.buildertek__Section_XIX__c = quote1[0].buildertek__Section_XIX__c;
+                        quote.buildertek__Section_XX__c = quote1[0].buildertek__Section_XX__c;
+                        quote.buildertek__Section_XXI__c = quote1[0].buildertek__Section_XXI__c;
+                        quote.buildertek__Section_XXII__c = quote1[0].buildertek__Section_XXII__c; 
                         quote.buildertek__Footer__c = quote1[0].buildertek__Footer__c;
                     // } 
                     // else if(!masterQuoteItemList.isEmpty()) {
