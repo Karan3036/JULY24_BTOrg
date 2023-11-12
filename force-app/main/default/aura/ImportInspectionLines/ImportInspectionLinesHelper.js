@@ -58,7 +58,7 @@
                 console.log('result--->',result);
                 console.log('Result--->',{result});
                 if (result === 'SUCCESS') {
-                    this.showToast(component, "Success", "Inspection Line Inserted Succesfully");
+                    this.showToast(component, "Success", "Inspection Line Inserted Successfully");
                 } else {
                     this.showToast(component, "Error", result);
                 }
