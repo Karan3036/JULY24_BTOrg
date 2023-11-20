@@ -41,7 +41,7 @@ public class QBInvoiceJSON {
     public class SalesItemLineDetail{
         public ItemRef ItemRef;
         public Double UnitPrice;
-        public Integer Qty;
+        public Decimal Qty;
         public ItemAccountRef ItemAccountRef;
         public String TaxCodeRef;
     }
@@ -107,7 +107,6 @@ public class QBInvoiceJSON {
 
     }
 
-    public class Invoice{
         public String Id;
         public String domain;
 		public Boolean sparse;
@@ -118,7 +117,7 @@ public class QBInvoiceJSON {
         public String TxnDate;
         public CurrencyRef CurrencyRef;
         public LinkedTxn LinkedTxn;
-        public Line Line;
+        public List<line> Line;
         public TxnTaxDetail TxnTaxDetail;
         public CustomerRef CustomerRef;
         public String CustomerMemo;
@@ -126,7 +125,7 @@ public class QBInvoiceJSON {
         public ShipAddr ShipAddr;
         public Boolean FreeFormAddress;
         public SalesTermRef SalesTermRef;
-        public String DueDate;
+        public Date DueDate;
         public String TotalAmt;
         public Boolean ApplyTaxAfterDiscount;
         public String PrintStatus;
@@ -137,13 +136,13 @@ public class QBInvoiceJSON {
         public Boolean AllowOnlinePayment;
         public Boolean AllowOnlineCreditCardPayment;
         public Boolean AllowOnlineACHPayment;
-    }
+    
 
         public static QBInvoiceJSON parse(String json) {
             return (QBInvoiceJSON) System.JSON.deserialize(json, QBInvoiceJSON.class);
         }
 
-        public static QBInvoiceJSON.Invoice parseCustomer(String json) {
-            return (QBInvoiceJSON.Invoice) System.JSON.deserialize(json, QBInvoiceJSON.Invoice.class);
-    }
+    //     public static QBInvoiceJSON.Invoice parseCustomer(String json) {
+    //         return (QBInvoiceJSON.Invoice) System.JSON.deserialize(json, QBInvoiceJSON.Invoice.class);
+    // }
 }
