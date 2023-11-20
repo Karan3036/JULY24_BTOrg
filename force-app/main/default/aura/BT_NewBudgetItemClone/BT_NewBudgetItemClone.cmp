@@ -314,8 +314,10 @@
     <aura:attribute name="TotalRecordCount" type="Integer" default="0" />
     <aura:attribute name="CollapeCount" type="Integer" default="0" />
     <aura:attribute name="displayRecordList" type="List" />
+
     <aura:attribute name="costCodeList" type="List" />
     <aura:attribute name="budgetFields" type="List" />
+
     
     <aura:HTML tag="style">
         .slds-tabs_card{
@@ -377,6 +379,27 @@
         <aura:if isTrue="{!v.isbudget}">
             <div class="slds-modal__header rkclass" style="text-align: left;">
                 <a href="{!v.fromWhereBudgetIsOpen}" style="font-size:17px;padding-right: 50px;" onclick="{!c.closetab}">{!v.budgetName} </a>
+
+                <!-- <div class="rkclass">
+                    <div class="rkclasses">
+                        <p>Original Budget </p><lightning:formattedNumber value="{!v.OriginalBudget}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
+                    </div>
+                    <div class="rkclasses">
+                        <p>Total Costs </p><lightning:formattedNumber value="{!v.TotalCosts}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
+                    </div>
+                    <div class="rkclasses">
+                        <p>Total Sales Price </p><lightning:formattedNumber value="{!v.TotalSalesPrice}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
+                    </div>
+                    <div class="rkclasses">
+                        <p>Gross Margin (%) </p><lightning:formattedNumber value="{!v.GrossMarginPer/100}" style="percent" minimumFractionDigits="2" />
+                    </div>
+                    <div class="rkclasses">
+                        <p>Gross Margin ($) </p><lightning:formattedNumber value="{!v.GrossMargin}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
+                    </div>
+                    <div class="rkclasses">
+                        <p>Projected Gross Margin (%) </p><lightning:formattedNumber value="{!v.ProjectedGrossMargin/100}" style="percent" minimumFractionDigits="2" />
+                    </div> 
+                </div> -->
                 <div class="rkclass">
                     <aura:iteration items="{!v.budgetFields}" var="item">
                         <div class="rkclasses">
@@ -1135,7 +1158,8 @@
                                                                 </aura:if>
 
                                                             </td>
-                                                            <aura:iteration items="{!recs.recordList}" var="value" indexVar="groIndex">
+                                                            <aura:iteration items="{!recs.recordList}" var="value" indexVar="groIndex">        
+                                                                        
                                                                 <aura:if isTrue="{!value.fieldName != 'buildertek__Contractor__c' &amp;&amp; value.fieldName != 'buildertek__CostCodeDivision__c'}" >
                                                                     <td class="ShowIconClass" data-myvalue="{!groIndex}" style="font-size: 0.78rem !important;">
                                                                         <aura:if isTrue="{!or(and(and(v.isEditMode, v.fieldName == value.fieldName), v.quoteItemId == recs.recordId),and(v.enableMassUpdate,
@@ -1313,6 +1337,15 @@
                                                                         </aura:if>
 
                                                                     </td>
+
+                                                                    <aura:set attribute="else">
+                                                                        <aura:if isTrue="{!value.fieldName == 'buildertek__Contractor__c'}">
+                                                                            <td>
+                                                                                <ui:outputURL value="{!'/one/one.app?#/sObject/'+ value.originalValue + '/view'}" target="_blank" label="{!value.referenceValue}" />
+                                                                            </td>
+                                                                        </aura:if>
+                                                                    </aura:set>
+
                                                                     
                                                                 </aura:if>
                                                             </aura:iteration>
