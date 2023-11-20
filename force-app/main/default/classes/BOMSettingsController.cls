@@ -586,7 +586,12 @@ public class BOMSettingsController {
             upsert settingsrec;
             msg = 'saved';
         }catch(Exception e){
-            system.debug('exception '+e.getMessage()); 
+            system.debug('exception '+e.getMessage());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_for_Force_Site__c FROM buildertek__Exception_Log_Store_Option__c];
+            if(StoreExcCustomSetting[0].buildertek__Store_Exception_for_Force_Site__c == true){
+                BT_ExceptionHandler.Store_Exception(e);
+            }
+            return null;
         }
         
         return msg;

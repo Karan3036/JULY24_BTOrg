@@ -13,7 +13,11 @@ public class BTPaymentSuccessController {
             InvoiceData = [Select id,name,Total_Amount_Tax__c from buildertek__Billings__c where id =:invid];
             amount = string.valueOf(InvoiceData.Total_Amount_Tax__c); 
         }catch(Exception e){
-            system.debug('exception e--->'+e.getMessage()+'---line no--->'+e.getLineNumber());             
+            system.debug('exception e--->'+e.getMessage()+'---line no--->'+e.getLineNumber()); 
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_for_Force_Site__c FROM buildertek__Exception_Log_Store_Option__c];
+            if(StoreExcCustomSetting[0].buildertek__Store_Exception_for_Force_Site__c == true){
+                BT_ExceptionHandler.Store_Exception(e);
+            }           
         } 
                 
     }
@@ -118,6 +122,11 @@ public class BTPaymentSuccessController {
      
         }catch(Exception e){
             system.debug('exception --->'+e.getMessage()+'---line no--->'+e.getLineNumber());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_for_Force_Site__c FROM buildertek__Exception_Log_Store_Option__c];
+            if(StoreExcCustomSetting[0].buildertek__Store_Exception_for_Force_Site__c == true){
+                BT_ExceptionHandler.Store_Exception(e);
+            }
+            return null;
         }
         
         return null;
