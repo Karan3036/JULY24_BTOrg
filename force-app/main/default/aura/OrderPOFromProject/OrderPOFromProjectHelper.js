@@ -151,12 +151,12 @@
     settempId : function(component, poId){
         var action = component.get("c.addEmailTemplateId");
         action.setParams({
-            POIDs: poId,
+            POIDs: poId
         });
         action.setCallback(this, function (response) {
             var state = response.getState();
             if (state === "SUCCESS") {
-                console.log('Success--->',response);
+                console.log('Success');
             } else if (state === "ERROR") {
                 var errors = response.getError();
                 if (errors && errors[0] && errors[0].message) {

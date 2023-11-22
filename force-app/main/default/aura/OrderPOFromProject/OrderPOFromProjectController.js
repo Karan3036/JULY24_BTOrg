@@ -3,16 +3,17 @@
 
 		// var workspaceAPI = component.find("workspace");
 		// workspaceAPI.getEnclosingTabId().then((response) => {
-			// let opendTab = response.tabId;
-			// workspaceAPI.setTabLabel({
-			// 	tabId: opendTab,
-			// 	label: "Purchase Orders"
-			// });
-			// workspaceAPI.setTabIcon({
-			// 	tabId: opendTab,
-			// 	icon: 'custom:custom5',
-			// 	iconAlt: 'Purchase Orders'
-			// });
+		// 	let opendTab = response.tabId;
+		// 	console.log(opendTab);
+		// 	workspaceAPI.setTabLabel({
+		// 		tabId: opendTab,
+		// 		label: "Purchase Orders"
+		// 	});
+		// 	workspaceAPI.setTabIcon({
+		// 		tabId: opendTab,
+		// 		icon: 'custom:custom5',
+		// 		iconAlt: 'Purchase Orders'
+		// 	});
 		// });
 		// debugger;
 
@@ -519,6 +520,57 @@
 
 	},
 
+	
+	unSelect: function (component, event, helper) {
+		try {
+			console.log('test-->');
+			var records = component.get("v.PaginationList");
+			console.log('records-->', records);
+		
+			// Loop through the records and set the 'poCheck' property to false
+			records.forEach(function (record) {
+				record.poRecInner.forEach(function (innerRecord) {
+					innerRecord.poCheck = false;
+					innerRecord.poLinesWrapper.forEach(function (nestedrec) {
+						nestedrec.poLineCheck = false;
+					}); 
+				});
+			});
+		
+			// Update the 'records' attribute with the modified array
+			component.set('v.PaginationList', records);
+			var checkboxes = component.find("checkContractor");
+			if (Array.isArray(checkboxes)) {
+				checkboxes.forEach(function (checkbox) {
+					checkbox.set("v.checked", false);
+				});
+			} else {
+				checkboxes.set("v.checked", false);
+			}
+
+			var nestedboxes = component.find("checkPOLine");
+			if (Array.isArray(nestedboxes)) {
+				nestedboxes.forEach(function (nestedbox) {
+					nestedbox.set("v.checked", false);
+				});
+			} else {
+				nestedboxes.set("v.checked", false);
+			}
+		
+			// Uncheck all checkboxes within the iteration
+			
+		
+			// Reset the selectedCount to 0
+			component.set("v.selectedCount", 0);
+		
+			console.log('records1-->', records);
+		} catch (error) {
+			console.log('error--->',error);
+		}
+	},
+	
+	
+ 
 	massUpdate: function (component, event, helper) {
 		component.set("v.enableMassUpdate", true);
 	},
