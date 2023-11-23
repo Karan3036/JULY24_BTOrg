@@ -26,6 +26,11 @@
     </div>
 
     <aura:html tag="style">
+        .onePanelManagerScoped .pmcontainer{
+            position: fixed !important;
+            z-index: 9999;
+        }
+        
         .slds-form-element__label{
         display: none;
         }

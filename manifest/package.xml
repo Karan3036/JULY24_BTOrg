@@ -1,58 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-<members>AddProductController</members>
-    <members>AssetHistoryMassUpdate</members>
-    <members>BOMSettingsController</members>
-    <members>BT_AdminConfigurationController</members>
-    <members>BT_CleanupFilesController</members>
-    <members>BT_ApplicationConfigurationController</members>
-    <members>BT_EditFileController</members>
-    <members>BT_FileAdministratorController</members>
-    <members>BT_FileDetailController</members>
-    <members>BT_FileExplorerPageConfigController</members>
-    <members>BT_FileManagementConfigurationController</members>
-    <members>BT_FileSharingController</members>
-    <members>BT_FileUploadPageConfigurationController</members>
-    <members>BT_GeneratePDF</members>
-    <members>BT_GenerateQuotePDF</members>
-    <members>BT_GenerateQuotePDFSignature</members>
-    <members>BT_GroupManagementController</members>
-    <members>BT_ImportFilesController</members>
-    <members>BT_ImportWarrantyItems</members>
-    <members>BT_MultiFileUploadController</members>
-    <members>BT_SendEmailController</members>
-    <members>BT_Task_Manager_Controller</members>
-    <members>BT_UploadFileController</members>
-    <members>BTPaymentSuccessController</members>
-    <members>checkListQuestionsCtrl</members>
-    <members>CommonMassUpdate</members>
-    <members>CommunitiesSelfRegController</members>
-    <members>ConfirmationController</members>
-    <members>contractGeneratePDF</members>
-    <members>CustomCalendar_AC</members>
-    <members>FileUpload</members>
-    <members>generatePDF</members>
-    <members>ImportMasterPO</members>
-    <members>ImportMasterSchedules</members>
-    <members>MassUpdateMasterSelection</members>
-    <members>MassUpdatePurchaseOrderLineItem</members>
-    <members>MassUpdateQuote</members>
-    <members>MassUpdateTakeOffLines</members>
-    <members>MassUpdateTakeToDo</members>
-    <members>MyProfilePageController</members>
-    <members>ParticipantResponseClass</members>
-    <members>ParticipantsController</members>
-    <members>ParticipantUpdatesController</members>
-    <members>PreQualObject_MSAFormController</members>
-    <members>PreviewContractController</members>
-    <members>ProjectMassUpdate</members>
-    <members>PunchListMassUpdate</members>
-    <members>RFQAccepted</members>
-    <members>RFQResponseController</members>
-    <members>UpdateInspectionLineController</members>
-    <name>ApexClass</name>
-    </types>
+		<members>Add_QuoteLine_from_Vendor</members>
+		<name>AuraDefinitionBundle</name>
+	</types>
     
     <version>57.0</version>
 </Package>

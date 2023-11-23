@@ -2527,7 +2527,13 @@ public with sharing class QuoteDAO{
         public String CostCode;
 
         @AuraEnabled
-        public String QuantityUnitOfMeasure;        //----
+        public String QuantityUnitOfMeasure; 
+        
+        @AuraEnabled
+        public String PriceBookId; 
+        
+        @AuraEnabled
+        public String PriceBookName; //----
     }
 
     @AuraEnabled
@@ -2715,5 +2721,48 @@ public with sharing class QuoteDAO{
         // }
     }
     // >>>>>>>>>>> Changes For CHB - 78 <<<<<<<<<<<<<<<<<<
+
+    //create a method getVendors which returns a list of vendors which have products 
+    @AuraEnabled
+    public static List<Account> getVendors(){
+        List<Account> vendorList = [SELECT Id, Name FROM Account WHERE Id IN (SELECT buildertek__Vendor__c FROM Product2 WHERE IsActive = True) ORDER BY Name ASC];
+        return vendorList;
+    }
+    @AuraEnabled
+    public static List<productWrapper> getProductsthroughVendor(string vendorId) {
+        System.debug('in vendor caliing method');
+
+
+        List<PriceBookEntry> pEntries = [SELECT Id,Product2Id, Product2.buildertek__Quote_Group__c , Product2.Name, Product2.ProductCode,Product2.buildertek__Vendor__r.Name,Product2.buildertek__Cost_Code__r.Name, Pricebook2Id, Product2.Description, toLabel(Product2.Family), 
+                                            Product2.IsActive,buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure  //----
+                                            FROM PricebookEntry WHERE Product2.buildertek__Vendor__c =: vendorId AND IsActive = True 
+                                            ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000];
+
+        List<productWrapper> products = new List<productWrapper>();
+        for (PriceBookEntry pEntry: pEntries) {
+            productWrapper aProduct = new productWrapper();
+            aProduct.Id = pEntry.Product2Id;
+            aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
+            aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
+            aProduct.Name = pEntry.Product2.Name;
+            aProduct.ProductCode = pEntry.Product2.ProductCode;
+            aProduct.Description = pEntry.Product2.Description;
+            aProduct.Family = pEntry.Product2.Family;
+            aProduct.IsActive = pEntry.Product2.IsActive;
+            aProduct.UnitPrice = pEntry.UnitPrice;            
+            aProduct.Size = pEntry.Pricebook2.Name;
+            aProduct.Selected = false;
+            aProduct.MarkUp = pEntry.buildertek__Markup__c;
+            aProduct.Discount = pEntry.buildertek__Discount__c;
+            aProduct.UnitCost = pEntry.buildertek__Unit_Cost__c;
+            aProduct.Phase = pEntry.Product2.buildertek__Quote_Group__c;
+            aProduct.QuantityUnitOfMeasure = pEntry.Product2.QuantityUnitOfMeasure;   
+            aProduct.PriceBookId = pEntry.Pricebook2Id;
+            aProduct.PriceBookName = pEntry.Pricebook2.Name;
+            products.add(aProduct);
+        }
+
+        return products;
+    }
 
 }
