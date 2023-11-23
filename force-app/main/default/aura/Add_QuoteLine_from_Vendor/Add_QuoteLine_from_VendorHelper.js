@@ -126,6 +126,7 @@
                 // if(element.Selected){
                     console.log("ELEMENT----->" , {element});
                     selectedProducts.push({
+                        'PriceBookEntryId':element.PriceBookEntryId,
                         'Id':element.Id,
                         'Name': element.Name,
                         'buildertek__Unit_Price__c': element.UnitPrice,

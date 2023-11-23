@@ -182,7 +182,7 @@
                                 <tr class="slds-hint-parent">
                                     <td class="slds-text-align_right slds-cell_action-mode" role="gridcell" style="width:5% !important">
                                         <div class="slds-checkbox">
-                                          <lightning:input type="checkbox" name="input1" checked="{!product.Selected}" id="{!product.Id}" onchange="{!c.checkboxChange}" />
+                                          <lightning:input type="checkbox" name="input1" checked="{!product.Selected}" id="{!product.PriceBookEntryId}" onchange="{!c.checkboxChange}" />
                                         </div>
                                     </td>
                                     <td data-label="Pricebook Name" class="" style="width:15% !important">
@@ -294,7 +294,7 @@
                             <aura:iteration items="{!v.selectedProducts}" var="item" indexVar="recIndex">
                                 <tr title="Product">
                                     <td>
-                                        <span data-id="{!item.Id}"  onclick="{!c.removeQuoteLine}">
+                                        <span data-id="{!item.PriceBookEntryId}"  onclick="{!c.removeQuoteLine}">
                                             <lightning:icon iconName="utility:delete" size="xx-small" />   
                                         </span>                     
                                     </td>

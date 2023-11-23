@@ -45,13 +45,14 @@
 
     checkboxChange : function(component, event, helper) {
         var selectedRecords = component.get("v.selectedRecords");
+        console.log('selectedRecords--->',selectedRecords);
         var tableDataList = component.get("v.tableDataList");
         var selectedCheckbox = event.getSource(); // Get the checkbox that fired the event
         var productId = selectedCheckbox.get("v.id");
         var isChecked = selectedCheckbox.get("v.checked");
         
         // Find the selected record by its ID
-        var selectedRecord = tableDataList.find(record => record.Id === productId);
+        var selectedRecord = tableDataList.find(record => record.PriceBookEntryId === productId);
         
         if (isChecked) {
             selectedRecords.push(selectedRecord);
@@ -82,8 +83,8 @@
             console.log('selected :: ' + productList);
             var updatedList = [];
             productList.forEach(function(value) {
-                console.log('listed"s id --> ' + value.Id);
-                if (value.Id !== currentId) {
+                console.log('listed"s id --> ' + value.PriceBookEntryId);
+                if (value.PriceBookEntryId !== currentId) {
                     updatedList.push(value);
                 }
             });
@@ -93,13 +94,13 @@
             // Remove the record from v.selectedRecords attribute
             var selectedRecords = component.get('v.selectedRecords');
             var updatedSelectedRecords = selectedRecords.filter(function(record) {
-                return record.Id !== currentId;
+                return record.PriceBookEntryId !== currentId;
             });
             component.set('v.selectedRecords', updatedSelectedRecords);
         
             var quoteLineList = component.get('v.quoteLineList');
             quoteLineList.forEach(function(element) {
-                if (element.Id === currentId) {
+                if (element.PriceBookEntryId === currentId) {
                     element.Selected = false;
                 }
             });
@@ -164,7 +165,7 @@
 
     changePricebookFamily: function(component, event, helper) {
         var listOfAllRecords = component.get('v.quoteLineList');
-        var searchPriceBookFilter = component.find("selectedPricebook").get("v.value").toUpperCase();
+        var searchPriceBookFilter = component.find("selectedPricebook").get("v.value");
         console.log('searchPriceBookFilter--->',searchPriceBookFilter);
         component.set("v.sProductFamily", '');
         component.set("v.sProductName", '');
@@ -175,7 +176,7 @@
             for (i = 0; i < listOfAllRecords.length; i++) {
                 if (
                     listOfAllRecords[i].PriceBookName &&
-                    listOfAllRecords[i].PriceBookName.toUpperCase().indexOf(searchPriceBookFilter) != -1
+                    listOfAllRecords[i].PriceBookName.indexOf(searchPriceBookFilter) != -1
                 ) {
                     tempArray.push(listOfAllRecords[i]);
                 }
@@ -188,7 +189,7 @@
 
     changeProductFamily: function(component, event, helper) {
         var listOfAllRecords = component.get('v.quoteLineList');
-        var searchProductFamilyFilter = component.find("selectedProductFamily").get("v.value").toUpperCase();
+        var searchProductFamilyFilter = component.find("selectedProductFamily").get("v.value");
         console.log('searchProductFamilyFilter--->',searchProductFamilyFilter);
         var searchPriceBookFilter = component.find("selectedPricebook").get("v.value");
         console.log('searchPriceBookFilter--->',searchPriceBookFilter);
@@ -196,38 +197,42 @@
         var i;
     
         if (searchProductFamilyFilter != '' && (searchPriceBookFilter == undefined || searchPriceBookFilter == '')) {
+            console.log('in1');
             for (i = 0; i < listOfAllRecords.length; i++) {
                 if (
                     listOfAllRecords[i].Family &&
-                    listOfAllRecords[i].Family.toUpperCase().indexOf(searchProductFamilyFilter) != -1
+                    listOfAllRecords[i].Family.indexOf(searchProductFamilyFilter) != -1
                 ) {
                     tempArray.push(listOfAllRecords[i]);
                 }
             }
             component.set("v.tableDataList", tempArray);
         } else if (searchPriceBookFilter != '' && (searchProductFamilyFilter == undefined || searchProductFamilyFilter == '')) {
+            console.log('in2');
             for (i = 0; i < listOfAllRecords.length; i++) {
                 if (
                     listOfAllRecords[i].PriceBookName &&
-                    listOfAllRecords[i].PriceBookName.toUpperCase().indexOf(searchPriceBookFilter) != -1
+                    listOfAllRecords[i].PriceBookName.indexOf(searchPriceBookFilter) != -1
                 ) {
                     tempArray.push(listOfAllRecords[i]);
                 }
             }
             component.set("v.tableDataList", tempArray);
         } else if (searchProductFamilyFilter != '' && searchPriceBookFilter != ''){
+            console.log('in3');
             for (i = 0; i < listOfAllRecords.length; i++) {
                 if (
                     listOfAllRecords[i].PriceBookName &&
                     listOfAllRecords[i].PriceBookName.indexOf(searchPriceBookFilter) != -1 &&
                     listOfAllRecords[i].Family &&
-                    listOfAllRecords[i].Family.toUpperCase().indexOf(searchProductFamilyFilter) != -1
+                    listOfAllRecords[i].Family.indexOf(searchProductFamilyFilter) != -1
                 ) {
                     tempArray.push(listOfAllRecords[i]);
                 }
             }
             component.set("v.tableDataList", tempArray);
         } else {
+            console.log('in4');
             component.set("v.tableDataList", listOfAllRecords);
         }
     },

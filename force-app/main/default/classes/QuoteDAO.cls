@@ -2533,7 +2533,10 @@ public with sharing class QuoteDAO{
         public String PriceBookId; 
         
         @AuraEnabled
-        public String PriceBookName; //----
+        public String PriceBookName;
+
+        @AuraEnabled
+        public String PriceBookEntryId;
     }
 
     @AuraEnabled
@@ -2741,6 +2744,7 @@ public with sharing class QuoteDAO{
         List<productWrapper> products = new List<productWrapper>();
         for (PriceBookEntry pEntry: pEntries) {
             productWrapper aProduct = new productWrapper();
+            aProduct.PriceBookEntryId = pEntry.Id;
             aProduct.Id = pEntry.Product2Id;
             aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
             aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
