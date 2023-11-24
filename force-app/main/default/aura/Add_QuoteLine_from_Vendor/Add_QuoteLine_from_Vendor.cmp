@@ -19,6 +19,11 @@
 <aura:attribute name="disableBtnVen" type="String" default="true"/>
 <aura:attribute name="disableBtnProd" type="String" default="true"/>
 
+<aura:attribute name="myTime" type="Date" />
+<aura:attribute name="prevInput" type="String" />
+<aura:attribute name="pbName" type="String" />
+<aura:attribute name="searchTimeout" type="Object" />
+
 <aura:attribute name="sProductName" type="String" />
 <aura:attribute name="sProductFamily" type="String" />
 <aura:attribute name="productFamilyOptions" type="List" />

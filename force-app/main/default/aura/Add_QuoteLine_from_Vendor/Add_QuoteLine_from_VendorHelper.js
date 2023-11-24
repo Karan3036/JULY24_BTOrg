@@ -44,6 +44,7 @@
         component.set("v.Spinner", true);
         var vendorId = component.get('v.vendorId');
         console.log('vendorId--->',vendorId);
+        component.set("v.vendorId" , vendorId);
         var action = component.get("c.getProductsthroughVendor");
             action.setParams({
                 "vendorId": vendorId 
@@ -101,6 +102,48 @@
                 }
             });
             $A.enqueueAction(action);
+    },
+
+    searchDatatableHelper : function(component, event, helper){
+        let vendorId = component.get("v.vendorId");
+        let pbName = component.get("v.pbName");
+        let sProductName = component.get("v.sProductName");
+        var action = component.get("c.getProductsFilterByName");
+        action.setParams({
+            "venId": vendorId ,
+            "pbName": pbName ,
+            "pName": sProductName
+        });
+        action.setCallback(this, function(response) {
+            var rows = response.getReturnValue();
+            if (response.getState() == "SUCCESS" && rows != null) {
+                console.log('quoteLineList ==> ',{rows});
+                var selectedRecords = component.get("v.selectedRecords");
+                rows.forEach(function(row) {
+                    var matchingRecord = selectedRecords.find(function(record) {
+                        return record.Id === row.Id;
+                    });
+                    if (matchingRecord) {
+                        row.Selected = true;
+                    }
+                });
+                
+                // Sort the records with selected ones on top
+                rows.sort(function(a, b) {
+                    if (a.Selected && !b.Selected) {
+                        return -1; // a comes before b
+                    } else if (!a.Selected && b.Selected) {
+                        return 1; // b comes before a
+                    }
+                    return 0; // no change in order
+                }); 
+                
+                // component.set("v.quoteLineList", rows);
+                component.set("v.tableDataList", rows);
+                component.set('v.Spinner', false);
+            }
+        });
+        $A.enqueueAction(action);
     },
 
     goToEditModalHelper: function(component, event, helper) {
