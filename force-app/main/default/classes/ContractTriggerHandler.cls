@@ -121,6 +121,7 @@ public without sharing class ContractTriggerHandler{
         }
         for (buildertek__Contract__c cont : updatedContracts){
             if (cont.RecordTypeId == rt.Id && cont.buildertek__Status__c == 'Approved' && cont.buildertek__Project__c != null && oldContractsMap.get(cont.Id).buildertek__Status__c != cont.buildertek__Status__c){
+                System.debug('in if');
                 system.debug('%%%%%%%%%%%%%%%%%%%%%----->'+cont.buildertek__Status__c);
                 
                 if (projectContractAmountMap.get(cont.buildertek__Project__c) == null){
@@ -134,6 +135,7 @@ public without sharing class ContractTriggerHandler{
                 proj.buildertek__Contract_Amount__c = contractAmountMap.get(cont.Id);
                 projectList.add(proj);
             } else if (cont.RecordTypeId == rt.Id && oldContractsMap.get(cont.Id).buildertek__Status__c == 'Approved' && cont.buildertek__Status__c != 'Approved'){
+                System.debug('in if else 1');
                 if (projectContractAmountMap.get(cont.buildertek__Project__c) != null){
                     decimal finalTotalAmount = projectContractAmountMap.get(cont.buildertek__Project__c)-cont.buildertek__Revised_Contract_Amount__c;
                     buildertek__Project__c proj = new buildertek__Project__c();
@@ -142,6 +144,7 @@ public without sharing class ContractTriggerHandler{
                     projectList.add(proj);
                 }
             } else if (cont.RecordTypeId == rt.Id && oldContractsMap.get(cont.Id).buildertek__Status__c == cont.buildertek__Status__c && cont.buildertek__Status__c == 'Approved' && oldContractsMap.get(cont.Id).buildertek__Revised_Contract_Amount__c != cont.buildertek__Revised_Contract_Amount__c){
+                System.debug('in if else 2');
                 if (projectContractAmountMap.get(cont.buildertek__Project__c) != null){
                     decimal finalTotalAmount = projectContractAmountMap.get(cont.buildertek__Project__c)-oldContractsMap.get(cont.Id).buildertek__Revised_Contract_Amount__c;
                     finalTotalAmount = finalTotalAmount + cont.buildertek__Revised_Contract_Amount__c;
@@ -152,6 +155,7 @@ public without sharing class ContractTriggerHandler{
                 }
             }
         }
+        System.debug('projectList---> '+projectList);
         if (projectList.size() > 0){
             update projectList;
             

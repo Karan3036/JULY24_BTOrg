@@ -2728,7 +2728,12 @@ public with sharing class QuoteDAO{
     //create a method getVendors which returns a list of vendors which have products 
     @AuraEnabled
     public static List<Account> getVendors(){
-        List<Account> vendorList = [SELECT Id, Name FROM Account WHERE Id IN (SELECT buildertek__Vendor__c FROM Product2 WHERE IsActive = True) ORDER BY Name ASC];
+        Set<Id> vendorIds = new Set<Id>();
+        List<PriceBookEntry> pEntries = [SELECT Product2.buildertek__Vendor__c, Product2.buildertek__Vendor__r.Name FROM PricebookEntry WHERE IsActive = True AND Product2.buildertek__Vendor__c != NULL];
+        for (PriceBookEntry pEntry : pEntries) {
+            vendorIds.add(pEntry.Product2.buildertek__Vendor__c);
+        }
+        List<Account> vendorList = [SELECT Id, Name FROM Account WHERE Id IN :vendorIds ORDER BY Name ASC];
         return vendorList;
     }
     @AuraEnabled
