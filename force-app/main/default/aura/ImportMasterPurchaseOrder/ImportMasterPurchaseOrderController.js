@@ -1,12 +1,12 @@
 ({
 	doInit : function(component, event, helper) {
         try {
-            component.set("v.Spinner", true);
+            $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
             var action = component.get("c.getMasterPO");
             action.setCallback(this, function(response){
                 var result = response.getReturnValue();
                 console.log('result---> ',result);
-                component.set("v.Spinner", false);
+                $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 if(result != null){
                     var pageSize = component.get("v.pageSize");
                     component.set("v.masterPOList", result);
@@ -33,7 +33,7 @@
             helper.getcurr(component, event, helper);
         } catch (error) {
             console.log('error---> ',error);
-            component.set("v.Spinner", false);
+            $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         }
 	},
 	
@@ -128,7 +128,7 @@
 	},
 	
 	importPOLine : function(component, event, helper){
-	    component.set("v.Spinner", true);
+	    $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
 	    var POList = component.get("v.masterPOList");
         console.log({POList});
 	    console.log('quotesList ---------> '+JSON.stringify(POList));
@@ -152,7 +152,7 @@
                 console.log({response});
 	            var state = response.getState();
 	            if(state === "SUCCESS"){
-                    component.set("v.Spinner", false);
+                    $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
 	                var result = response.getReturnValue();  
                     console.log({result});
 	                if(result.Status === 'Success'){
@@ -182,7 +182,7 @@
 	        });
 	        $A.enqueueAction(action);
 	    }else{
-	        component.set("v.Spinner", false);
+	        $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             var toastEvent = $A.get("e.force:showToast");
             toastEvent.setParams({
                 "title": "Error!",

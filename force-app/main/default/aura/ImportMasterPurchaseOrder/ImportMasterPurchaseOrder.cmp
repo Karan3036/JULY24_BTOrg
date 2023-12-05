@@ -2,7 +2,6 @@
     implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader"
     access="global">
     <aura:attribute name="masterPOList" type="object" />
-    <aura:attribute name="Spinner" type="Boolean" />
 
     <!-- Attribute Declration For Pagination -->
 
@@ -17,6 +16,12 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     <ltng:require styles="{!$Resource.MOdalPreviewWidth72}" />
+    <aura:html tag="style">
+        .onePanelManagerScoped .pmcontainer{
+            position: fixed !important;
+            z-index: 9999;
+        }
+    </aura:html>
     <div class="slds-modal__header" style="font-size:17px;">
         Import Master Purchase Order
     </div>
@@ -25,25 +30,20 @@
             <table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
                 <thead>
                     <tr class="slds-text-title_caps">
-                        <th scope="col"
-                            style="background-color:rgba(27, 82, 151, 1.0); color:white; border-top-left-radius:5px;vertical-align: top;line-height: 2;width: 30px !important;">
+                        <th scope="col" style="background-color:rgba(27, 82, 151, 1.0); color:white; border-top-left-radius:5px;vertical-align: top;line-height: 2;width: 30px !important;padding-top: 8px;">
                             <ui:inputCheckbox aura:id="checkContractors" change="{!c.selectAll}" />
                         </th>
-                        <th
-                            style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
+                        <th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
                             Name
                         </th>
-                        <th
-                            style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
+                        <th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
                             Description
                         </th>
-                        <th
-                            style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
-                            <span style="padding-left:98px"> Type</span>
+                        <th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
+                            Type
                         </th>
-                        <th
-                            style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
-                            <span style="padding-left:106px"> PO Total</span>
+                        <th style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
+                            PO Total
                         </th>
                     </tr>
                 </thead>
@@ -56,24 +56,18 @@
                                         text="{!rec.masterPORecord.Id}" change="{!c.handleCheck}" />
                                 </td>
                                 <td width="50%" role="gridcell">
-                                    <ui:outputText value="{!rec.masterPORecord.Name}" />
+                                    <ui:outputText value="{!rec.masterPORecord.Name}"/>
                                 </td>
                                 <td width="50%" role="gridcell">
                                     <ui:outputText value="{!rec.masterPORecord.buildertek__Description__c}" />
                                 </td>
                                 <td width="30%" role="gridcell">
-                                    <span style="padding-left:98px">
-                                        <ui:outputText value="{!rec.masterPORecord.buildertek__Type__c}" />
-                                    </span>
+                                    <ui:outputText value="{!rec.masterPORecord.buildertek__Type__c}" />
                                 </td>
                                 <td width="27%" role="gridcell">
-                                    <span style="padding-left:106px">
-                                        <!-- <ui:outputText value="{!rec.masterPORecord.buildertek__PO_Total__c}" /> -->
-                                        <lightning:formattedNumber value="{!rec.masterPORecord.buildertek__PO_Total__c}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
-                                    </span>
+                                    <lightning:formattedNumber value="{!rec.masterPORecord.buildertek__PO_Total__c}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
                                 </td>
                             </aura:if>
-
                         </tr>
                     </aura:iteration>
                 </tbody>
@@ -81,18 +75,6 @@
             <br />
 
         </div>
-        <aura:if isTrue="{!v.Spinner}">
-            <div aura:id="spinnerId" class="slds-spinner_container">
-                <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
-                    <span class="slds-assistive-text">Loading</span>
-                    <div class="slds-spinner__dot-a"></div>
-                    <div class="slds-spinner__dot-b"></div>
-                    <div class="custom-loading-text">
-                        <b>Processing, Please Wait</b>
-                    </div>
-                </div>
-            </div>
-        </aura:if>
     </div>
     <div class="slds-modal__footer">
         <div class="slds-clearfix">
@@ -114,4 +96,5 @@
 
 
     </div>
+    <c:BT_Spinner/>
 </aura:component>
