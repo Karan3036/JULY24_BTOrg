@@ -139,11 +139,13 @@ public without sharing class QBMap {
             DateTime yourDate = Datetime.now();
             Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
             QBInvoiceJSON invoice = new QBInvoiceJSON();
-            if(invId != null && invId != ''){
+
+            if(inv.buildertek__QBO_ID__c != null && inv.buildertek__QBO_ID__c != ''){
                 invoice.Id = inv.buildertek__QBO_ID__c;
                 invoice.sparse = true;
                 invoice.SyncToken = inv.buildertek__QBO_SyncToken__c;
             }
+            
             invoice.TotalAmt = inv.buildertek__Total_Amount_Tax__c;
             invoice.Balance = inv.buildertek__Total_Amount_Tax__c;
             invoice.TxnDate = txnDate;
@@ -257,100 +259,44 @@ public without sharing class QBMap {
         }
     }
 
+    public static String mapVendorAccountData(Account acc, Integer a){
+        String accId = acc.Id;
+        String QBId = acc.QBO_ID__c;
+        QBVendorJSON customer = new QBVendorJSON();
 
-
-    // public static string mapReceipt_PaymetData_Hard(buildertek__Receipt__c receipt){
-    //     try {
-
-    //         QBReceiptJSON QBPayment = new QBReceiptJSON();
-    //         QBPayment.TotalAmt = receipt.buildertek__Amount__c;
-    //         QBPayment.CustomerRef = new QBReceiptJSON.CustomerRef();
-
-    //         QBReceiptJSON.CustomerRef QBPayment_cust = new QBReceiptJSON.CustomerRef();
-    //         QBPayment_cust.value = '113';
-    //         QBPayment.CustomerRef = QBPayment_cust;
-
-    //         return JSON.serialize(QBPayment, True);
-    //     } catch (Exception e ) {
-    //         system.debug('error in mapReceipt_PaymetData >> ' + e.getMessage() +'\n'+ e );
-    //         return null;
-    //     }
-    // } 
-    // public static String mapInvoiceLineData(buildertek__Billable_Lines__c newline){
-    //     try {
-    //     String lineId = newline.Id;
-    //     String QBId = newline.QBO_ID__c;
-    //     String IncomeAccount = 'BuilderTek';
-    //     String Iv = '01';
-    //     QBInvoiceLineJSON Iline = new QBInvoiceLineJSON();
-    //     String Todate = Date.today().format();
-
-    //     // Iline.Taxable = True;  
-    //     // Iline.Name = newline.Name;     
-    //     Iline.Name = newline.buildertek__Item_Name__c +'-'+ lineId.right(4).substring(0,4);     
-    //     Iline.SyncToken = newline.QBO_SyncToken__c;
-    //     Iline.sparse = True;
-    //     Iline.Description = newline.Description__c;
-    //     Iline.UnitPrice = newline.Unit_Price__c;
-    //     Iline.Type = 'Service';
-    //     // Iline.QtyOnHand = newline.buildertek__Quantity__c;
-    //     // Iline.TrackQtyOnHand = true;
-    //     // Iline.InvStartDate = Todate;
-    //     Iline.IncomeAccountRef = new QBInvoiceLineJSON.IncomeAccountRef();
-    //     Iline.AssetAccountRef = new QBInvoiceLineJSON.AssetAccountRef();
-
-    //     QBInvoiceLineJSON.IncomeAccountRef Iacc = new QBInvoiceLineJSON.IncomeAccountRef();
-    //     Iacc.name = IncomeAccount;
-    //     Iacc.value = Iv;
-    //     Iline.IncomeAccountRef = Iacc;
-
-    //     // QBInvoiceLineJSON.AssetAccountRef Aacc = new QBInvoiceLineJSON.AssetAccountRef();
-    //     // Aacc.name = IncomeAccount;
-    //     // Aacc.value = Iv;
-    //     // Iline.AssetAccountRef = Aacc;
+        String AccountId = acc.Id;
+        //Map given account fields
+        customer.CompanyName = acc.Name +' - '+AccountId.right(4).substring(0,4);
+        customer.Active = True;       
+        customer.SyncToken = acc.QBO_SyncToken__c;
+        customer.sparse = True;
      
-    //     return JSON.serialize(Iline, True);
-    //     }catch(Exception e){
-    //         System.debug('Exception is >> '+ e.getMessage());
-    //         return null;
-    //     }
-    // }
-    // public static String mapInvoiceData(buildertek__Billings__c inv, String CustomerId, String LineiD, String LineName){
-    //     String invId = inv.Id;
-    //     String QBId = inv.QBO_ID__c;
+        //Create Shipping address
+        QBVendorJSON.BillAddr BillAddr = new QBVendorJSON.BillAddr();
+        BillAddr.City = acc.ShippingCity;
+        BillAddr.Line1 = acc.ShippingStreet;
+        BillAddr.CountrySubDivisionCode = acc.ShippingState;
+        BillAddr.PostalCode = acc.ShippingPostalCode;
+        BillAddr.Lat = String.valueOf(acc.ShippingLatitude);
+        BillAddr.Long_x = String.valueOf(acc.ShippingLongitude);
+        BillAddr.CountrySubDivisionCode = acc.ShippingCountry;
+        customer.BillAddr = BillAddr;
 
-    //     QBInvoiceJSON invoice = new QBInvoiceJSON();
-    //     invoice.TotalAmt = String.valueOf(inv.buildertek__Total_Amount_Tax__c);
-    //     invoice.Balance = inv.buildertek__Total_Amount_Tax__c;
-    //     invoice.Line = new List<QBInvoiceJSON.line>();
+        customer.PrintOnCheckName = acc.Name;
 
-    //     QBInvoiceJSON.line Line = new QBInvoiceJSON.line();
-    //     Line.DetailType = 'SalesItemLineDetail';
-    //     Line.Amount = inv.buildertek__Total_Amount_Tax__c;
-    //     Line.Id = '1';
-    //     Line.LineNum = '1';
-    //     Line.Qty = inv.buildertek__Quantity__c;
-    //     Line.SalesItemLineDetail = new QBInvoiceJSON.SalesItemLineDetail();
+        //Create Email Address
+        QBVendorJSON.PrimaryEmailAddr Addr = new QBVendorJSON.PrimaryEmailAddr();
+        Addr.Address = acc.buildertek__Email_Address__c;
+        customer.PrimaryEmailAddr = Addr;
 
-    //     QBInvoiceJSON.SalesItemLineDetail SILD = new QBInvoiceJSON.SalesItemLineDetail();
-    //     SILD.ItemRef = new QBInvoiceJSON.ItemRef();
+        //Create Primary Phone
+        QBVendorJSON.PrimaryPhone phone = new QBVendorJSON.PrimaryPhone ();
+        phone.FreeFormNumber = acc.Phone;
+        customer.PrimaryPhone = phone;
+        customer.Id = acc.QBO_ID__c;
+        customer.DisplayName = acc.Name;
 
-    //     QBInvoiceJSON.ItemRef ItemRef = new QBInvoiceJSON.ItemRef();
-    //     ItemRef.name = LineName;
-    //     ItemRef.value = LineiD;
-
-    //     SILD.ItemRef = ItemRef;
-    //     Line.SalesItemLineDetail = SILD;
-    //     invoice.Line.add(Line);
-
-    //     invoice.CustomerRef = new QBInvoiceJSON.CustomerRef();
-    //     QBInvoiceJSON.CustomerRef customer = new QBInvoiceJSON.CustomerRef();
-    //     customer.value = CustomerId;
-
-    //     invoice.CustomerRef = customer;
-
-    //     // System.debug('Invoice request Body :: ' + JSON.serialize(invoice, True).replace('"Long_x":', '"Long":'));
-
-    //     return JSON.serialize(invoice, True).replace('"Long_x":', '"Long":');
-    // }
+        return JSON.serialize(customer, True).replace('"Long_x":', '"Long":');
+ 
+    }
 }

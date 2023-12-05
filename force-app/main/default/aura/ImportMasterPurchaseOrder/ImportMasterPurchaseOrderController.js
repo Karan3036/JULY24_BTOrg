@@ -86,7 +86,7 @@
                         for (var i = 0; i < getAllId.length; i++) {
         					component.find("checkContractor")[i].set("v.value", true); 
         					var checkbox = component.find("checkContractor")[i].get("v.text");  
-                    	        Submittals[i].budgetCheck = true;
+                    	        Submittals[i].poCheck = true;
                     	    
                         }
                     } 
@@ -96,7 +96,7 @@
             				
             				var checkbox = component.find("checkContractor")[i].get("v.text"); 
             				var Submittals = component.get("v.masterPOList");
-            	                Submittals[i].budgetCheck = false;
+            	                Submittals[i].poCheck = false;
                        }
                    } 
                 } 
@@ -106,7 +106,7 @@
                     if (selectedHeaderCheck == true) {
                         	component.find("checkContractor").set("v.value", true); 
         					var checkbox = component.find("checkContractor").get("v.text");  
-                    	        Submittals[i].budgetCheck = true;
+                    	        Submittals[i].poCheck = true;
                     	    
                         
                     } 
@@ -115,7 +115,7 @@
             				
             				var checkbox = component.find("checkContractor").get("v.text"); 
             				var Submittals = component.get("v.masterPOList");
-            	                Submittals[i].budgetCheck = false;
+            	                Submittals[i].poCheck = false;
                        
                    } 
             }
@@ -142,6 +142,7 @@
 	            }
 	        }
 	    }
+        console.log('poids.length---->' + poids.length);
 	    if(poids.length > 0){
 	        var action = component.get("c.importMasterPOLines");
 	        action.setParams({

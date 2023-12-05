@@ -2,6 +2,9 @@
 
 public without sharing class QBIntegrationQueue {
     
+
+    // --------------- ------------- ----------------- Sales Invoice and Payment(Receipt) QB Integration Flow - START ------------------- --------------------- ----------------------- --------------------
+
     @future(callout=true)
     public static void QB_Payment_Invoice_Flow_Callout(Id Sales_invoice_Id, Id receiptID, Boolean Create_Payment){
         //  *********  Integration flow --> Customer - TaxRate - Term - Items(Product and Service) - Invoice - Payment(Receipt)
@@ -91,7 +94,6 @@ public without sharing class QBIntegrationQueue {
         } catch (Exception e) {
             System.debug('Error in QB_Payment_Invoice_Flow_Callout ..' + e.getMessage() + '\n' + e +'\n Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
         }
-
     }
 
     public static void Create_Customer_TaxRate_item_invoice_payment_in_QB(List<buildertek__Billable_Lines__c> SILines, buildertek__Billings__c SI, Account acc, buildertek__QuickBooks_Setting__mdt QBMetadata, Boolean Get_Access_Token, String receiptID, Boolean Create_Payment){
@@ -107,8 +109,9 @@ public without sharing class QBIntegrationQueue {
                 QBCustomerResponseJSON.Customer customer = new QBCustomerResponseJSON.Customer();
                 customer = Customer_Response_Deser.Customer;
                 String CustomerQBId = customer.Id;
+                String SyncToken = customer.SyncToken;
                 Create_TaxRate_item_invoice_payment_in_QB(SILines, SI, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, Create_Payment);
-                UpdateAccount(acc.Id, CustomerQBId, QBMetadata);
+                UpdateAccount(acc.Id, CustomerQBId, QBMetadata, SyncToken);
             }
             else{
                 QBException.QB_response( Customer_Response.getStatusCode(),  Customer_Response.getBody(), 'QBIntegrationQueue', 'Create_Customer_TaxRate_item_invoice_payment_in_QB');
@@ -434,75 +437,6 @@ public without sharing class QBIntegrationQueue {
         }
     }
 
-
-    // ..... Update Records ......
-    public static void UpdateAccount(String acc_Id, String QB_Id , buildertek__QuickBooks_Setting__mdt  QBMetadata){
-        try {
-            system.debug('Account going to Update');
-            String qbCustomerURL = QBMetadata.buildertek__Qb_URL__c + 'customerdetail?nameId=' + QB_Id;
-            Account Acc = [SELECT Id,Name, buildertek__QBO_ID__c,buildertek__QB_Record_URL__c  FROM Account WHERE Id =: acc_Id LIMIT 1];
-            Acc.buildertek__QBO_ID__c = QB_Id;
-            Acc.buildertek__QB_Record_URL__c = qbCustomerURL;
-            update Acc;
-        
-        } catch (Exception e) {
-            System.debug('Error in UpdateAccount : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
-        }
-    }
-
-    public static void UpdateSIline(list<buildertek__Billable_Lines__c> SILines, Map<Id, List<String>> lineIdsMap){
-        try {
-            system.debug('sales Invoice line going to Update');
-
-            for (buildertek__Billable_Lines__c record : SILines) {
-                // Check if the Salesforce ID exists in the mapping and update the QuickBooks ID
-                List<String> qbIdAndNameList = lineIdsMap.get(record.Id);
-
-                // Assuming the list contains QB ID and QB Name in index 0 and 1 respectively
-                if (qbIdAndNameList != null && qbIdAndNameList.size() >= 2) {
-                    record.buildertek__QBO_ID__c = qbIdAndNameList[0]; // Assign QuickBooks ID
-                    record.buildertek__QBO_Name__c = qbIdAndNameList[1];
-                    // Optionally, you can also use qbIdAndNameList[1] to access QuickBooks Name if needed
-                }
-            }
-
-            update SILines;
-        } catch (Exception e) {
-            System.debug('Error in UpdateSIline : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
-        }
-    }
-
-    public static void UpdateSalesInvoice(String invoice_Id, String QB_invoice_Id, String taxCodeId, Double taxRateValue , buildertek__QuickBooks_Setting__mdt  QBMetadata, String TermQBId, String QbInvNumber, String QBInvSyncTocken){
-        try {
-            system.debug('sales Invoice going to Update');
-            String qbInvoiceURL = QBMetadata.buildertek__Qb_URL__c + 'invoice?txnId=' + QB_invoice_Id;
-            buildertek__Billings__c Invoice = [SELECT Id, Name , buildertek__QBO_ID__c,buildertek__QB_Invoice_Number__c	, buildertek__QBO_Tax_Rate__c,buildertek__QBO_Tax_Rate_ID__c, buildertek__QB_Invoice_URL__c FROM buildertek__Billings__c WHERE ID =:invoice_Id LIMIT 1];
-            Invoice.buildertek__QBO_ID__c = QB_invoice_Id;
-            Invoice.buildertek__QBO_Tax_Rate_ID__c = taxCodeId;
-            Invoice.buildertek__QBO_Tax_Rate__c = taxRateValue;
-            Invoice.buildertek__QB_Invoice_URL__c = qbInvoiceURL;
-            Invoice.buildertek__QBO_Term_Id__c = TermQBId;
-            Invoice.buildertek__QB_Invoice_Number__c = QbInvNumber;
-            Invoice.buildertek__QBO_SyncToken__c = QBInvSyncTocken;
-            update Invoice;
-        } catch (Exception e) {
-            System.debug('Error in UpdateSalesInvoice : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
-        }
-    }
-
-    public static void UpdateReceipt(String receipt_Id, String QB_Payment_Id , buildertek__QuickBooks_Setting__mdt  QBMetadata){
-        try {
-            system.debug('Receipt going to Update');
-            String qbPaymentURL = QBMetadata.buildertek__Qb_URL__c + 'recvpayment?txnId=' + QB_Payment_Id;
-            buildertek__Receipt__c receipt = [SELECT Id, Name , buildertek__QBO_ID__c, buildertek__QB_Receipt_URL__c FROM buildertek__Receipt__c WHERE ID =:receipt_Id LIMIT 1];
-            receipt.buildertek__QBO_ID__c = QB_Payment_Id;
-            receipt.buildertek__QB_Receipt_URL__c = qbPaymentURL;
-            update receipt;
-        } catch (Exception e) {
-            System.debug('Error in UpdateReceipt : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
-        }
-    }
-
     @AuraEnabled
     public static String Create_customer_item_invoice_in_QB_flow(String Sales_invoice_Id){
         // This method run from the Quick action button to create Customer, Invoice and invoice in QB...
@@ -542,6 +476,148 @@ public without sharing class QBIntegrationQueue {
             return null;
         }
     }
+    // --------------- ------------- ----------------- Sales Invoice and Payment(Receipt) QB Integration Flow - END ---------------------------------------- ----------------------- --------------------
 
+    // ---------------------- ****************************** Contactor Invoice QB Integration Flow - START *********************** --------------------------------------- 
+    @future(callout=true)
+    public static void QB_ContactorInvoice_Flow_Callout(String COInvId){
+        try {
+            buildertek__Account_Payable__c CoInv = [SELECT Id, Name , buildertek__QBO_ID__c,buildertek__QBO_SyncToken__c, buildertek__QB_Record_URL__c, buildertek__Purchase_Order__c, buildertek__Purchase_Order__r.buildertek__Vendor__c, buildertek__QBO_Bill_Number__c FROM buildertek__Account_Payable__c WHERE Id =: COInvId LIMIT 1];
+
+            List<buildertek__Account_Payable_Item__c> COInvLines = [SELECT Id, Name , buildertek__QBO_ID__c,buildertek__QBO_SyncToken__c, buildertek__QB_Record_URL__c FROM buildertek__Account_Payable_Item__c WHERE buildertek__Account_Payable__c =: CoInv.Id];
+
+            Account vendor = [SELECT Id, Name FROM Account WHERE Id =: CoInv.buildertek__Purchase_Order__r.buildertek__Vendor__c LIMIT 1];
+
+            buildertek__QuickBooks_Setting__mdt QBMetadata = [SELECT Id, DeveloperName,buildertek__Base_Url__c, buildertek__minorversion__c, MasterLabel, buildertek__Access_Token__c, buildertek__Client_Id__c, buildertek__Client_Secret__c, buildertek__Refresh_Token__c, buildertek__Qb_URL__c, buildertek__Scope__c, buildertek__Company_Id__c FROM buildertek__QuickBooks_Setting__mdt LIMIT 1];
+            Boolean Get_Access_Token = false;
+
+            QBIntegrationQueue.Create_Vendor_in_QB(vendor, QBMetadata, Get_Access_Token, CoInv,'buildertek__Account_Payable__c');
+
+        } catch (Exception e) {
+            System.debug('Error in QB_ContactorInvoice_Flow_Callout : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+        }
+    }
+
+    public static void Create_CoInvLines_CoInv_in_QB(){
+        try {
+            
+        } catch (Exception e) {
+            System.debug('Error in Create_COInoiceLine_COInv_Flow : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+        }
+    }
+    // ---------------------- ************** *********** Contactor Invoice QB Integration Flow - END ********** ************* --------------------------------------- 
+
+
+
+    public static void Create_Vendor_in_QB(Account acc, buildertek__QuickBooks_Setting__mdt QBMetadata, Boolean Get_Access_Token, sObject SObjRecord, String SyncObjName){
+        try {
+            String Vendor_EndPoint = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/vendor?minorversion=' + QBMetadata.buildertek__minorversion__c;            
+            String Vendor_RequestBody = QBMap.mapVendorAccountData(acc, 1);
+            system.debug('JSON Body >>' +  Vendor_RequestBody);
+            HttpResponse Vendor_Response = QBCallOutService.QBAPICallOut(Vendor_EndPoint , Vendor_RequestBody, Get_Access_Token);
+            system.debug('Vendor API Status Code >> ' + Vendor_Response.getStatusCode());
+            System.debug('Vendor_Response.getBody() :: '+ Vendor_Response.getBody());
+            if(Vendor_Response.getStatusCode() == 200){
+                QBVendorResponseJSON Vendor_Response_Deser = QBVendorResponseJSON.parse(Vendor_Response.getBody());
+                QBVendorResponseJSON.Vendor vendor = new QBVendorResponseJSON.Vendor();
+                vendor = Vendor_Response_Deser.Vendor;
+                String VendorQBId = vendor.Id;
+                String SyncToken = vendor.SyncToken;
+                System.debug(' SyncObjName :: ' + SObjRecord);
+
+                if(SyncObjName == 'buildertek__Purchase_Order__c'){
+                    // Create Purchase Order In QB
+                    // Run Purchase Order Integartion Logic
+                }
+                else if(SyncObjName == 'buildertek__Account_Payable__c'){
+                    // Create Contractor Invoice (Bill) In QB
+                    // Run Contractor Invoice Integartion Logic
+                }
+                else if(SyncObjName == 'buildertek__Account_Payable_Clone__c'){
+                    // Create Payable Invoice(Bill) In QB
+                    // Run Payable Invoice Integartion Logic
+                }
+                // Create_TaxRate_item_invoice_payment_in_QB(SILines, SI, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, Create_Payment);
+                UpdateAccount(acc.Id, VendorQBId, QBMetadata, SyncToken);
+            }
+            else{
+                QBException.QB_response( Vendor_Response.getStatusCode(),  Vendor_Response.getBody(), 'QBIntegrationQueue', 'Create_Vendor_in_QB');
+            }
+            
+        } catch (Exception e) {
+            System.debug('Error in Create_Vendor_in_QB ..' + e.getMessage() + '\n' + e +'\n Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+        }
+    }
+
+        // ..... ....... ........... .......... ............. Update Records Utility Methods - STARTS ...... ........ ......... ......... .............
+        public static void UpdateAccount(String acc_Id, String QB_Id , buildertek__QuickBooks_Setting__mdt  QBMetadata, String SyncToken){
+            try {
+                system.debug('Account going to Update');
+                String qbCustomerURL = QBMetadata.buildertek__Qb_URL__c + 'customerdetail?nameId=' + QB_Id;
+                Account Acc = [SELECT Id,Name, buildertek__QBO_ID__c,buildertek__QB_Record_URL__c  FROM Account WHERE Id =: acc_Id LIMIT 1];
+                Acc.buildertek__QBO_ID__c = QB_Id;
+                Acc.buildertek__QB_Record_URL__c = qbCustomerURL;
+                Acc.buildertek__QBO_SyncToken__c = SyncToken;
+                update Acc;
+            
+            } catch (Exception e) {
+                System.debug('Error in UpdateAccount : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+            }
+        }
+    
+        public static void UpdateSIline(list<buildertek__Billable_Lines__c> SILines, Map<Id, List<String>> lineIdsMap){
+            try {
+                system.debug('sales Invoice line going to Update');
+    
+                for (buildertek__Billable_Lines__c record : SILines) {
+                    // Check if the Salesforce ID exists in the mapping and update the QuickBooks ID
+                    List<String> qbIdAndNameList = lineIdsMap.get(record.Id);
+    
+                    // Assuming the list contains QB ID and QB Name in index 0 and 1 respectively
+                    if (qbIdAndNameList != null && qbIdAndNameList.size() >= 2) {
+                        record.buildertek__QBO_ID__c = qbIdAndNameList[0]; // Assign QuickBooks ID
+                        record.buildertek__QBO_Name__c = qbIdAndNameList[1];
+                        // Optionally, you can also use qbIdAndNameList[1] to access QuickBooks Name if needed
+                    }
+                }
+    
+                update SILines;
+            } catch (Exception e) {
+                System.debug('Error in UpdateSIline : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+            }
+        }
+    
+        public static void UpdateSalesInvoice(String invoice_Id, String QB_invoice_Id, String taxCodeId, Double taxRateValue , buildertek__QuickBooks_Setting__mdt  QBMetadata, String TermQBId, String QbInvNumber, String QBInvSyncTocken){
+            try {
+                system.debug('sales Invoice going to Update');
+                String qbInvoiceURL = QBMetadata.buildertek__Qb_URL__c + 'invoice?txnId=' + QB_invoice_Id;
+                buildertek__Billings__c Invoice = [SELECT Id, Name , buildertek__QBO_ID__c,buildertek__QB_Invoice_Number__c	, buildertek__QBO_Tax_Rate__c,buildertek__QBO_Tax_Rate_ID__c, buildertek__QB_Invoice_URL__c FROM buildertek__Billings__c WHERE ID =:invoice_Id LIMIT 1];
+                Invoice.buildertek__QBO_ID__c = QB_invoice_Id;
+                Invoice.buildertek__QBO_Tax_Rate_ID__c = taxCodeId;
+                Invoice.buildertek__QBO_Tax_Rate__c = taxRateValue;
+                Invoice.buildertek__QB_Invoice_URL__c = qbInvoiceURL;
+                Invoice.buildertek__QBO_Term_Id__c = TermQBId;
+                Invoice.buildertek__QB_Invoice_Number__c = QbInvNumber;
+                Invoice.buildertek__QBO_SyncToken__c = QBInvSyncTocken;
+                update Invoice;
+            } catch (Exception e) {
+                System.debug('Error in UpdateSalesInvoice : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+            }
+        }
+    
+        public static void UpdateReceipt(String receipt_Id, String QB_Payment_Id , buildertek__QuickBooks_Setting__mdt  QBMetadata){
+            try {
+                system.debug('Receipt going to Update');
+                String qbPaymentURL = QBMetadata.buildertek__Qb_URL__c + 'recvpayment?txnId=' + QB_Payment_Id;
+                buildertek__Receipt__c receipt = [SELECT Id, Name , buildertek__QBO_ID__c, buildertek__QB_Receipt_URL__c FROM buildertek__Receipt__c WHERE ID =:receipt_Id LIMIT 1];
+                receipt.buildertek__QBO_ID__c = QB_Payment_Id;
+                receipt.buildertek__QB_Receipt_URL__c = qbPaymentURL;
+                update receipt;
+            } catch (Exception e) {
+                System.debug('Error in UpdateReceipt : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+            }
+        }
+        // ..... ....... ........... .......... ............. Update Records Utility Methods - END ...... ........ ......... ......... .............
+    
     
 }
