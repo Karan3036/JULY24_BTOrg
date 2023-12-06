@@ -1,4 +1,4 @@
-public without sharing class QBVendorJSON {
+public with sharing class QBVendorJSON {
     public String PrintOnCheckName;
     public BillAddr BillAddr;
     public String AcctNum;

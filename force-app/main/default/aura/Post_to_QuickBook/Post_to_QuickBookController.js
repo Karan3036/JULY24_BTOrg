@@ -19,11 +19,29 @@
 
         console.log(component.get("v.BTAccountType.buildertek__BT_Account_Type__c"));
         var BTAccountType = component.get("v.BTAccountType")["buildertek__BT_Account_Type__c"];
+        var QBID = component.get("v.BTAccountType")["buildertek__QB_Type__c"];
+        var QBType = component.get("v.BTAccountType")["buildertek__QB_Type__c"];
         if(BTAccountType == "Customer" || BTAccountType == "Vendor"){
             component.set("v.AccountType", BTAccountType)
         }
+        if(QBID == null){
+            helper.PostAccountToQuickbook(component, event, helper);
+        }
+        else if(QBID != null){
+            if(BTAccountType == QBType){
+                helper.PostAccountToQuickbook(component, event, helper);
+            }
+            else{
+                component.find('notifLib').showNotice({
+                    "variant": "error",
+                    "header": "Error",
+                    "message":  'This Account is posted as ' + QBType + ' in Quickbook, So You can not Post this Account as ' + BTAccountType +  ' again',
+                }); 
+                $A.get("e.force:closeQuickAction").fire();
+            }
+        }
 
-      },
+    },
 
     handleChangeAccountType: function(component, event, helper){
         var auraIdField = event.getSource().getLocalId();
@@ -31,21 +49,6 @@
         console.log('Selected account type : ',component.find(auraIdField).get("v.value"));
 
         component.set("v.AccountType",component.find(auraIdField).get("v.value"));
-    },
-
-    PostAccountToQuickbook: function(component, event, helper){
-        var accountType = component.get("v.AccountType");
-        if(accountType == 'Customer' || accountType == 'Vendor'){
-            component.set("v.ShowAccountTypeOpt", false);
-            helper.Post_Customer_vendor_ToQBHelper(component, event, helper);
-        }
-        else{
-            component.find('notifLib').showNotice({
-                "variant": "error",
-                "header": "Error",
-                "message": 'Please Select at least on Account Type!',
-            });    
-        }
     },
 
     CloseQuickAction: function(component, event, helper){
