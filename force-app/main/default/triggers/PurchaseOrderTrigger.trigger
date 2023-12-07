@@ -40,7 +40,7 @@ trigger PurchaseOrderTrigger on Purchase_Order__c(after delete, after insert, af
             handler.OnAfterUpdate(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap);
             //handler.afterUpdate(Trigger.old, Trigger.new, Trigger.oldMap, Trigger.newMap);
         } else if (Trigger.isDelete && Trigger.isBefore){
-            handler.OnBeforeDelete(Trigger.old, Trigger.oldMap);
+            PurchaseOrder_handler.handledelete(Trigger.old);
         } else if (Trigger.isDelete && Trigger.isAfter){
             handler.OnAfterDelete(Trigger.old);
         } 
