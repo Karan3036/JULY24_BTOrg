@@ -81,7 +81,7 @@ public with sharing class PurchaseOrderItemTriggerHandler {
 			poids.add(POI.Id);
 		}
 		System.debug(poids);
-		quickBookCallout(poids);
+		// quickBookCallout(poids);
  	}
      
  	public void OnAfterUpdate(Purchase_Order_Item__c[] oldPurchaseOrderItems, Purchase_Order_Item__c[] updatedPurchaseOrderItems, Map<ID, Purchase_Order_Item__c> PurchaseOrderItemMap, Map<Id, Purchase_Order_Item__c> oldPurchaseOrderItemsMap){
