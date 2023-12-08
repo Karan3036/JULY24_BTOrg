@@ -9,16 +9,12 @@ public with sharing class ImportMasterPurchaseOrderController {
                                                 WHERE buildertek__PO_Type__c = 'Master'
                                                 ORDER BY Name
                                                 ASC limit 50000]; 
-                                                                            
-            List<MasterPOClass> MasterPOClassList = new List<MasterPOClass>();
-            for(buildertek__Purchase_Order__c masterPO : masterPOList){
-                MasterPOClass MasterPOClassRecord = new MasterPOClass(); 
-                MasterPOClassRecord.masterPORecord = masterPO;
-                MasterPOClassRecord.poCheck = false;
-                MasterPOClassList.add(MasterPOClassRecord);
-            }
+                                                
+            if (masterPOList.size() > 0) {
+                return masterPOList;
+            }  
 
-            return  MasterPOClassList;   
+            return null;   
         } catch (Exception e) {
             System.debug('Error--> '+e.getMessage());
             List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
@@ -166,16 +162,6 @@ public with sharing class ImportMasterPurchaseOrderController {
             }
             return msg;
         }
-    }
-
-    
-    public class MasterPOClass{
-         @AuraEnabled
-         public buildertek__Purchase_Order_Item__c poRecord {get;set;}
-         @AuraEnabled
-         public buildertek__Purchase_Order__c masterPORecord {get;set;}
-         @AuraEnabled
-         public boolean poCheck {get;set;}
     }
     
     public class MessageClass{
