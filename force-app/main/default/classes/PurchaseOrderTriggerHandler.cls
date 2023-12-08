@@ -438,11 +438,6 @@ PurchaseOrderDAO.isUpdatePurchaseOrder = true;
         try {
             // Collect unique project IDs from the updated purchase orders
             Set<Id> projectIdsToUpdate = new Set<Id>();
-            for (buildertek__Purchase_Order__c po : newPurchaseOrders) {
-                if (po.buildertek__Project__c != null) {
-                    projectIdsToUpdate.add(po.buildertek__Project__c);
-                }
-            }
 
             for (buildertek__Purchase_Order__c newPO : newPurchaseOrders) {
                 buildertek__Purchase_Order__c oldPO = oldPurchaseOrderMap.get(newPO.Id);
@@ -450,6 +445,9 @@ PurchaseOrderDAO.isUpdatePurchaseOrder = true;
                 // Check if relevant fields have changed
                 if (hasFieldsChanged(newPO, oldPO)) {
                     projectIdsToUpdate.add(newPO.buildertek__Project__c);
+                    if (newPO.buildertek__Project__c != oldPO.buildertek__Project__c) {
+                        projectIdsToUpdate.add(oldPO.buildertek__Project__c);
+                    }
                 }
             }
 

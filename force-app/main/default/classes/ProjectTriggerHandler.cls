@@ -335,10 +335,14 @@ public with sharing class ProjectTriggerHandler {
 
         }
 
-
+        System.debug('OnAfterUpdate method calling............');
         List<buildertek__Project__c> updateprojectRecList =  new List<buildertek__Project__c>();
         //update project dates from schedules
          if (ProjectMap.keySet().size() > 0){
+
+            for (Id checkKye : ProjectMap.keySet()) {
+            	System.debug('checkKye'+checkKye);
+            }
 
             for(buildertek__Project__c proj : [select Id,Name,buildertek__Actual_Start__c, buildertek__Stage__c, buildertek__Actual_Completion_Date__c,buildertek__Project_Completion__c,buildertek__Original_Start_Date__c,buildertek__Original_End_Date__c,
                                 (select id,Name,buildertek__Start_Date__c,buildertek__End_Date__c,buildertek__Actual_Completion_Date_2__c,buildertek__Actual_Start_Date_2__c,buildertek__Original_Start_Date__c,buildertek__Original_End_Date__c from buildertek__Schedules__r ORDER BY CreatedDate ASC)  from buildertek__Project__c where Id IN:ProjectMap.keySet()]){
@@ -628,7 +632,6 @@ public with sharing class ProjectTriggerHandler {
 
         for (String objName : objectSet) {
 
-            System.debug('karan testing trigger');
             if(objName == 'Purchase Order') {
                 CloneAny(objName, 'buildertek__Purchase_Order__c', 'buildertek__Purchase_Order_Item__c');
             }

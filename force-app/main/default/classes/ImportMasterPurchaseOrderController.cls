@@ -30,7 +30,33 @@ public with sharing class ImportMasterPurchaseOrderController {
     }
     
     @AuraEnabled
-    public static MessageClass importMasterPOLines(List<String> poIds, String recordId) {
+    public static MessageClass checkUpdatePricingField(List<String> poIds, String recordId) {
+        MessageClass msg = new MessageClass();
+        try {
+            List<buildertek__Purchase_Order__c> updatePricingValue = [SELECT Id, buildertek__Update_Pricing__c FROM buildertek__Purchase_Order__c WHERE Id =: recordId];
+
+            if(updatePricingValue[0].buildertek__Update_Pricing__c == true){
+                System.debug('Check is True');
+                msg = importMasterPOLinesWithVendorPricing(poIds, recordId);
+                return msg;
+            }
+            else {
+                System.debug('Check is False');
+                msg = importMasterPOLinesWithoutVendorPricing(poIds, recordId);
+                return msg;
+            } 
+        } catch (Exception exp) {
+            msg.Status = 'Failed';
+            msg.Message = exp.getMessage();
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(exp);
+            }
+            return msg;
+        }
+    }
+
+    public static MessageClass importMasterPOLinesWithVendorPricing(List<String> poIds, String recordId) {
         MessageClass msg = new MessageClass();
         try {
             List<buildertek__Purchase_Order_Item__c> newinslst = new List<buildertek__Purchase_Order_Item__c>();
@@ -71,6 +97,50 @@ public with sharing class ImportMasterPurchaseOrderController {
                         // If there is no product, use the unit cost from the Master PO Line
                         newinsp.buildertek__Unit_Price__c = ins.buildertek__Unit_Price__c;
                     }
+
+                    newinslst.add(newinsp);
+                }
+            }
+            System.debug('POLineList---> ' + newinslst);
+            if (newinslst.size() > 0) {
+                insert newinslst;
+                msg.Status = 'Success';
+                msg.Message = 'PO Lines Imported Successfully';
+            } else {
+                msg.Status = 'Failed';
+                msg.Message = 'There were no PO Lines for the selected PO(s)';
+            }
+            return msg;
+        } catch (Exception exp) {
+            msg.Status = 'Failed';
+            msg.Message = exp.getMessage();
+            System.debug('error--> ' + exp.getMessage());
+            System.debug('error line--> ' + exp.getLineNumber());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(exp);
+            }
+            return msg;
+        }
+    }
+
+    public static MessageClass importMasterPOLinesWithoutVendorPricing(List<String> poIds, String recordId) {
+        MessageClass msg = new MessageClass();
+        try {
+            List<buildertek__Purchase_Order_Item__c> newinslst = new List<buildertek__Purchase_Order_Item__c>();
+
+            for (String poId : poIds) {
+                List<buildertek__Purchase_Order_Item__c> insplinelst = [SELECT Id, Name, buildertek__Purchase_Order__c, buildertek__Quantity__c, buildertek__Description__c, buildertek__Tax__c, buildertek__Cost_Code__c, buildertek__Unit_Price__c FROM buildertek__Purchase_Order_Item__c WHERE buildertek__Purchase_Order__c = :poId];
+
+                for (buildertek__Purchase_Order_Item__c ins : insplinelst) {
+                    buildertek__Purchase_Order_Item__c newinsp = new buildertek__Purchase_Order_Item__c();
+                    newinsp.buildertek__Purchase_Order__c = recordId;
+                    newinsp.Name = ins.Name;
+                    newinsp.buildertek__Quantity__c = ins.buildertek__Quantity__c;
+                    newinsp.buildertek__Description__c = ins.buildertek__Description__c;
+                    newinsp.buildertek__Tax__c = ins.buildertek__Tax__c;
+                    newinsp.buildertek__Cost_Code__c = ins.buildertek__Cost_Code__c;
+                    newinsp.buildertek__Unit_Price__c = ins.buildertek__Unit_Price__c;
 
                     newinslst.add(newinsp);
                 }

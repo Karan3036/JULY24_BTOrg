@@ -144,7 +144,7 @@
 	    }
         console.log('poids.length---->' + poids.length);
 	    if(poids.length > 0){
-	        var action = component.get("c.importMasterPOLines");
+	        var action = component.get("c.checkUpdatePricingField");
 	        action.setParams({
 	            poIds : poids,
 	            recordId : component.get("v.recordId")
@@ -214,6 +214,7 @@
         component.set("v.startPage",start);
         component.set("v.endPage",end);
         component.set('v.PaginationList', Paginationlist);
+        helper.updateCheckboxValues(component);
     },
     previous: function (component, event, helper) {
         var sObjectList = component.get("v.masterPOList"); 
@@ -235,5 +236,6 @@
         component.set("v.startPage",start);
         component.set("v.endPage",end);
         component.set('v.PaginationList', Paginationlist);
+        helper.updateCheckboxValues(component);
     },
 })
