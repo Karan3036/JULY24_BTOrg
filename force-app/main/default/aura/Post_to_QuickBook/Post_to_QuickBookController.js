@@ -9,12 +9,21 @@
         if(Objectname == "Account"){
             component.set("v.ShowAccountTypeOpt", true);
         }
-
-        if (Objectname == 'buildertek__Purchase_Order__c') {
-            helper.createPO(component, event, helper);
+        else if (Objectname == 'buildertek__Purchase_Order__c') {
+            helper.SyncPO(component, event, helper);
+        }
+        else if(Objectname == 'buildertek__Account_Payable__c'){
+            helper.SyncCOInvoice(component, event, helper)
+        }
+        else if(Objectname == 'buildertek__Account_Payable_Clone__c'){
+            helper.SyncPayableInvoice(component, event, helper)
+        }
+        else if(Objectname == 'buildertek__Billings__c'){
+            helper.SyncSIInvoice(component, event, helper)
         }
     },
 
+    // this method only run when Object Is Account
     handleRecordLoaded: function(component, event, helper) {
 
         console.log(component.get("v.BTAccountType.buildertek__BT_Account_Type__c"));
@@ -25,17 +34,17 @@
             component.set("v.AccountType", BTAccountType)
         }
         if(QBID == null){
-            helper.PostAccountToQuickbook(component, event, helper);
+            helper.SyncAccountToQuickbook(component, event, helper);
         }
         else if(QBID != null){
             if(BTAccountType == QBType){
-                helper.PostAccountToQuickbook(component, event, helper);
+                helper.SyncAccountToQuickbook(component, event, helper);
             }
             else{
                 component.find('notifLib').showNotice({
                     "variant": "error",
                     "header": "Error",
-                    "message":  'This Account is posted as ' + QBType + ' in Quickbook, So You can not Post this Account as ' + BTAccountType +  ' again',
+                    "message":  'This Account is sync as ' + QBType + ' in Quickbook, So You can not sync this Account as ' + BTAccountType +  ' again.',
                 }); 
                 $A.get("e.force:closeQuickAction").fire();
             }
