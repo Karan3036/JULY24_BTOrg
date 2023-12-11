@@ -1,9 +1,7 @@
 ({
     doInit: function (component, event, helper) {
-        // component.set("v.spinner", true);
         helper.getAllScheduleItems(component, event, helper);
         helper.getAllPOs(component, event, helper);
-        // component.set("v.spinner", false);
     },
 
     Save: function (component, event, helper) {
@@ -28,7 +26,6 @@
     },
 
     onSelectChange: function (component, event, helper) {
-        component.set("v.spinner", true);
         let poItem = event.getSource();
         let poId = poItem.get("v.value");
         let scheduleItemId = event.target.dataset.id;
@@ -63,7 +60,6 @@
 
         component.set("v.poList", poList);
         component.set("v.selectedPOItems", selectedPOItems);
-        component.set("v.spinner", false);
     },
 
 })

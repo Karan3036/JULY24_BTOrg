@@ -24,13 +24,12 @@
         let action = component.get("c.fetchAllPOs");
         action.setCallback(this, function (response) {
             let state = response.getState();
-            component.set("v.spinner", false);
             if (state === "SUCCESS") {
                 let result = response.getReturnValue();
                 result.forEach(po => {
                     po.isDisabled = false;
                 });
-    
+
                 component.set("v.poList", result);
                 console.log('PO List: ' + JSON.stringify(result));
             } else {
@@ -39,6 +38,9 @@
                 showToast('Error', 'Error', 'Something Went Wrong', '3000');
             }
         });
+        setTimeout(function () {
+            component.set("v.spinner", false);
+        }, 3000);
         $A.enqueueAction(action);
     },
 
