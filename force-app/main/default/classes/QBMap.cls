@@ -2,7 +2,7 @@ public without sharing class QBMap {
 
     public static String mapAccountData(Account acc, Integer a){
         String accId = acc.Id;
-        String QBId = acc.buildertek__QBO_ID__c;
+        String QBId = acc.buildertek__QB_Id__c;
         QBCustomerJSON.Customer customer = new QBCustomerJSON.Customer();
 
         String AccountId = acc.Id;
@@ -10,8 +10,8 @@ public without sharing class QBMap {
         customer.CompanyName = acc.Name +' - '+AccountId.right(4).substring(0,4);
         customer.Taxable = True; 
         customer.Notes = acc.Description;
-        if(acc.buildertek__QBO_ID__c != null && acc.buildertek__QBO_ID__c != ''){
-            customer.Id = acc.buildertek__QBO_ID__c;
+        if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Id__c != ''){
+            customer.Id = acc.buildertek__QB_Id__c;
             customer.SyncToken = acc.buildertek__QBO_SyncToken__c;
             customer.sparse = true;
         }
@@ -125,13 +125,13 @@ public without sharing class QBMap {
         try {
             System.debug(' in mapInvoiceData method');
             String invId = inv.Id;
-            String invQBId = inv.QBO_ID__c;
+            String invQBId = inv.buildertek__QB_Id__c;
             DateTime yourDate = Datetime.now();
             Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
             QBInvoiceJSON invoice = new QBInvoiceJSON();
 
-            if(inv.buildertek__QBO_ID__c != null && inv.buildertek__QBO_ID__c != ''){
-                invoice.Id = inv.buildertek__QBO_ID__c;
+            if(inv.buildertek__QB_Id__c != null && inv.buildertek__QB_Id__c != ''){
+                invoice.Id = inv.buildertek__QB_Id__c;
                 invoice.sparse = true;
                 invoice.SyncToken = inv.buildertek__QBO_SyncToken__c;
             }
@@ -261,8 +261,8 @@ public without sharing class QBMap {
         Vendor.Active = true;  
 
         // If QB Id is Not Null, Update Vendor in QB Else Create New Vendor In QB.....
-        if(acc.buildertek__QBO_ID__c != null && acc.buildertek__QBO_ID__c != ''){
-            Vendor.Id = acc.buildertek__QBO_ID__c;
+        if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Id__c != ''){
+            Vendor.Id = acc.buildertek__QB_Id__c;
             Vendor.SyncToken = acc.buildertek__QBO_SyncToken__c;
             Vendor.sparse = true;
         }
@@ -304,7 +304,6 @@ public without sharing class QBMap {
             Map<Id, String> NameMap = new Map<Id, String>();
             Map<Id, Decimal> UnitPriceMap = new Map<Id, Decimal>();
             Map<Id, Decimal> QuantityMap = new Map<Id, Decimal>();
-
 
             for(sObject Item : sObjectItemList){
                 // Type conversation from sObject to Generic Object....
@@ -371,12 +370,12 @@ public without sharing class QBMap {
             String QBSyncToken = null;
             if(SyncObjName == 'buildertek__Account_Payable__c'){
                 buildertek__Account_Payable__c record = (buildertek__Account_Payable__c)SOBJ;
-                QBOID = record.buildertek__QBO_ID__c;
+                QBOID = record.buildertek__QB_Id__c;
                 QBSyncToken = record.buildertek__QBO_SyncToken__c;
             }
             else if(SyncObjName == 'buildertek__Account_Payable_Clone__c'){
                 buildertek__Account_Payable_Clone__c record = (buildertek__Account_Payable_Clone__c)SOBJ;
-                QBOID = record.buildertek__QBO_ID__c;
+                QBOID = record.buildertek__QB_Id__c;
                 QBSyncToken = record.buildertek__QBO_SyncToken__c;
             }
 
@@ -446,14 +445,14 @@ public without sharing class QBMap {
         try {
             System.debug(' in mapPODataBatch method');
             String invId = inv.Id;
-            String invQBId = inv.QBO_ID__c;
+            String invQBId = inv.buildertek__QB_Id__c;
             DateTime yourDate = Datetime.now();
             Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
 
             QBPOJSON purchaseorder = new QBPOJSON();
 
-            if(inv.buildertek__QBO_ID__c != null && inv.buildertek__QBO_ID__c != ''){
-                purchaseorder.Id = inv.buildertek__QBO_ID__c;
+            if(inv.buildertek__QB_Id__c != null && inv.buildertek__QB_Id__c != ''){
+                purchaseorder.Id = inv.buildertek__QB_Id__c;
                 purchaseorder.sparse = true;
                 purchaseorder.SyncToken = inv.buildertek__QBO_SyncToken__c;
             }

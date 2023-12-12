@@ -1,7 +1,7 @@
 ({
     doInit : function(component, event, helper) {
         var id = component.get("v.recordId");
-        console.log(id);
+        console.log('RecordId---> ',id);
 
         var Objectname = component.get("v.sobjecttype");
         console.log('Objectname---> ',Objectname);
@@ -20,6 +20,9 @@
         }
         else if(Objectname == 'buildertek__Billings__c'){
             helper.SyncSIInvoice(component, event, helper)
+        }
+        else if(Objectname == 'buildertek__Expense__c'){
+            helper.SyncExpense(component, event, helper)
         }
     },
 

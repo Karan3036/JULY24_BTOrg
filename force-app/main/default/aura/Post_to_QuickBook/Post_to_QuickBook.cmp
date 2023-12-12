@@ -129,6 +129,16 @@
                 </div>
             </aura:if>
 
+            <aura:if isTrue="{!v.sObjectName == 'buildertek__Expense__c'}">
+                <img alt="Creating new record in QuickBook." src="{!$Resource.gearsloading}" style="height:150px !important;"/>
+                <br/>
+                <div style="margin-block: 10px;">
+                    Syncing Expense with Quickbooks... 
+                    <br/> Please don't leave this page until Expense is Synced to Quickbook.
+                    <br/>
+                </div>
+            </aura:if>
+
     	</center>
     </div>
 
