@@ -49,7 +49,7 @@
                 
                 <force:recordData aura:id="recordLoader"
                 recordId="{!v.recordId}"
-                fields="buildertek__BT_Account_Type__c, buildertek__QBO_ID__c, buildertek__QB_Type__c"
+                fields="buildertek__BT_Account_Type__c, buildertek__QB_Id__c, buildertek__QB_Type__c"
                 targetRecord="{!v.record}"
                 targetFields="{!v.BTAccountType}"
                 targetError="{!v.recordError}"

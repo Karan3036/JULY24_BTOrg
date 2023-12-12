@@ -583,7 +583,9 @@ public without sharing class QBIntegrationQueue {
     public static void Create_Lines_to_Items_in_QB(sObject SObejctRecord, String VendorQBId, buildertek__QuickBooks_Setting__mdt QBMetadata , boolean Get_Access_Token, String SyncObjName){
         try {
 
+            List<sObject> ItemsWithoutQBId = new List<sObject>();
             List<sObject> ItemstoCreate = new List<sObject>();
+            Map<String ,sObject> ItemstoCreateMap = new Map<String ,sObject>();
             List<sObject> ItemList = new List<sObject>();
             
             // Sync Purchase Order Lines
@@ -593,7 +595,8 @@ public without sharing class QBIntegrationQueue {
                     // Type casting --> sObject to Purchase invoice Lines....
                     buildertek__Purchase_Order_Item__c Items = (buildertek__Purchase_Order_Item__c)Item;
                     if(Items.buildertek__QBO_ID__c == null){
-                        ItemstoCreate.add(Items);
+                        ItemsWithoutQBId.add(Items);
+                        ItemstoCreateMap.put(Items.Name, Items);
                     }
                 }
             }
@@ -604,7 +607,8 @@ public without sharing class QBIntegrationQueue {
                     // Type casting --> sObject to Contractor invoice Lines....
                     buildertek__Account_Payable_Item__c Items = (buildertek__Account_Payable_Item__c)Item;
                     if(Items.buildertek__QBO_ID__c == null){
-                        ItemstoCreate.add(Items);
+                        ItemsWithoutQBId.add(Items);
+                        ItemstoCreateMap.put(Items.Name, Items);
                     }
                 }
             }
@@ -615,10 +619,51 @@ public without sharing class QBIntegrationQueue {
                     // Type casting --> sObject to Payable invoice Lines....
                     buildertek__Account_Payable_Item_Clone__c Items = (buildertek__Account_Payable_Item_Clone__c)Item;
                     if(Items.buildertek__QBO_ID__c == null){
-                            ItemstoCreate.add(Items);
+                        ItemsWithoutQBId.add(Items);
+                        ItemstoCreateMap.put(Items.Name, Items);
                     }
                 }
             }
+
+            String ItemNames = '(';
+                for(sObject Item : ItemsWithoutQBId){
+                    if(Item.get('buildertek__QBO_ID__c') == null){
+                        ItemNames += '\''+Item.get('Name') + '\',';
+                    }
+                }
+            ItemNames += '\'zzz_zzz\')'; 
+            system.debug('ItemNames : ' + ItemNames);
+
+            String ItemQuery = EncodingUtil.urlEncode('select * from Item WHERE name in '+ ItemNames + ' STARTPOSITION 1 MAXRESULTS 1000', 'UTF-8');
+            string GET_Items_JSONBody = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/query?query=' + ItemQuery + '&minorversion='+ QBMetadata.buildertek__minorversion__c;   
+            HttpResponse GET_Items_Response = QBCallOutService.QBAPICallOut_GET(GET_Items_JSONBody, null, false);
+            System.debug('GET_Items_Response.getStatusCode() : ' + GET_Items_Response.getStatusCode());
+            System.debug('GET_Items_Response.getBody() : ' + GET_Items_Response.getBody());
+            list<QBBatchResJSON.Item> queryItemsList = new list<QBBatchResJSON.Item>();
+            if(GET_Items_Response.getStatusCode() == 200){
+                QBBatchResJSON GET_Items_Response_Desr = QBBatchResJSON.parse(GET_Items_Response.getBody());
+                system.debug('GET_Items_Response_Desr : ' + GET_Items_Response_Desr);
+                QBBatchResJSON.QueryResponse queryRes = new QBBatchResJSON.QueryResponse();
+                queryRes = GET_Items_Response_Desr.QueryResponse;
+                system.debug('queryRes : ' + queryRes);
+                if(queryRes.maxResults != null){
+                    queryItemsList = queryRes.Item;
+                    system.debug('Item List Size : ' + queryRes.Item.size());
+                }
+            }
+
+            System.debug('ItemstoCreateMap  : ' + ItemstoCreateMap);
+
+            if(queryItemsList.size() > 0){
+                system.debug('Item List : ' + queryItemsList);
+                for(QBBatchResJSON.Item queryItem : queryItemsList){
+                    System.debug('Item Name Available : ' + queryItem.Name);
+                    if(ItemstoCreateMap.containsKey(queryItem.Name)){
+                        ItemstoCreateMap.remove(queryItem.Name);
+                    }
+                }
+            }
+            System.debug('Items to create  : ' + ItemstoCreateMap);
 
 
                 // If any Line Item Pending to Sync in QB....
@@ -1271,5 +1316,37 @@ public without sharing class QBIntegrationQueue {
         }
         // ..... ....... ........... .......... ............. Update Records Utility Methods - END ...... ........ ......... ......... .............
     
-    
+    public static void QBItems_GET_APTCallout(String recordId){
+        try{
+            String ItemNames = '(';
+            List<buildertek__Purchase_Order_Item__c> ItemList = [SELECT Id, Name , buildertek__QBO_ID__c,buildertek__QBO_SyncToken__c,buildertek__QBO_Name__c, buildertek__Unit_Price__c,buildertek__Total_Price__c,buildertek__Quantity__c FROM buildertek__Purchase_Order_Item__c WHERE buildertek__Purchase_Order__c =: recordId];
+                for(buildertek__Purchase_Order_Item__c Item : ItemList){
+                    if(Item.buildertek__QBO_ID__c == null){
+                        ItemNames += '\''+Item.Name + '\',';
+                    }
+                }
+             ItemNames += '\'zzz_zzz\')'; 
+            buildertek__QuickBooks_Setting__mdt QBMetadata = [SELECT Id, DeveloperName,buildertek__Base_Url__c, buildertek__minorversion__c, MasterLabel, buildertek__Access_Token__c, buildertek__Client_Id__c, buildertek__Client_Secret__c, buildertek__Refresh_Token__c, buildertek__Qb_URL__c, buildertek__Scope__c, buildertek__Company_Id__c FROM buildertek__QuickBooks_Setting__mdt LIMIT 1];
+
+            String ItemQuery = EncodingUtil.urlEncode('select * from Item WHERE name in '+ ItemNames + ' STARTPOSITION 1 MAXRESULTS 1000', 'UTF-8');
+            string GET_Items_JSONBody = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/query?query=' + ItemQuery + '&minorversion='+ QBMetadata.buildertek__minorversion__c;   
+            HttpResponse GET_Items_Response = QBCallOutService.QBAPICallOut_GET(GET_Items_JSONBody, null, false);
+            System.debug('GET_Items_Response.getStatusCode() : ' + GET_Items_Response.getStatusCode());
+            System.debug('GET_Items_Response.getBody() : ' + GET_Items_Response.getBody());
+            if(GET_Items_Response.getStatusCode() == 200){
+                QBBatchResJSON GET_Items_Response_Desr = QBBatchResJSON.parse(GET_Items_Response.getBody());
+                system.debug('GET_Items_Response_Desr : ' + GET_Items_Response_Desr);
+                QBBatchResJSON.QueryResponse queryRes = new QBBatchResJSON.QueryResponse();
+                queryRes = GET_Items_Response_Desr.QueryResponse;
+                system.debug('queryRes : ' + queryRes);
+                if(queryRes.maxResults != null){
+                    system.debug('Item List : ' + queryRes.Item);
+                    system.debug('Item List Size : ' + queryRes.Item.size());
+                }
+            }
+        }
+        catch(Exception e){
+            System.debug('Error in UpdateRecord_OnError : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+        }
+    }
 }
