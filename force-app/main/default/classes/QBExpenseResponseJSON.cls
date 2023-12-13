@@ -60,4 +60,7 @@ public with sharing class QBExpenseResponseJSON {
 		public String BillableStatus;
 		public AccountRef AccountRef;
 	}
+    public static QBExpenseResponseJSON parse(String json) {
+		return (QBExpenseResponseJSON) System.JSON.deserialize(json, QBExpenseResponseJSON.class);
+	}
 }

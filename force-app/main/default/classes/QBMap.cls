@@ -308,11 +308,11 @@ public without sharing class QBMap {
             for(sObject Item : sObjectItemList){
                 // Type conversation from sObject to Generic Object....
                 // Store Field Data Into Respective Map....
-            if(SyncObjName == 'buildertek__Purchase_Order__c'){
-                    buildertek__Purchase_Order_Item__c record = (buildertek__Purchase_Order_Item__c)Item;
-                    NameMap.put(record.Id, record.Name);
-                    UnitPriceMap.put(record.Id, record.buildertek__Unit_Price__c);
-                    QuantityMap.put(record.Id, record.buildertek__Quantity__c);
+                if(SyncObjName == 'buildertek__Purchase_Order__c'){
+                        buildertek__Purchase_Order_Item__c record = (buildertek__Purchase_Order_Item__c)Item;
+                        NameMap.put(record.Id, record.Name);
+                        UnitPriceMap.put(record.Id, record.buildertek__Unit_Price__c);
+                        QuantityMap.put(record.Id, record.buildertek__Quantity__c);
                 }
                 else if(SyncObjName == 'buildertek__Account_Payable__c'){
                         buildertek__Account_Payable_Item__c record = (buildertek__Account_Payable_Item__c)Item;
@@ -326,6 +326,12 @@ public without sharing class QBMap {
                         UnitPriceMap.put(record.Id, record.buildertek__Unit_Price__c);
                         QuantityMap.put(record.Id, record.buildertek__Quantity__c);
                 }
+                else if(SyncObjName == 'buildertek__Expense__c'){
+                    buildertek__Expense_Line__c record = (buildertek__Expense_Line__c)Item;
+                    NameMap.put(record.Id, record.Name);
+                    UnitPriceMap.put(record.Id, record.buildertek__Price__c);
+                    QuantityMap.put(record.Id, record.buildertek__Quantity__c);
+            }
             }
             
             // Creating a Batch
@@ -420,8 +426,8 @@ public without sharing class QBMap {
                 
                 QBBillReqJSON.ItemBasedExpenseLineDetail POLD = new QBBillReqJSON.ItemBasedExpenseLineDetail();
                 POLD.ItemRef = new QBBillReqJSON.ItemRef();
-                POLD.Qty = Integer.valueOf(qbQuantity);
-                POLD.UnitPrice = Integer.valueOf(qbUnitPrice);
+                POLD.Qty = Double.valueOf(qbQuantity);
+                POLD.UnitPrice = Double.valueOf(qbUnitPrice);
                 
                 QBBillReqJSON.ItemRef ItemRef = new QBBillReqJSON.ItemRef();
                 ItemRef.name = qbName;
@@ -488,8 +494,8 @@ public without sharing class QBMap {
                 
                 QBPOJSON.ItemBasedExpenseLineDetail POLD = new QBPOJSON.ItemBasedExpenseLineDetail();
                 POLD.ItemRef = new QBPOJSON.ItemRef();
-                POLD.Qty = Integer.valueOf(qbQuantity);
-                POLD.UnitPrice = Integer.valueOf(qbUnitPrice);
+                POLD.Qty = Double.valueOf(qbQuantity);
+                POLD.UnitPrice = Double.valueOf(qbUnitPrice);
                 
                 QBPOJSON.ItemRef ItemRef = new QBPOJSON.ItemRef();
                 ItemRef.name = qbName;
@@ -509,6 +515,81 @@ public without sharing class QBMap {
             return JSON.serialize(purchaseorder, True).replace('"Long_x":', '"Long":');
         } catch (Exception e) {
             System.debug('exception in mappurchaseorderData :: ' + e.getMessage());
+            return null;
+        }
+    }
+
+    public static String mapExpenseDataBatch(buildertek__Expense__c expense, String VendorQBId, Map<Id, List<String>> lineIdsMap) {
+        try {
+            System.debug('karan test---> '+expense);
+            System.debug('karan test1---> '+lineIdsMap);
+            String QBOID = null;
+            String QBSyncToken = null;
+            String paymenttype = null;
+
+            QBOID = expense.buildertek__QB_Id__c;
+            QBSyncToken = expense.buildertek__QBO_SyncToken__c;
+            paymenttype = expense.buildertek__Payment_Method__c;
+
+            QBExpenseJSON QbExpense = new QBExpenseJSON();
+            if(QBOID != null && QBOID != ''){
+                QbExpense.Id = QBOID;
+                QbExpense.sparse = true;
+                QbExpense.SyncToken = QBSyncToken;
+            }
+            QbExpense.PaymentType = paymenttype;
+
+            QBExpenseJSON.AccountRef vendor = new QBExpenseJSON.AccountRef();
+            vendor.value = VendorQBId;
+            QbExpense.AccountRef = vendor;
+
+            // QBExpenseJSON.SalesTermRef term = new QBExpenseJSON.SalesTermRef();
+            // term.value = TermQBId;
+            // QbExpense.SalesTermRef = term;
+            
+            QbExpense.Line = new list<QBExpenseJSON.Line>();
+            Integer lineNumber = 1;
+            for(String LineId : lineIdsMap.keySet()){
+                List<String> qbIdAndNameList = lineIdsMap.get(lineId);
+                String qbId = '';
+                String qbName = '';
+                String qbTotal = '';
+                String qbQuantity = '';
+                String qbUnitPrice = '';
+                
+                if (qbIdAndNameList != null) {
+                    qbId = qbIdAndNameList[0]; // Retrieve QuickBooks ID
+                    qbName = qbIdAndNameList[1]; // Retrieve QuickBooks Name
+                    qbTotal = qbIdAndNameList[2]; // Retrive Item Total Value(SubTotal)
+                    qbQuantity = qbIdAndNameList[3]; // Retrive Item Quantity
+                    qbUnitPrice = qbIdAndNameList[4]; // Retrive Unite Prices
+                }
+                
+                QBExpenseJSON.Line Linee = new QBExpenseJSON.Line();
+                Linee.DetailType = 'AccountBasedExpenseLineDetail';
+                Linee.Amount = Double.valueOf(qbTotal);
+                Linee.Id = qbId;
+                // Linee.ItemBasedExpenseLineDetail = new QBPOJSON.ItemBasedExpenseLineDetail();
+                
+                // QBExpenseJSON.AccountBasedExpenseLineDetail POLD = new QBExpenseJSON.AccountBasedExpenseLineDetail();
+                // POLD.ItemRef = new QBExpenseJSON.ItemRef();
+                // POLD.Qty = Integer.valueOf(qbQuantity);
+                // POLD.UnitPrice = Integer.valueOf(qbUnitPrice);
+                
+                // QBExpenseJSON.ItemRef ItemRef = new QBExpenseJSON.ItemRef();
+                // ItemRef.name = qbName;
+                // ItemRef.value = qbId; // Retrieve the line ID from the map
+                
+                // POLD.ItemRef = ItemRef;
+                // Linee.ItemBasedExpenseLineDetail = POLD;
+                QbExpense.Line.add(Linee);
+                
+                lineNumber++;
+            }
+    
+            return JSON.serialize(QbExpense);
+        } catch (Exception e) {
+            System.debug('Exception in mapQBBillData :: '  + e.getMessage());
             return null;
         }
     }
