@@ -162,7 +162,7 @@ public without sharing class QBMap {
                 QBInvoiceJSON.line Linee = new QBInvoiceJSON.line();
                 Linee.DetailType = 'SalesItemLineDetail';
                 Linee.Amount = Double.valueOf(qbTotal);
-                Linee.Id = qbId;
+                Linee.Id = string.ValueOf(lineNumber);
                 Linee.LineNum =lineNumber;
                 Linee.SalesItemLineDetail = new QBInvoiceJSON.SalesItemLineDetail();
                 
@@ -421,7 +421,7 @@ public without sharing class QBMap {
                 QBBillReqJSON.Line Linee = new QBBillReqJSON.Line();
                 Linee.DetailType = 'ItemBasedExpenseLineDetail';
                 Linee.Amount = Double.valueOf(qbTotal);
-                Linee.Id = qbId;
+                Linee.Id = string.ValueOf(lineNumber);
                 // Linee.ItemBasedExpenseLineDetail = new QBPOJSON.ItemBasedExpenseLineDetail();
                 
                 QBBillReqJSON.ItemBasedExpenseLineDetail POLD = new QBBillReqJSON.ItemBasedExpenseLineDetail();
@@ -488,7 +488,7 @@ public without sharing class QBMap {
                 QBPOJSON.line Linee = new QBPOJSON.line();
                 Linee.DetailType = 'ItemBasedExpenseLineDetail';
                 Linee.Amount = Double.valueOf(qbTotal);
-                Linee.Id = qbId;
+                Linee.Id = string.ValueOf(lineNumber);
                 // Linee.LineNum =lineNumber;
                 Linee.ItemBasedExpenseLineDetail = new QBPOJSON.ItemBasedExpenseLineDetail();
                 
@@ -519,17 +519,20 @@ public without sharing class QBMap {
         }
     }
 
-    public static String mapExpenseDataBatch(buildertek__Expense__c expense, String VendorQBId, Map<Id, List<String>> lineIdsMap) {
+    public static String mapExpenseDataBatch(buildertek__Expense__c expense, String VendorQBId, Map<Id, List<String>> lineIdsMap, String taxCodeId, String TermQBId) {
         try {
             System.debug('karan test---> '+expense);
             System.debug('karan test1---> '+lineIdsMap);
+            System.debug('VendorQBId---> '+VendorQBId);
+            System.debug('taxCodeId---> '+taxCodeId);
+            System.debug('TermQBId---> '+TermQBId);
             String QBOID = null;
             String QBSyncToken = null;
             String paymenttype = null;
 
             QBOID = expense.buildertek__QB_Id__c;
             QBSyncToken = expense.buildertek__QBO_SyncToken__c;
-            paymenttype = expense.buildertek__Payment_Method__c;
+            paymenttype = 'CreditCard';
 
             QBExpenseJSON QbExpense = new QBExpenseJSON();
             if(QBOID != null && QBOID != ''){
@@ -539,9 +542,9 @@ public without sharing class QBMap {
             }
             QbExpense.PaymentType = paymenttype;
 
-            QBExpenseJSON.AccountRef vendor = new QBExpenseJSON.AccountRef();
-            vendor.value = VendorQBId;
-            QbExpense.AccountRef = vendor;
+            // QBExpenseJSON.AccountRef vendor = new QBExpenseJSON.AccountRef();
+            // vendor.value = VendorQBId;
+            // QbExpense.AccountRef = vendor;
 
             // QBExpenseJSON.SalesTermRef term = new QBExpenseJSON.SalesTermRef();
             // term.value = TermQBId;
@@ -568,20 +571,20 @@ public without sharing class QBMap {
                 QBExpenseJSON.Line Linee = new QBExpenseJSON.Line();
                 Linee.DetailType = 'AccountBasedExpenseLineDetail';
                 Linee.Amount = Double.valueOf(qbTotal);
-                Linee.Id = qbId;
-                // Linee.ItemBasedExpenseLineDetail = new QBPOJSON.ItemBasedExpenseLineDetail();
+                Linee.Id = string.ValueOf(lineNumber);
+                Linee.AccountBasedExpenseLineDetail = new QBExpenseJSON.AccountBasedExpenseLineDetail();
                 
-                // QBExpenseJSON.AccountBasedExpenseLineDetail POLD = new QBExpenseJSON.AccountBasedExpenseLineDetail();
-                // POLD.ItemRef = new QBExpenseJSON.ItemRef();
+                QBExpenseJSON.AccountBasedExpenseLineDetail POLD = new QBExpenseJSON.AccountBasedExpenseLineDetail();
+                POLD.AccountRef = new QBExpenseJSON.AccountRef();
                 // POLD.Qty = Integer.valueOf(qbQuantity);
                 // POLD.UnitPrice = Integer.valueOf(qbUnitPrice);
                 
-                // QBExpenseJSON.ItemRef ItemRef = new QBExpenseJSON.ItemRef();
-                // ItemRef.name = qbName;
-                // ItemRef.value = qbId; // Retrieve the line ID from the map
+                QBExpenseJSON.AccountRef ItemRef = new QBExpenseJSON.AccountRef();
+                ItemRef.name = 'Visa';
+                ItemRef.value = '42'; // Retrieve the line ID from the map
                 
-                // POLD.ItemRef = ItemRef;
-                // Linee.ItemBasedExpenseLineDetail = POLD;
+                // POLD.AccountRef = ItemRef;
+                Linee.AccountBasedExpenseLineDetail = POLD;
                 QbExpense.Line.add(Linee);
                 
                 lineNumber++;
@@ -590,6 +593,46 @@ public without sharing class QBMap {
             return JSON.serialize(QbExpense);
         } catch (Exception e) {
             System.debug('Exception in mapQBBillData :: '  + e.getMessage());
+            return null;
+        }
+    }
+
+    public static String MapExpenseToBatch(List<buildertek__Expense_Line__c> SILine) {
+        try {
+            System.debug('\n in createProducts \n');
+            QBBatchReqJSON BatchItemRequest = new QBBatchReqJSON();
+            
+            for (buildertek__Expense_Line__c item : SILine) {
+                String lineId = item.Id;
+                Boolean taxable = true;
+                DateTime yourDate = Datetime.now();
+                Date invStartDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
+                System.debug('item.buildertek__Price__c >> ' + item.buildertek__Price__c);
+                Decimal UnitePrice = item.buildertek__Price__c != null ? item.buildertek__Price__c : 0;
+                BatchItemRequest.addBatchItem(
+                    String.valueOf(item.Id),
+                    true, // Set TrackQtyOnHand as needed
+                    item.Name,
+                    item.buildertek__Quantity__c,
+                    UnitePrice,
+                    // item.buildertek__Total__c,
+                    'Sales of Product Income',
+                    '79', // Assuming a fixed value for income account value
+                    invStartDate,
+                    'Inventory',
+                    taxable,
+                    'Test acc',
+                    '100',
+                    'Cost of Goods Sold',
+                    '80'
+                );
+            }
+            
+            // Now perform the API callout using QBBatchReqJSON class
+            // createInvoiceLines(BatchItemRequest);
+            return JSON.serialize(BatchItemRequest);
+        } catch (Exception e) {
+            System.debug('Exception in createProduct :: '  + e.getMessage());
             return null;
         }
     }

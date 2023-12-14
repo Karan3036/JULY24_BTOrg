@@ -133,7 +133,7 @@ public without sharing class QBIntegrationQueue {
     public static void sync_Expense_in_QB(buildertek__Expense__c expense, String VendorQBId,Map<Id, List<String>> lineIdsMap, buildertek__QuickBooks_Setting__mdt QBMetadata, Boolean Get_Access_Token, String SyncObjName){
         try {
             String Expense_EndPoint = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/purchase?minorversion=' + QBMetadata.buildertek__minorversion__c;
-            String Expense_RequestBody = QBMap.mapExpenseDataBatch(expense, VendorQBId, lineIdsMap);
+            String Expense_RequestBody = null;
             System.debug('Expense_RequestBody >> ' + Expense_RequestBody);
             HttpResponse Expense_Response = QBCallOutService.QBAPICallOut(Expense_EndPoint , Expense_RequestBody, Get_Access_Token);
             
@@ -211,6 +211,7 @@ public without sharing class QBIntegrationQueue {
 
             List<sObject> ItemsWithoutQBId = new List<sObject>();
             Map<String ,sObject> ItemToSyncMap = new Map<String ,sObject>();
+            List<sObject> ItemToSync = new List<sObject>();
             List<sObject> ItemList = new List<sObject>();
             
             // Sync Purchase Order Lines
@@ -221,6 +222,7 @@ public without sharing class QBIntegrationQueue {
                     buildertek__Purchase_Order_Item__c Items = (buildertek__Purchase_Order_Item__c)Item;
                     if(Items.buildertek__QB_Id__c == null){
                         ItemToSyncMap.put(Items.Name, Items);
+                        ItemToSync.add(Items);
                     }
                 }
             }
@@ -232,6 +234,7 @@ public without sharing class QBIntegrationQueue {
                     buildertek__Account_Payable_Item__c Items = (buildertek__Account_Payable_Item__c)Item;
                     if(Items.buildertek__QB_Id__c == null){
                         ItemToSyncMap.put(Items.Name, Items);
+                        ItemToSync.add(Items);
                     }
                 }
             }
@@ -243,6 +246,7 @@ public without sharing class QBIntegrationQueue {
                     buildertek__Account_Payable_Item_Clone__c Items = (buildertek__Account_Payable_Item_Clone__c)Item;
                     if(Items.buildertek__QB_Id__c == null){
                         ItemToSyncMap.put(Items.Name, Items);
+                        ItemToSync.add(Items);
                     }
                 }
             }
@@ -254,12 +258,14 @@ public without sharing class QBIntegrationQueue {
                     buildertek__Expense_Line__c Items = (buildertek__Expense_Line__c)Item;
                     if(Items.buildertek__QB_Id__c == null){
                         ItemToSyncMap.put(Items.Name, Items);
+                        ItemToSync.add(Items);
                     }
                 }
             }
             list<sObject> ItemsNotHaveQBId = ItemToSyncMap.values(); // List of SF Line Without QB Id.....
 
             List<sObject> ItemstoCreate = new List<sObject>();  // List of SF Lines Without QB Id And Without Dupliacte Name (So These Are need to Create In QB)....
+            map<String, sObject> ItemstoCreate_Map = new map<String, sObject>();
             Map<String, QBBatchResJSON.Item> QBItemsToAssign_Map = new Map<String, QBBatchResJSON.Item>(); // Map Of QB Dupliate Item Name and Duplicate Item QB Object...
             
 
@@ -297,31 +303,55 @@ public without sharing class QBIntegrationQueue {
                         system.debug('Item List Size : ' + queryRes.Item.size());
                     }
                 }
+                // -------- 
+                map<String, QBBatchResJSON.Item> queryItems_Map = new map<String, QBBatchResJSON.Item>();   // For Furter Query and Filteration
 
-                System.debug('Items With Duplicate Name : ' + ItemToSyncMap.keySet());
-    
                 // IF SF Lines Are Not Synced With QB But Item With Duplicate Name Already Availabel In QB.... Then Use QB ID of That QB Items for SF Lines
                 if(queryItemsList.size() > 0){
-                    system.debug('Item List : ' + queryItemsList);
+                    system.debug('Quplicate Name Items In QB' + queryItemsList);
+
                     for(QBBatchResJSON.Item queryItem : queryItemsList){
-                        if(ItemToSyncMap.containsKey(queryItem.Name)){
-                            // If Duplicate Name Item Found... then USE QB Id insted of Create New QB Item...
-                            QBItemsToAssign_Map.put(queryItem.Name, queryItem);
-                        }
-                        else{
-                            // if Duplicate Name Not Found... Create New QB Item....
-                            ItemstoCreate.add(ItemToSyncMap.get(queryItem.Name));
-                        }
+                        queryItems_Map.put(queryItem.Name, queryItem);
                     }
 
-                    System.debug('No of Items to create  : ' + ItemstoCreate);
-                    System.debug('QBItemsToAssign_Map : ' + QBItemsToAssign_Map.keySet());
+                    // Filter Duplicate Name SF Items And SF Items To Create IN QB...
+                    for(sObject item : ItemToSync){
+
+                        String ItemName = string.valueOf(item.get('Name'));
+                        String DupliacteItemName = queryItems_Map.get(ItemName).Name;
+
+                        // if( ItemName == DupliacteItemName){
+                        //     QBItemsToAssign_Map.put(item.Id, queryItems_Map.get(ItemName));
+                        // }
+                        // else{
+                        //     ItemstoCreate.add(item);
+                        // }
+
+                        if(ItemName != DupliacteItemName){
+                            ItemstoCreate_Map.put(ItemName, item);
+                        }
+                    }
                 }
                 else{
                     // If None of the Line have Duplicate Name In QB....
                     System.debug('.... None of the Line have Duplicate Name In QB .....');
-                    ItemstoCreate = ItemsNotHaveQBId;
+                    ItemstoCreate = ItemToSync;
+                    for(sObject item : ItemToSync){
+                        String ItemName = string.valueOf(item.get('Name'));
+                        ItemstoCreate_Map.put(ItemName, item);
+                    }
                 }
+
+                for(sObject item : ItemToSync){
+                    String ItemName = string.valueOf(item.get('Name'));
+                    Id CreteItemId = ItemstoCreate_Map.get(ItemName).Id;
+                    if(item.Id != CreteItemId){
+                        QBItemsToAssign_Map.put(item.Id, queryItems_Map.get(ItemName));
+                    }
+                }
+                System.debug('No of Items to create  : ' + ItemstoCreate.size());
+                System.debug('no of QBItemsToAssign_Map : ' + QBItemsToAssign_Map.keySet().size());
+
                 // When SF Line Does Not Have QB In and Also Item With Duplicate Name Not Found In QB....
                 if(ItemstoCreate.size() > 0){
                 Integer totalItems = ItemstoCreate.size();
@@ -357,7 +387,7 @@ public without sharing class QBIntegrationQueue {
                                     buildertek__Purchase_Order_Item__c Items = (buildertek__Purchase_Order_Item__c)Item;
 
                                     // Assign QB Id to Dupliacte Name Lines...
-                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(String.valueOf(Items.get('Name')));
+                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
                                     if(QBDuplicateNameItem != null){
                                         Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
                                         Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
@@ -375,7 +405,7 @@ public without sharing class QBIntegrationQueue {
                                     buildertek__Account_Payable_Item__c Items = (buildertek__Account_Payable_Item__c)Item;
 
                                     // Assign QB Id to Dupliacte Name Lines...
-                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(String.valueOf(Items.get('Name')));
+                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
                                     if(QBDuplicateNameItem != null){
                                         Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
                                         Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
@@ -392,7 +422,7 @@ public without sharing class QBIntegrationQueue {
                                     buildertek__Account_Payable_Item_Clone__c Items = (buildertek__Account_Payable_Item_Clone__c)Item;
 
                                     // Assign QB Id to Dupliacte Name Lines...
-                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(String.valueOf(Items.get('Name')));
+                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
                                     if(QBDuplicateNameItem != null){
                                         Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
                                         Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
@@ -409,7 +439,7 @@ public without sharing class QBIntegrationQueue {
                                     buildertek__Expense_Line__c Items = (buildertek__Expense_Line__c)Item;
 
                                     // Assign QB Id to Dupliacte Name Lines...
-                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(String.valueOf(Items.get('Name')));
+                                    QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
                                     if(QBDuplicateNameItem != null){
                                         Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
                                         Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
@@ -485,7 +515,7 @@ public without sharing class QBIntegrationQueue {
                             buildertek__Purchase_Order_Item__c Items = (buildertek__Purchase_Order_Item__c)Item;
 
                             // Assign QB Id to Dupliacte Name Lines...
-                            QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(String.valueOf(Items.get('Name')));
+                            QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
                             if(QBDuplicateNameItem != null){
                                 Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
                                 Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
@@ -503,7 +533,7 @@ public without sharing class QBIntegrationQueue {
                             buildertek__Account_Payable_Item__c Items = (buildertek__Account_Payable_Item__c)Item;
 
                             // Assign QB Id to Dupliacte Name Lines...
-                            QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(String.valueOf(Items.get('Name')));
+                            QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
                             if(QBDuplicateNameItem != null){
                                 Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
                                 Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
@@ -520,7 +550,7 @@ public without sharing class QBIntegrationQueue {
                             buildertek__Account_Payable_Item_Clone__c Items = (buildertek__Account_Payable_Item_Clone__c)Item;
 
                             // Assign QB Id to Dupliacte Name Lines...
-                            QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(String.valueOf(Items.get('Name')));
+                            QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
                             if(QBDuplicateNameItem != null){
                                 Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
                                 Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
@@ -1090,28 +1120,8 @@ public without sharing class QBIntegrationQueue {
     @AuraEnabled
     public static string sync_Expense_in_QB_AuraCallout(String recordId, String SyncObjName){
         try {
-            buildertek__Expense__c expense = [SELECT Id, Name, buildertek__Vendor__c,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__Project__r.buildertek__Customer__c,buildertek__Total_Expense__c,buildertek__Tax_Rate__c FROM buildertek__Expense__c WHERE Id =: recordId LIMIT 1];
-
-            Account acc = null;
-            if(expense.buildertek__Vendor__c != null){
-                acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__QB_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: expense.buildertek__Vendor__c limit 1];
-            }
-
-            List<buildertek__Expense_Line__c> expenseLines = [SELECT Id, Name, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: recordId];
-
-            if(expenseLines.size() == 0){
-                return 'no_expenselines';
-            }
-            else if(acc == null){
-                return 'no_vendor_account';
-            }
-            else if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Type__c == 'Customer'){
-                return 'account_sync_as_customer';
-            }
-            else{
-                qb_Expense_Flow_Callout(recordId, SyncObjName);
-                return 'success';
-            }
+            String intgra = QBIntegrationQueue_SIFlow.create_Expense_in_QB_AuraCallout(recordId, SyncObjName);
+            return intgra;
         } catch (Exception e) {
             System.debug('Error in sync_Vendor_In_QB_AuraCallout : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
             return null;
