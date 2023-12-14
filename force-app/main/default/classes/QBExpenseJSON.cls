@@ -12,6 +12,7 @@ public with sharing class QBExpenseJSON {
     public String domain;
     public MetaData MetaData;
     public String SyncToken;
+	public EntityRef EntityRef;
 	public class value{
 		public String Value;
 		public String Name;
@@ -34,6 +35,7 @@ public with sharing class QBExpenseJSON {
 		public String DetailType;
 		public ProjectRef ProjectRef;
 		public AccountBasedExpenseLineDetail AccountBasedExpenseLineDetail;
+		public ItemBasedExpenseLineDetail ItemBasedExpenseLineDetail;
 		public String Id;
 	}
 	public class any_y{
@@ -55,5 +57,21 @@ public with sharing class QBExpenseJSON {
 		public TaxCodeRef TaxCodeRef;
 		public String BillableStatus;
 		public AccountRef AccountRef;
+	}
+	public class EntityRef{
+		public String type;
+		public String name;
+		public String value;
+	}
+	public class ItemBasedExpenseLineDetail{
+		public ItemRef ItemRef;
+		public String BillableStatus;
+		public Double UnitPrice;
+		public TaxCodeRef TaxCodeRef;
+		public Double Qty;
+	}
+	public class ItemRef{
+		public String value;
+		public String name;
 	}
 }
