@@ -523,7 +523,7 @@ public without sharing class QBMap {
         }
     }
 
-    public static String mapExpenseDataBatch(buildertek__Expense__c expense, String VendorQBId, Map<Id, List<String>> lineIdsMap) {
+    public static String mapExpenseDataBatch(buildertek__Expense__c expense, String VendorQBId, Map<Id, List<String>> lineIdsMap, String PayMethodId) {
         try {
             System.debug('karan test---> ' + expense);
             System.debug('karan test1---> ' + lineIdsMap);
@@ -556,6 +556,10 @@ public without sharing class QBMap {
             Vendorinfo.value = VendorQBId;
             Vendorinfo.type = vendortype;
             QbExpense.EntityRef = Vendorinfo;
+
+            QBExpenseJSON.PaymentMethodRef paymethod = new QBExpenseJSON.PaymentMethodRef();
+            paymethod.value = PayMethodId;
+            QbExpense.PaymentMethodRef = paymethod;
     
             // QbExpense.CustomField = new List<String>{'CustomField1', 'CustomField2'};
     
@@ -659,5 +663,14 @@ public without sharing class QBMap {
             System.debug('Exception in createProduct :: '  + e.getMessage());
             return null;
         }
+    }
+
+    public static String mapPMData(String pmname){
+
+        QBPMCreateJSON paymentMethod = new QBPMCreateJSON();
+        paymentMethod.Name = pmname;
+        paymentMethod.Active = true;
+
+        return JSON.serialize(paymentMethod);
     }
 }

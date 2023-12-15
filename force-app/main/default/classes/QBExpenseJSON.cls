@@ -13,6 +13,7 @@ public with sharing class QBExpenseJSON {
     public MetaData MetaData;
     public String SyncToken;
 	public EntityRef EntityRef;
+	public PaymentMethodRef PaymentMethodRef;
 	public class value{
 		public String Value;
 		public String Name;
@@ -73,5 +74,8 @@ public with sharing class QBExpenseJSON {
 	public class ItemRef{
 		public String value;
 		public String name;
+	}
+	public class PaymentMethodRef{
+		public String value;
 	}
 }

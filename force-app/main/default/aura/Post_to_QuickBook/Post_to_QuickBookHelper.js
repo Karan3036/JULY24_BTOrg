@@ -361,6 +361,13 @@
     		            "message": 'Vendor Account Already Sync as Customer in Quickbooks.',
     		        });  
                 }
+                else if(result == 'payment_method_null'){
+                    component.find('notifLib').showNotice({
+    		            "variant": "error",
+    		            "header": "Error",
+    		            "message": 'Payment Method should not be empty.',
+    		        });  
+                }
                 else{
                     component.find('notifLib').showNotice({
     		            "variant": "error",

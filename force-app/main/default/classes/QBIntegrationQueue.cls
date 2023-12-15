@@ -142,10 +142,10 @@ public without sharing class QBIntegrationQueue {
         }
     }
 
-    public static void sync_expense_in_QB(buildertek__Expense__c expense, String CustomerQBId,Map<Id, List<String>> lineIdsMap, buildertek__QuickBooks_Setting__mdt QBMetadata, Boolean Get_Access_Token, String SyncObjName){
+    public static void sync_expense_in_QB(buildertek__Expense__c expense, String CustomerQBId,Map<Id, List<String>> lineIdsMap, buildertek__QuickBooks_Setting__mdt QBMetadata, Boolean Get_Access_Token, String PayMethodId, String SyncObjName){
         try {
             String Expense_EndPoint = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/purchase?minorversion=' + QBMetadata.buildertek__minorversion__c;
-            String Expense_RequestBody = QBMap.mapExpenseDataBatch(expense, CustomerQBId, lineIdsMap);
+            String Expense_RequestBody = QBMap.mapExpenseDataBatch(expense, CustomerQBId, lineIdsMap, PayMethodId);
             System.debug('Expense_RequestBody >> ' + Expense_RequestBody);
             HttpResponse Expense_Response = QBCallOutService.QBAPICallOut(Expense_EndPoint , Expense_RequestBody, Get_Access_Token);
             
@@ -162,7 +162,7 @@ public without sharing class QBIntegrationQueue {
                 // if(receiptID != null){
                 //     sync_Payment_In_QB(InvoiceQBId, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, SyncObjName);
                 // }
-                UpdateExpense(expense.Id, InvoiceQBId, QBMetadata, QBInvSyncTocken);
+                UpdateExpense(expense.Id, InvoiceQBId, QBMetadata, QBInvSyncTocken, PayMethodId);
             }
             else{
                 QBException.QB_response( Expense_Response.getStatusCode(),  Expense_Response.getBody(), 'QBIntegrationQueue', 'sync_invoice_in_QB');
@@ -530,7 +530,8 @@ public without sharing class QBIntegrationQueue {
                                 }
                                 else if(SyncObjName == 'buildertek__Expense__c'){
                                     buildertek__Expense__c expense = (buildertek__Expense__c)SObejctRecord;
-                                    sync_expense_in_QB(expense, VendorQBId, lineIdsMap, QBMetadata,Get_Access_Token, SyncObjName);
+                                    // sync_expense_in_QB(expense, VendorQBId, lineIdsMap, QBMetadata,Get_Access_Token, SyncObjName);
+                                    sync_PaymentMethod_in_QB(expense, VendorQBId, lineIdsMap, QBMetadata, Get_Access_Token, SyncObjName);
                                     UpdateExpenseline(ItemList, lineIdsMap);
                                 }
                             }
@@ -645,7 +646,8 @@ public without sharing class QBIntegrationQueue {
                         }
                         else if(SyncObjName == 'buildertek__Expense__c'){
                             buildertek__Expense__c expense = (buildertek__Expense__c)SObejctRecord;
-                            sync_expense_in_QB(expense, VendorQBId, lineIdsMap, QBMetadata,Get_Access_Token, SyncObjName);
+                            // sync_expense_in_QB(expense, VendorQBId, lineIdsMap, QBMetadata,Get_Access_Token, SyncObjName);
+                            sync_PaymentMethod_in_QB(expense, VendorQBId, lineIdsMap, QBMetadata, Get_Access_Token, SyncObjName);
                             UpdateExpenseline(ItemList, lineIdsMap);
                         }
                     }
@@ -721,7 +723,8 @@ public without sharing class QBIntegrationQueue {
                 }
                 else if(SyncObjName == 'buildertek__Expense__c'){
                     buildertek__Expense__c expense = (buildertek__Expense__c)SObejctRecord;
-                    sync_expense_in_QB(expense, VendorQBId, lineIdsMap1, QBMetadata, Get_Access_Token, SyncObjName);
+                    // sync_expense_in_QB(expense, VendorQBId, lineIdsMap1, QBMetadata, Get_Access_Token, SyncObjName);
+                    sync_PaymentMethod_in_QB(expense, VendorQBId, lineIdsMap1, QBMetadata, Get_Access_Token, SyncObjName);
                 }
             }
             
@@ -1045,6 +1048,9 @@ public without sharing class QBIntegrationQueue {
             else if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Type__c == 'Customer'){
                 return 'account_sync_as_customer';
             }
+            else if(expense.buildertek__Payment_Method__c == null){
+                return 'payment_method_null';
+            }
             else{
                 qb_Expense_Flow_Callout(recordId, SyncObjName);
                 return 'success';
@@ -1208,17 +1214,14 @@ public without sharing class QBIntegrationQueue {
             }
         }
     
-        public static void UpdateExpense(String invoice_Id, String QB_invoice_Id, buildertek__QuickBooks_Setting__mdt  QBMetadata, String QBInvSyncTocken){
+        public static void UpdateExpense(String invoice_Id, String QB_invoice_Id, buildertek__QuickBooks_Setting__mdt  QBMetadata, String QBInvSyncTocken, String PaymentMethodId){
             try {
                 system.debug('sales Invoice going to Update');
                 String qbInvoiceURL = QBMetadata.buildertek__Qb_URL__c + 'expense?txnId=' + QB_invoice_Id;
-                buildertek__Expense__c Invoice = [SELECT Id, Name, buildertek__Payment_Method__c, buildertek__Vendor__c,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__Project__r.buildertek__Customer__c,buildertek__Total_Expense__c,buildertek__Tax_Rate__c FROM buildertek__Expense__c WHERE ID =:invoice_Id LIMIT 1];
+                buildertek__Expense__c Invoice = [SELECT Id, Name, buildertek__Vendor__c,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__Project__r.buildertek__Customer__c,buildertek__Total_Expense__c,buildertek__Tax_Rate__c FROM buildertek__Expense__c WHERE ID =:invoice_Id LIMIT 1];
                 Invoice.buildertek__QB_Id__c = QB_invoice_Id;
-                // Invoice.buildertek__QB_Payment_Method_Id__c = taxCodeId;
-                // Invoice.buildertek__QBO_Tax_Rate__c = taxRateValue;
                 Invoice.buildertek__QB_Record_URL__c = qbInvoiceURL;
-                // Invoice.buildertek__QBO_Term_Id__c = TermQBId;
-                // Invoice.buildertek__QB_Invoice_Number__c = QbInvNumber;
+                Invoice.buildertek__QB_Payment_Method_Id__c = PaymentMethodId;
                 Invoice.buildertek__QBO_SyncToken__c = QBInvSyncTocken;
                 Invoice.buildertek__QB_Integration_Response_Message__c = 'Integrated Successfully';
     
@@ -1227,6 +1230,73 @@ public without sharing class QBIntegrationQueue {
                 System.debug('Error in UpdateSalesInvoice : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
             }
         }
+
+        public static void sync_PaymentMethod_in_QB(buildertek__Expense__c expense, String CustomerQBId, Map<Id, List<String>> lineIdsMap, buildertek__QuickBooks_Setting__mdt QBMetadata, Boolean Get_Access_Token, String SyncObjName){
+        try {
+            String paymentmethodId;
+            String paymentmethodName;
+            paymentmethodName = string.valueOf(expense.buildertek__Payment_Method__c);
+             System.debug('paymentmethodName------>' + paymentmethodName);
+            String encodedQueryParam = EncodingUtil.urlEncode('Select * From PaymentMethod Where Name = \''+paymentmethodName + '\'', 'UTF-8');
+
+            String EndPoint_for_get_TaxRate_fromQB = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/query?query=' + encodedQueryParam + '&minorversion='+ QBMetadata.buildertek__minorversion__c; 
+
+            HttpResponse get_PMId_from_QB_ResponseBody = QBCallOutService.QBAPICallOut_GET(EndPoint_for_get_TaxRate_fromQB, null,false);
+                if(get_PMId_from_QB_ResponseBody.getStatusCode() == 200){
+                    System.debug('get_PMId_from_QB_ResponseBody.getBody() :: ' + get_PMId_from_QB_ResponseBody.getBody());
+
+                    QBPMQueryJSON get_PaymentMethod_from_QB_ResponseBody_Deser = QBPMQueryJSON.parse(get_PMId_from_QB_ResponseBody.getBody());
+                    System.debug('get_PaymentMethod_from_QB_ResponseBody_Deser.QueryResponse >> ' + get_PaymentMethod_from_QB_ResponseBody_Deser.QueryResponse);
+                    // Accessing Id and RateValue directly from the TaxRate instanceß
+                    if(get_PaymentMethod_from_QB_ResponseBody_Deser.QueryResponse.PaymentMethod != null){
+                        QBPMQueryJSON.PaymentMethod  getPaymentMethodDetail = get_PaymentMethod_from_QB_ResponseBody_Deser.QueryResponse.PaymentMethod[0];
+                        System.debug('getPaymentMethodDetail----->' + getPaymentMethodDetail);
+                        // TaxRate is already exist in QB
+                        paymentmethodId = getPaymentMethodDetail.Id;
+                        // paymentmethodName = expense.buildertek__Payment_Method__c;
+                        System.debug('paymentmethodId -----> ' + paymentmethodId);
+                        System.debug('paymentmethodName -----> ' + paymentmethodName);
+                        System.debug('// Create Invoice with exsiting tax rate ID...');
+                        sync_expense_in_QB(expense, CustomerQBId, lineIdsMap, QBMetadata, Get_Access_Token, paymentmethodId, SyncObjName);
+                        
+                    }
+                    else{
+                        // TaxRate is not exist in QB
+                        System.debug('Creating New Payment Methid In QB');
+                        paymentmethodId = null;
+                        // paymentmethodName = null;
+                        String PaymentMethod_EndPoint = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/paymentmethod?minorversion=' + QBMetadata.buildertek__minorversion__c; 
+                        String PaymentMethod_RequestBody = QBMap.mapPMData(paymentmethodName);
+                        System.debug('PaymentMethod_RequestBody--> '+ PaymentMethod_RequestBody);           
+                        HttpResponse PaymentMethod_ResponseBody = QBCallOutService.QBAPICallOut(PaymentMethod_EndPoint, PaymentMethod_RequestBody,false);
+                        if(PaymentMethod_ResponseBody.getStatusCode() == 200){
+                            System.debug('PaymentMethod_ResponseBody.getBody() :: '+ PaymentMethod_ResponseBody.getBody());
+                            QBPMResponseJSON PaymentMethod_ResponseBody_Deser =  QBPMResponseJSON.parse(PaymentMethod_ResponseBody.getBody());
+                            List<QBPMResponseJSON.PaymentMethod> PMDetails = new  List<QBPMResponseJSON.PaymentMethod>();
+                            PMDetails.add(PaymentMethod_ResponseBody_Deser.PaymentMethod);
+                            paymentmethodId = PMDetails[0].Id;
+                            // paymentmethodName = PMDetails[0].RateValue;
+                            sync_expense_in_QB(expense, CustomerQBId, lineIdsMap, QBMetadata, Get_Access_Token, paymentmethodId, SyncObjName);
+                        }
+                        else{
+                            QBException.QB_response( PaymentMethod_ResponseBody.getStatusCode(),  PaymentMethod_ResponseBody.getBody(), 'QBIntegrationQueue', 'sync_PaymentMethod_in_QB');
+                            QBOErrorJSON Response_Error = QBOErrorJSON.parse(PaymentMethod_ResponseBody.getBody());
+                            QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
+                            falut = Response_Error.Fault;
+                            String ErrorMessage = 'Error During Tax Rate Callout :- '+'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                            // UpdateSalesInvoice_OnError(expense.Id, ErrorMessage);
+                            QBIntegrationQueue.UpdateRecord_OnError(expense.Id, ErrorMessage, SyncObjName);
+                        }
+                    }
+                }
+                else{
+                    QBException.QB_response( get_PMId_from_QB_ResponseBody.getStatusCode(),  get_PMId_from_QB_ResponseBody.getBody(), 'QBIntegrationQueue', 'sync_PaymentMethod_in_QB');
+                }
+            
+        } catch (Exception e) {
+            System.debug('Error in sync_TaxRate_in_QB ..' + e.getMessage() + '\n' + e +'\n Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+        }
+    }
 
         public static void UpdateRecord_OnError(String recordId, String ErrorMessage, String SyncObjName){
             try {
