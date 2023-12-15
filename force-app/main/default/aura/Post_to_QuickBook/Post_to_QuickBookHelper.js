@@ -1,18 +1,19 @@
 ({
-    SyncPO : function(component, event, helper) {
-        var action = component.get("c.sync_Purchase_Order_in_QB_AuraCallout");
+    SyncSIInvoice : function(component, event, helper){
+        console.log('inside SyncCOInvoice');
+        var action = component.get("c.sync_Invoice_in_QB_AuraCallout");
         action.setParams({
             recordId : component.get("v.recordId"),
             SyncObjName : component.get("v.sobjecttype")
         });
-        
+
         action.setCallback(this, function(response) {
             var state = response.getState();
             console.log('state ==> ' + state);
-            
+            var result = response.getReturnValue();
+            console.log('return value ==> '+ result);
+
             if(state === "SUCCESS") {
-                var result = response.getReturnValue();
-                console.log('return value ==> '+ result);
                 $A.get("e.force:closeQuickAction").fire();
                 if(result == 'success'){
             		component.find('notifLib').showNotice({
@@ -20,24 +21,32 @@
     		            "header": "Success",
     		            "message": "Completed",
     		        });    
-                }else if(result == 'no_polines') {
+                }else if(result == 'no_invoicelines') {
                     component.find('notifLib').showNotice({
     		            "variant": "error",
     		            "header": "Error",
-    		            "message": 'There are no PO Line(s) associated with the PO.',
+    		            "message": 'There are no Line(s) associated with the Invoice.',
     		        });    
-                }else if(result == 'no_vendor_account'){
+                }
+                else if(result == 'no_customer_account'){
                     component.find('notifLib').showNotice({
     		            "variant": "error",
     		            "header": "Error",
-    		            "message": 'There are no Vendor account associated with the PO.',
+    		            "message": 'There are no Customer associated with the Invoice.',
     		        });  
-                } 
-                else if(result == 'account_sync_as_customer'){
+                }
+                else if(result == 'account_synced_as_vendor'){
                     component.find('notifLib').showNotice({
     		            "variant": "error",
     		            "header": "Error",
-    		            "message": 'Vendor Account Already Sync as Customer in Quickbooks.',
+    		            "message": 'Customer Account Already Synced as Vendor in QB.',
+    		        });  
+                }
+                else if(result == 'account_type_not_customer'){
+                    component.find('notifLib').showNotice({
+    		            "variant": "error",
+    		            "header": "Error",
+    		            "message": 'Customer Account type is not a Customer.',
     		        });  
                 }
                 else{
@@ -49,8 +58,8 @@
                 }
                 
             }
+            
         });
-        
         $A.enqueueAction(action);	
     },
 
@@ -101,6 +110,13 @@
     		            "variant": "error",
     		            "header": "Error",
     		            "message": 'PO Vendor Account Already Sync as Customer in Quickbooks.',
+    		        });  
+                }
+                else if(result == 'account_type_not_vendor'){
+                    component.find('notifLib').showNotice({
+    		            "variant": "error",
+    		            "header": "Error",
+    		            "message": 'PO Vendor Account type is not a Vendor.',
     		        });  
                 }
                 else{
@@ -160,6 +176,13 @@
     		            "message": 'Vendor Account Already Sync as Customer in Quickbooks.',
     		        });  
                 }
+                else if(result == 'account_type_not_vendor'){
+                    component.find('notifLib').showNotice({
+    		            "variant": "error",
+    		            "header": "Error",
+    		            "message": 'Vendor Account type is not a Vendor.',
+    		        });  
+                }
                 else{
                     component.find('notifLib').showNotice({
     		            "variant": "error",
@@ -174,21 +197,20 @@
         $A.enqueueAction(action);	
     },
 
-    SyncSIInvoice : function(component, event, helper){
-        console.log('inside SyncCOInvoice');
-        var action = component.get("c.sync_Invoice_in_QB_AuraCallout");
+    SyncPO : function(component, event, helper) {
+        var action = component.get("c.sync_Purchase_Order_in_QB_AuraCallout");
         action.setParams({
             recordId : component.get("v.recordId"),
             SyncObjName : component.get("v.sobjecttype")
         });
-
+        
         action.setCallback(this, function(response) {
             var state = response.getState();
             console.log('state ==> ' + state);
-            var result = response.getReturnValue();
-            console.log('return value ==> '+ result);
-
+            
             if(state === "SUCCESS") {
+                var result = response.getReturnValue();
+                console.log('return value ==> '+ result);
                 $A.get("e.force:closeQuickAction").fire();
                 if(result == 'success'){
             		component.find('notifLib').showNotice({
@@ -196,25 +218,31 @@
     		            "header": "Success",
     		            "message": "Completed",
     		        });    
-                }else if(result == 'no_invoicelines') {
+                }else if(result == 'no_polines') {
                     component.find('notifLib').showNotice({
     		            "variant": "error",
     		            "header": "Error",
-    		            "message": 'There are no Line(s) associated with the Invoice.',
+    		            "message": 'There are no PO Line(s) associated with the PO.',
     		        });    
-                }
-                else if(result == 'no_customer_account'){
+                }else if(result == 'no_vendor_account'){
                     component.find('notifLib').showNotice({
     		            "variant": "error",
     		            "header": "Error",
-    		            "message": 'There are no Customer associated with the Invoice.',
+    		            "message": 'There are no Vendor account associated with the PO.',
+    		        });  
+                } 
+                else if(result == 'account_sync_as_customer'){
+                    component.find('notifLib').showNotice({
+    		            "variant": "error",
+    		            "header": "Error",
+    		            "message": 'Vendor Account Already Sync as Customer in Quickbooks.',
     		        });  
                 }
-                else if(result == 'account_synced_as_vendor'){
+                else if(result == 'account_type_not_vendor'){
                     component.find('notifLib').showNotice({
     		            "variant": "error",
     		            "header": "Error",
-    		            "message": 'Customer Account Already Synced as Vendor in QB.',
+    		            "message": 'Vendor Account type is not a Vendor.',
     		        });  
                 }
                 else{
@@ -226,8 +254,8 @@
                 }
                 
             }
-            
         });
+        
         $A.enqueueAction(action);	
     },
 
@@ -380,7 +408,7 @@
         });
         
         $A.enqueueAction(action);
-    }
+    },
 
 
 })
