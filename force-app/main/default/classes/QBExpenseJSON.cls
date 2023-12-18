@@ -37,6 +37,7 @@ public with sharing class QBExpenseJSON {
 		public ProjectRef ProjectRef;
 		public AccountBasedExpenseLineDetail AccountBasedExpenseLineDetail;
 		public ItemBasedExpenseLineDetail ItemBasedExpenseLineDetail;
+		public String Description;
 		public String Id;
 	}
 	public class any_y{

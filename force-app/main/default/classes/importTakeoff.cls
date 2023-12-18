@@ -9,7 +9,8 @@ public with sharing class importTakeoff {
     }
     
     @AuraEnabled
-    public static void fetchTakeoffLines(List<String> listOfTakeoffIds, String quoteId) {
+    public static MessageClass fetchTakeoffLines(List<String> listOfTakeoffIds, String quoteId) {
+        MessageClass msg = new MessageClass();
         try {
             System.debug('quoteId: ' + quoteId);
             List<buildertek__Project_Takeoff_Lines__c> takeoffLineList = new List<buildertek__Project_Takeoff_Lines__c>([SELECT Id, Name, buildertek__Build_Phase__c, 
@@ -21,7 +22,7 @@ public with sharing class importTakeoff {
                                                                                                                             WHERE buildertek__Project_Takeoff__c IN :listOfTakeoffIds]);
             Id grouppingId;
             List<buildertek__Quote_Item__c> quoteItems = [SELECT buildertek__Grouping__r.Id FROM buildertek__Quote_Item__c WHERE buildertek__Grouping__r.Name = 'No Grouping' LIMIT 1];
-            List<buildertek__quote__c> quoteList = [SELECT Id, buildertek__Markup__c, buildertek__Discount__c FROM buildertek__quote__c where Id = :quoteId];
+            // List<buildertek__quote__c> quoteList = [SELECT Id, buildertek__Markup__c, buildertek__Discount__c FROM buildertek__quote__c where Id = :quoteId];
             
             Map<String,buildertek__Quote_Line_Group__c> groupingMap = new Map<String,buildertek__Quote_Line_Group__c>();
             Map<Id,PricebookEntry> PricebookMap=new Map<Id,PricebookEntry>();
@@ -110,10 +111,31 @@ public with sharing class importTakeoff {
 
             if (quotelineList.size() > 0) {
                 insert quotelineList;
+                msg.Status = 'Success';
+                msg.Message = 'QuoteLine Imported Successfully !!!';
+            } else {
+                msg.Status = 'Failed';
+                msg.Message = 'There were no takeoff Lines for the selected Takeoff(s)';
             }
-        } catch(Exception e) {
-            System.debug('check error here :'+e.getMessage());
+            return msg;
+        } catch(Exception exp) {
+            msg.Status = 'Failed';
+            msg.Message = exp.getMessage();
+            System.debug('error--> ' + exp.getMessage());
+            System.debug('error line--> ' + exp.getLineNumber());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(exp);
+            }
+            return msg;
         }
     }
+
+    public class MessageClass{
+        @AuraEnabled
+        public String Status {get;set;}
+         @AuraEnabled
+        public string Message {get;set;}
+    } 
 
 }

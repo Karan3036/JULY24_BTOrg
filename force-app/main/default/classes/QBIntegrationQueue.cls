@@ -926,7 +926,7 @@ public without sharing class QBIntegrationQueue {
 
             Account acc = null;
             if(PO.buildertek__Vendor__c != null){
-                acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__QB_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: PO.buildertek__Vendor__c limit 1];
+                acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__QB_Type__c,buildertek__BT_Account_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: PO.buildertek__Vendor__c limit 1];
             }
 
             List<buildertek__Purchase_Order_Item__c> POLines = [SELECT Id, Name, buildertek__Purchase_Order__c,buildertek__Purchase_Order__r.Name,buildertek__Total_Price__c,buildertek__Item_Name__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Description__c,buildertek__Unit_Price__c FROM buildertek__Purchase_Order_Item__c WHERE buildertek__Purchase_Order__c =: recordId];
@@ -940,7 +940,7 @@ public without sharing class QBIntegrationQueue {
             else if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Type__c == 'Customer'){
                 return 'account_sync_as_customer';
             }
-            else if(acc.buildertek__QB_Id__c == null && acc.buildertek__QB_Type__c != 'Vendor'){
+            else if(acc.buildertek__QB_Id__c == null && acc.buildertek__BT_Account_Type__c != 'Vendor'){
                 return 'account_type_not_vendor';
             }
             else{
@@ -964,7 +964,7 @@ public without sharing class QBIntegrationQueue {
             Account acc = null;
             if(CoInv.buildertek__Purchase_Order__c != null){
                 if(CoInv.buildertek__Purchase_Order__r.buildertek__Vendor__c != null){
-                    acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__QB_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: CoInv.buildertek__Purchase_Order__r.buildertek__Vendor__c limit 1];
+                    acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__BT_Account_Type__c,buildertek__QB_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: CoInv.buildertek__Purchase_Order__r.buildertek__Vendor__c limit 1];
                 }
             }
 
@@ -980,7 +980,7 @@ public without sharing class QBIntegrationQueue {
             else if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Type__c == 'Customer'){
                 return 'account_sync_as_customer';
             }
-            else if(acc.buildertek__QB_Id__c == null && acc.buildertek__QB_Type__c != 'Vendor'){
+            else if(acc.buildertek__QB_Id__c == null && acc.buildertek__BT_Account_Type__c != 'Vendor'){
                 return 'account_type_not_vendor';
             }
             else{
@@ -1002,7 +1002,7 @@ public without sharing class QBIntegrationQueue {
 
             Account acc = null;
             if(PayableInv.buildertek__Vendor__c != null){
-                acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QB_Type__c,buildertek__QBO_SyncToken__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: PayableInv.buildertek__Vendor__c limit 1];
+                acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QB_Type__c,buildertek__QBO_SyncToken__c,buildertek__BT_Account_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: PayableInv.buildertek__Vendor__c limit 1];
             }
 
             if(payableLines.size() == 0){
@@ -1014,7 +1014,7 @@ public without sharing class QBIntegrationQueue {
             else if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Type__c == 'Customer'){
                 return 'account_sync_as_customer';
             }
-            else if(acc.buildertek__QB_Id__c == null && acc.buildertek__QB_Type__c != 'Vendor'){
+            else if(acc.buildertek__QB_Id__c == null && acc.buildertek__BT_Account_Type__c != 'Vendor'){
                 return 'account_type_not_vendor';
             }
             else{
@@ -1034,7 +1034,7 @@ public without sharing class QBIntegrationQueue {
 
             Account acc = null;
             if(expense.buildertek__Vendor__c != null){
-                acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__QB_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: expense.buildertek__Vendor__c limit 1];
+                acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__QB_Type__c,buildertek__BT_Account_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: expense.buildertek__Vendor__c limit 1];
             }
 
             List<buildertek__Expense_Line__c> expenseLines = [SELECT Id, Name, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: recordId];

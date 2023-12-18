@@ -1245,9 +1245,17 @@
                                                                             <aura:set attribute="else">
                                                                                 <div class="slds-truncate">
                                                                                     <aura:if isTrue="{!value.fieldType == 'reference'}">
-                                                                                        <div class="textAreaCss textAreaDiv1">
+                                                                                        <aura:if isTrue="{!value.fieldName == 'buildertek__Contractor__c'}">
                                                                                             <ui:outputURL value="{!'/one/one.app?#/sObject/'+ value.originalValue + '/view'}" target="_blank" label="{!value.referenceValue}" />
-                                                                                        </div>
+                                                                                        </aura:if>
+                                                                                        <aura:if isTrue="{!value.fieldName == 'buildertek__Cost_Code__c'}">
+                                                                                            <ui:outputURL value="{!'/one/one.app?#/sObject/'+ value.originalValue + '/view'}" target="_blank" label="{!value.referenceValue}" />
+                                                                                        </aura:if>
+                                                                                        <aura:if isTrue="{!value.fieldName == 'buildertek__Product__c'}">
+                                                                                            <div class="textAreaCss textAreaDiv1">
+                                                                                                <ui:outputURL value="{!'/one/one.app?#/sObject/'+ value.originalValue + '/view'}" target="_blank" label="{!value.referenceValue}" />
+                                                                                            </div>
+                                                                                        </aura:if>
                                                                                     </aura:if>
                                                                                     <aura:if isTrue="{!value.fieldType == 'currency'}">
                                                                                         <!-- Table Data Set From Here -->
@@ -1282,26 +1290,17 @@
                                                                                     <aura:if isTrue="{!value.fieldName == 'Name'}">
                                                                                         <lightning:input value="{!value.originalValue}" />
                                                                                     </aura:if>
-                                                                                    <aura:if isTrue="{!value.fieldType == 'picklist'}">
-                                                                                        <lightning:formattedText value="{!value.originalValue}" />
-                                                                                    </aura:if>
 
 
 
                                                                                     <aura:if isTrue="{!value.fieldName == 'buildertek__Cost_Code_Name__c'}">
-                                                                                        <!-- <ui:outputURL
-                                                                                                    value="{!'/one/one.app?#/sObject/'+ value.originalValue + '/view'}"
-                                                                                                    target="_blank"
-                                                                                                    label="{!value.referenceValue}" />-->
                                                                                         <lightning:formattedText value="{!value.originalValue}" />
-                                                                                        <!--  <lightning:input
-                                                                                                        value="{!value.originalValue}" />-->
                                                                                     </aura:if>
 
                                                                                     <aura:if isTrue="{!value.fieldType == 'number'}">
                                                                                         <lightning:formattedNumber value="{!value.originalValue}" />
                                                                                     </aura:if>
-                                                                                    <aura:if isTrue="{!and(and(value.fieldType == 'string', value.fieldName !='buildertek__Item_Name__c'),value.fieldName !='buildertek__CostCodeDivision__c' )}">
+                                                                                    <aura:if isTrue="{!and(and(and(value.fieldType == 'string', value.fieldName !='buildertek__Item_Name__c'),value.fieldName !='buildertek__CostCodeDivision__c' ),value.fieldName !='buildertek__Cost_Code_Name__c')}">
                                                                                         <aura:if isTrue="{!value.fieldName == 'buildertek__Product_Name__c'}">
                                                                                             <div class="textAreaCss textAreaDiv1">
                                                                                                 <lightning:formattedText value="{!value.originalValue}"/>
@@ -3065,11 +3064,10 @@
                                                     {!item.buildertek__Terms__c}
                                                 </td>
                                                 <td>
-                                                    {!item.buildertek__Amount__c}
-                                                    <!-- <lightning:formattedNumber value="{!item.buildertek__PO_Total__c}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" /> -->
+                                                    <lightning:formattedNumber value="{!item.buildertek__Amount__c}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
                                                 </td>
                                                 <td>
-                                                    {!item.buildertek__Total_Amount_Tax__c}
+                                                    <lightning:formattedNumber value="{!item.buildertek__Total_Amount_Tax__c}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
                                                 </td>
                                             </tr>
                                         </aura:iteration>
