@@ -7,7 +7,9 @@ public without sharing class QBMap {
 
         String AccountId = acc.Id;
         //Map given account fields
-        customer.CompanyName = acc.Name +' - '+AccountId.right(4).substring(0,4);
+        // customer.CompanyName = acc.Name +' - '+AccountId.right(4).substring(0,4);
+        customer.CompanyName = acc.Name;
+        
         customer.Taxable = True; 
         customer.Notes = acc.Description;
         if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Id__c != ''){
@@ -67,14 +69,21 @@ public without sharing class QBMap {
         
         QBTaxCodeJSON tax = new QBTaxCodeJSON();
         // String taxName = 'Tax - ' + string.valueOf(SI.buildertek__Tax_Rate__c);
-        tax.TaxCode = 'Tax - ' + string.valueOf(SI.buildertek__Tax_Rate__c);	
+        // tax.TaxCode = 'Tax - ' + string.valueOf(SI.buildertek__Tax_Rate__c);	
+        tax.TaxCode = (SI.buildertek__Tax_Rate__c != null) 
+                ? 'Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)
+                : 'Tax - 0.0000';
 	    tax.TaxRateDetails = new List<QBTaxCodeJSON.TaxRateDetails>();
 
         QBTaxCodeJSON.TaxRateDetails taxrate = new QBTaxCodeJSON.TaxRateDetails();
-        taxrate.RateValue = string.valueOf(SI.buildertek__Tax_Rate__c);
+        taxrate.RateValue = (SI.buildertek__Tax_Rate__c != null) 
+        ? 'Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)
+        : 'Tax - 0.0000';
         taxrate.TaxApplicableOn = 'Sales';
         taxrate.TaxAgencyId = '1';
-        taxrate.TaxRateName = 'Tax - ' + string.valueOf(SI.buildertek__Tax_Rate__c);
+        taxrate.TaxRateName = (SI.buildertek__Tax_Rate__c != null) 
+        ? 'Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)
+        : 'Tax - 0.0000';
         tax.TaxRateDetails.add(taxrate);
 
         return JSON.serialize(tax);
@@ -88,6 +97,7 @@ public without sharing class QBMap {
             
             for (buildertek__Billable_Lines__c item : SILine) {
                 String lineId = item.Id;
+                String LineName = item.buildertek__Item_Name__c +'-'+ item.Name;
                 Boolean taxable = true;
                 DateTime yourDate = Datetime.now();
                 Date invStartDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
@@ -97,7 +107,7 @@ public without sharing class QBMap {
                 BatchItemRequest.addBatchItem(
                     String.valueOf(item.Id),
                     true, // Set TrackQtyOnHand as needed
-                    item.buildertek__Item_Name__c +'-'+ item.Name,
+                    LineName,
                     Quantity,
                     UnitePrice,
                     // item.buildertek__Total__c,
@@ -258,7 +268,8 @@ public without sharing class QBMap {
         
         String AccountId = acc.Id;
         //Map given account fields
-        Vendor.CompanyName = acc.Name +' - '+AccountId.right(4).substring(0,4);
+        // Vendor.CompanyName = acc.Name +' - '+AccountId.right(4).substring(0,4);
+        Vendor.CompanyName = acc.Name;
         Vendor.Active = true;  
 
         // If QB Id is Not Null, Update Vendor in QB Else Create New Vendor In QB.....
@@ -329,7 +340,8 @@ public without sharing class QBMap {
                 }
                 else if(SyncObjName == 'buildertek__Expense__c'){
                     buildertek__Expense_Line__c record = (buildertek__Expense_Line__c)Item;
-                    NameMap.put(record.Id, record.Name);
+                    String itemName = record.buildertek__Product_Description__c;
+                    NameMap.put(record.Id, itemName);
                     UnitPriceMap.put(record.Id, record.buildertek__Price__c);
                     QuantityMap.put(record.Id, record.buildertek__Quantity__c);
             }
@@ -533,6 +545,8 @@ public without sharing class QBMap {
             String paymenttype = null;
             String vendorname = expense.buildertek__Vendor__r.Name;
             String vendortype = expense.buildertek__Vendor__r.buildertek__BT_Account_Type__c;
+            DateTime yourDate = Datetime.now();
+            Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
     
             QBOID = expense.buildertek__QB_Id__c;
             QBSyncToken = expense.buildertek__QBO_SyncToken__c;
@@ -545,6 +559,7 @@ public without sharing class QBMap {
                 QbExpense.SyncToken = QBSyncToken;
             }
             QbExpense.PaymentType = paymenttype;
+            QbExpense.TxnDate = txnDate;
 
             QBExpenseJSON.AccountRef AccRef2 = new QBExpenseJSON.AccountRef();
             AccRef2.name = 'Visa'; // Replace with the actual value

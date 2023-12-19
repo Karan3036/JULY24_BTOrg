@@ -70,6 +70,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                     if(SI_Wrapper.SyncObjName != 'Account'){ 
                         // sync_TaxRate_in_QB(SILines, SI, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, Create_Payment, SyncObjName);
                         sync_item_in_QB(SI_Wrapper.SILines, SI_Wrapper.SI, CustomerQBId, SI_Wrapper.QBMetadata, SI_Wrapper.Get_Access_Token, SI_Wrapper.receiptID, SI_Wrapper.SyncObjName);
+                        // sync_lines_to_items(SI_Wrapper.SILines, SI_Wrapper.SI, CustomerQBId, SI_Wrapper.QBMetadata, SI_Wrapper.Get_Access_Token, SI_Wrapper.receiptID, SI_Wrapper.SyncObjName);
                     }
                     UpdateAccount(SI_Wrapper.acc.Id, CustomerQBId, SI_Wrapper.QBMetadata, SyncToken, 'Customer');
                 }
@@ -157,6 +158,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                                     System.debug('when last batch finish.. crerate sales invoice');
                                     System.debug('lineIdsMap >> ' + lineIdsMap);
                                         // sync_invoice_in_QB(SI, CustomerQBId, lineIdsMap, QBMetadata, Get_Access_Token, receiptID, Create_Payment, taxCodeId, taxRateValue, TermQBId, SyncObjName);
+                                    sync_TaxRate_in_QB(SILines, SI, lineIdsMap, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, SyncObjName);
     
                                     // update sales invoice lines....
                                     UpdateSIline(ItemstoCreate, lineIdsMap);
@@ -198,7 +200,9 @@ public with sharing class QBIntegrationQueue_SIFlow {
                 String taxCodeId;
                 Double taxRateValue;
                 String taxCodeName;
-                taxCodeName = 'Tax - ' + string.valueOf(SI.buildertek__Tax_Rate__c);
+                taxCodeName = (SI.buildertek__Tax_Rate__c != null) 
+                ? 'Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)
+                : 'Tax - 0.0000';
                 // String  taxCodeName = taxName.substring(0, taxName.length() - 2);
                  System.debug('taxName------>' + taxCodeName);
                 String encodedQueryParam = EncodingUtil.urlEncode('Select * From TaxCode Where Name = \''+taxCodeName + '\'', 'UTF-8');
@@ -487,6 +491,274 @@ public with sharing class QBIntegrationQueue_SIFlow {
             //     this.TermQBId = TermQBId;
             //     this.acc = acc;
             // }
+        }
+
+        public static void sync_lines_to_items(List<buildertek__Billable_Lines__c> SILines, buildertek__Billings__c SI, String CustomerQBId, buildertek__QuickBooks_Setting__mdt QBMetadata, Boolean Get_Access_Token, String receiptID, String SyncObjName){
+            try {
+                set<String> ItemsWithoutQBId = new set<String>();           // To Store Unique Name Of SF Lines.....
+                List<buildertek__Billable_Lines__c> ItemToSync = new List<buildertek__Billable_Lines__c>();
+                List<buildertek__Billable_Lines__c> ItemList = new List<buildertek__Billable_Lines__c>();
+                ItemList = SILines;
+            // Sync sales Inovice Lines
+                for(buildertek__Billable_Lines__c Items : ItemList){
+                    if(Items.buildertek__QB_Id__c == null){
+                        ItemsWithoutQBId.add(Items.Name);
+                        ItemToSync.add(Items);
+                    }
+                }
+            
+            // If Any SF Lines does not availbale in QB... Else All SF Line Have QB Id (Already Synced With QB)...
+            if(ItemsWithoutQBId.size() > 0){
+                
+                list<String> ItemsNotHaveQBId_List = new list<String>(ItemsWithoutQBId); // List of Unique Name SF Line Without QB Id.....(Set to List COnversion for Interate using for Loop)     
+                // Create Query String for API callout Endpoint....
+                String ItemNames = '(';
+                for(integer i=0; i<ItemsNotHaveQBId_List.size(); i++){
+                    if(i != (ItemsNotHaveQBId_List.size() - 1)){
+                        ItemNames += '\''+ItemsNotHaveQBId_List[i] + '\',';
+                    }
+                    else{
+                        ItemNames += '\''+ItemsNotHaveQBId_List[i] + '\')';
+                    }
+                } 
+
+                // API Callout to Check Duplicate Name's Items alredy Exist or Not in QB...
+                String ItemQuery = EncodingUtil.urlEncode('select * from Item WHERE name in '+ ItemNames + ' STARTPOSITION 1 MAXRESULTS 1000', 'UTF-8');
+                string GET_Items_JSONBody = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/query?query=' + ItemQuery + '&minorversion='+ QBMetadata.buildertek__minorversion__c;   
+                HttpResponse GET_Items_Response = QBCallOutService.QBAPICallOut_GET(GET_Items_JSONBody, null, false);
+                System.debug('GET_Items_Response.getStatusCode() : ' + GET_Items_Response.getStatusCode());
+                System.debug('GET_Items_Response.getBody() : ' + GET_Items_Response.getBody());
+                list<QBBatchResJSON.Item> queryItemsList = new list<QBBatchResJSON.Item>();
+                if(GET_Items_Response.getStatusCode() == 200){
+                    QBBatchResJSON GET_Items_Response_Desr = QBBatchResJSON.parse(GET_Items_Response.getBody());
+                    system.debug('GET_Items_Response_Desr : ' + GET_Items_Response_Desr);
+                    QBBatchResJSON.QueryResponse queryRes = new QBBatchResJSON.QueryResponse();
+                    queryRes = GET_Items_Response_Desr.QueryResponse;
+                    system.debug('queryRes : ' + queryRes);
+                    if(queryRes.maxResults != null){
+                        queryItemsList = queryRes.Item;
+                        system.debug('Number Of Duplicate Name Items In QB ' + queryRes.Item.size());
+                    }
+                }
+                // -------- 
+                map<String, QBBatchResJSON.Item> queryItems_Map = new map<String, QBBatchResJSON.Item>();   // For Furter Query and Filteration
+                List<buildertek__Billable_Lines__c> ItemstoCreate = new List<buildertek__Billable_Lines__c>();  // List of SF Lines Without QB Id And Without Dupliacte Name (So These Are need to Create In QB)....
+                map<String, buildertek__Billable_Lines__c> ItemstoCreate_Map = new map<String, buildertek__Billable_Lines__c>();
+                Map<Id, QBBatchResJSON.Item> QBItemsToAssign_Map = new Map<Id, QBBatchResJSON.Item>(); // Map Of QB Dupliate Item Name and Duplicate Item QB Object...
+                List<buildertek__Billable_Lines__c> QBItemsToAssign = new List<buildertek__Billable_Lines__c>();
+
+                // IF SF Lines Are Not Synced With QB But Item With Duplicate Name Already Availabel In QB.... Then Use QB ID of That QB Items for SF Lines
+                if(queryItemsList.size() > 0){
+                    
+                    for(QBBatchResJSON.Item queryItem : queryItemsList){
+                        queryItems_Map.put(queryItem.Name.toLowerCase(), queryItem);
+                    }
+                    system.debug('Duplicate Name Items In QB' + queryItems_Map.keySet());
+
+                    // Filter Duplicate Name SF Items And SF Items To Create IN QB...
+                    for(buildertek__Billable_Lines__c item : ItemToSync){
+
+                        String ItemName = item.Name;
+                        String DupliacteItemName = queryItems_Map.get(ItemName).Name;
+
+                        if(ItemName != DupliacteItemName){
+                            // QB Will create Only Unique name Items.. So we only add unique name Lines in Map
+                            ItemstoCreate_Map.put(ItemName, item);
+                        }
+                        
+                        
+                    }
+
+                    ItemstoCreate = ItemstoCreate_Map.values();
+
+                    for(buildertek__Billable_Lines__c item : ItemToSync){
+                        String ItemName = item.Name;
+    
+                        Id CreteItemId;
+                        if(ItemstoCreate_Map.keySet().size() > 0){
+                            CreteItemId = ItemstoCreate_Map.get(ItemName).Id;
+                        }
+                        if(item.Id != CreteItemId){
+                            QBItemsToAssign_Map.put(item.Id, queryItems_Map.get(ItemName));
+                            QBItemsToAssign.add(item);
+                        }
+                    }
+                }
+                else{
+                    // If None of the Line have Duplicate Name In QB....
+                    System.debug('.... None of the Line have Duplicate Name In QB .....');
+                    // ItemstoCreate = ItemToSync;
+                    for(buildertek__Billable_Lines__c item : ItemToSync){
+                        String ItemName = item.Name;
+                        ItemstoCreate_Map.put(ItemName, item);
+                    }
+
+                    for(buildertek__Billable_Lines__c item : ItemToSync){
+                        String ItemName = item.Name;
+                        Id CreteItemId;
+                        if(ItemstoCreate_Map.keySet().size() > 0){
+                            CreteItemId = ItemstoCreate_Map.get(ItemName).Id;
+                        }
+                        if(item.Id != CreteItemId){
+                            // QBItemsToAssign_Map.put(item.Id, queryItems_Map.get(ItemName));
+                            QBItemsToAssign.add(item);
+                        }
+                    }
+
+                    ItemstoCreate = ItemstoCreate_Map.values();
+                }
+
+                System.debug('No of Items to create  : ' + ItemstoCreate.size());
+                System.debug('no of QBItemsToAssign : ' + QBItemsToAssign.size());
+
+                // When SF Line Does Not Have QB In and Also Item With Duplicate Name Not Found In QB....
+                if(ItemstoCreate.size() > 0){
+                Integer totalItems = ItemstoCreate.size();
+                Integer batchSize = 30;
+                Integer totalBatches = (totalItems + batchSize - 1) / batchSize; // Calculate total batches needed
+                Map<Id, List<String>> lineIdsMap = new Map<Id, List<String>>();
+    
+                for (Integer i = 0; i < totalBatches; i++) {
+                    Integer startIdx = i * batchSize;
+                    Integer endIdx = Math.min((i + 1) * batchSize, totalItems);
+    
+                    List<buildertek__Billable_Lines__c> itemsBatch = new List<buildertek__Billable_Lines__c>();
+    
+                    // Create the sublist for the current batch
+                    for (Integer j = startIdx; j < endIdx; j++) {
+                            itemsBatch.add(ItemstoCreate[j]);
+                    }
+                    System.debug('Items Are Going to Create : '+(i+1) +' ***** No. Batch length ******** '+ itemsBatch.size());
+                    
+                            // API Callout to Sync Items in QB...
+                            String Items_EndPoint = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/batch?minorversion=' + QBMetadata.buildertek__minorversion__c;
+                            String Items_RequestBody = QBMap.MapItemDataToBatch(itemsBatch, SyncObjName); 
+                            System.debug('Items_RequestBody ' +Items_RequestBody);
+                            HttpResponse Items_Response = QBCallOutService.QBAPICallOut(Items_EndPoint , Items_RequestBody, Get_Access_Token);
+                            system.debug('Item Batch API Status Code >> ' + Items_Response.getStatusCode());
+                            system.debug('Item Batch Resopnce >> ' + Items_Response.getBody());
+
+                        if(Items_Response.getStatusCode() == 200){
+                            QBBatchResJSON response = QBBatchResJSON.parse(Items_Response.getBody());
+
+                            Map<String, QBBatchResJSON.BatchItemResponse> NewCreatedItem_Map = new Map<String, QBBatchResJSON.BatchItemResponse>();
+                            Map<Id, QBBatchResJSON.BatchItemResponse> NewCreatedItemToAssign_Map = new Map<Id, QBBatchResJSON.BatchItemResponse>();
+
+                            for(QBBatchResJSON.BatchItemResponse batchItem : response.BatchItemResponse) {
+                                if (batchItem != null && batchItem.Item != null && batchItem.bId != null) {
+                                    NewCreatedItem_Map.put(batchItem.item.Name, batchItem);
+                                }
+                            }
+                            system.debug(' --- NewCreatedItem_Map ---- : ' + NewCreatedItem_Map);
+
+                            for(buildertek__Billable_Lines__c item : QBItemsToAssign){
+                                string ItemName = item.Name;
+                                NewCreatedItemToAssign_Map.put(item.Id, NewCreatedItem_Map.get(ItemName));
+                            }
+                            system.debug(' --- NewCreatedItemToAssign_Map ---- : ' + NewCreatedItemToAssign_Map);
+                            
+                            for(buildertek__Billable_Lines__c Items : ItemList){
+                                
+                                    // Assign QB Id to Dupliacte Name Lines...
+                                    QBBatchResJSON.BatchItemResponse newCraetedItem = NewCreatedItemToAssign_Map.get(Items.Id);
+                                    if(newCraetedItem != null){
+                                        Items.buildertek__QB_Id__c = newCraetedItem.Item.Id;
+                                        Items.buildertek__QBO_Name__c = newCraetedItem.Item.Name;
+                                    }
+
+                                    if(Items.buildertek__QB_Id__c != null){
+                                        lineIdsMap.put(
+                                            Id.valueOf(Items.Id), 
+                                            new List<String>{Items.buildertek__QB_Id__c, Items.buildertek__QBO_Name__c, string.valueOf(Items.buildertek__SubTotal__c), string.valueOf(Items.buildertek__Quantity__c), string.valueOf(Items.buildertek__Unit_Price__c)}
+                                        );
+                                    }
+                            
+                            }
+                            // Added Newly created invoice Lines to the Qb Invoice....
+                            for (QBBatchResJSON.BatchItemResponse batchItem : response.BatchItemResponse) {
+                                if (batchItem != null && batchItem.Item != null && batchItem.bId != null) {
+                                    lineIdsMap.put(
+                                        // Assuming SalesforceId__c is of type Id and QbId__c is of type String
+                                        Id.valueOf(batchItem.bId), // Salesforce ID
+                                        // List Of QB Line Id, QB Line Name , Total Price, Quantity, Unite Price...
+                                        new List<String> { batchItem.Item.Id , batchItem.Item.Name, String.valueOf((batchItem.Item.QtyOnHand)*(batchItem.Item.UnitPrice)), String.valueOf(batchItem.Item.QtyOnHand), String.valueOf(batchItem.Item.UnitPrice) } // QuickBooks ID
+                                    );
+                                }
+                            }
+                            
+                            if( i == (totalBatches-1)){
+                                System.debug('when last batch finish.. crerate sales invoice');
+                                System.debug('lineIdsMap >> ' + lineIdsMap);
+                                
+                                sync_TaxRate_in_QB(SILines, SI, lineIdsMap, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, SyncObjName);
+                                UpdateSIline(ItemstoCreate, lineIdsMap);
+                            }
+                        }
+                        else{
+                            QBException.QB_response( Items_Response.getStatusCode(),  Items_Response.getBody(), 'QBIntegrationQueue', 'sync_item_in_QB');
+                            QBOErrorJSON Response_Error = QBOErrorJSON.parse(Items_Response.getBody());
+                            QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
+                            falut = Response_Error.Fault;
+                            String ErrorMessage1 = 'Error During Co Line Callout :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                            // UpdateContractorInvoice_OnError(CoInv.Id, ErrorMessage1);
+                            QBIntegrationQueue.UpdateRecord_OnError(SI.Id, ErrorMessage1, SyncObjName);
+    
+                        }
+                    // }
+                    }
+                }
+                else{
+                    // When All SF Item with Duplicate Name Availbale In QB But SF Items Does Not Have QB ID... Then Assign QB Id First And Then Sync With Invoice/Bill/PO/Expense.... 
+                    System.debug('.... All SF Lines Have Duplicate Name...');
+                    Map<Id, List<String>> lineIdsMap = new Map<Id, List<String>>();
+
+                    for(buildertek__Billable_Lines__c Items : ItemList){
+
+                            // Assign QB Id to Dupliacte Name Lines...
+                            QBBatchResJSON.Item QBDuplicateNameItem = QBItemsToAssign_Map.get(Items.Id);
+                            if(QBDuplicateNameItem != null){
+                                Items.buildertek__QB_Id__c = QBDuplicateNameItem.Id;
+                                Items.buildertek__QBO_Name__c = QBDuplicateNameItem.Name;
+                            }
+
+                            if(Items.buildertek__QB_Id__c != null){
+                                lineIdsMap.put(
+                                    Id.valueOf(Items.Id), 
+                                    new List<String>{Items.buildertek__QB_Id__c, Items.buildertek__QBO_Name__c, string.valueOf(Items.buildertek__SubTotal__c), string.valueOf(Items.buildertek__Quantity__c), string.valueOf(Items.buildertek__Unit_Price__c)}
+                                );
+                            }
+                    
+                    }
+
+                    if(lineIdsMap.size() > 0){
+                        System.debug('lineIdsMap When Items To Create is NUll>> ' + lineIdsMap);
+
+                        sync_TaxRate_in_QB(SILines, SI, lineIdsMap, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, SyncObjName);
+                        UpdateSIline(ItemstoCreate, lineIdsMap);
+                    }
+                }
+            }
+            else{
+                // When All SF Lines Have QB Id... Then Nothing to Do With Items... Just Sync With Parent QB Objects(Invoice/Bill/PO/Expense)
+                System.debug('All Items are Synced with QB');
+                Map<Id, List<String>> lineIdsMap1 = new Map<Id, List<String>>();
+                for(buildertek__Billable_Lines__c Items : ItemList){
+                    lineIdsMap1.put(
+                            // Assuming SalesforceId__c is of type Id and QbId__c is of type String
+                            Id.valueOf(Items.Id), // Salesforce ID
+                            new List<String> { 
+                               Items.buildertek__QB_Id__c, Items.buildertek__QBO_Name__c, string.valueOf(Items.buildertek__SubTotal__c), string.valueOf(Items.buildertek__Quantity__c), string.valueOf(Items.buildertek__Unit_Price__c)
+                            }
+                    );
+                }
+
+                sync_TaxRate_in_QB(SILines, SI, lineIdsMap1, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, SyncObjName);
+               
+            }
+            } catch (Exception e) {
+                System.debug('Error in sync_lines_to_items : ' + e.getMessage() +'\n'+ e + 'Exception line no : '+ e.getLineNumber() +'--->'+ e.getStackTraceString());
+                
+            }
         }
 
 }

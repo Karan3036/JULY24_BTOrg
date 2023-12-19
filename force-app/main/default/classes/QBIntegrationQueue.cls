@@ -92,7 +92,7 @@ public without sharing class QBIntegrationQueue {
                 QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
                 falut = Response_Error.Fault;
                 String ErrorMessage = 'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
-                String ErrorMessage1 = 'Error During PO Callout :- ' + 'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                String ErrorMessage1 = 'Error During PO syncing :- ' + 'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
                 // UpdatePO_OnError(PO.Id, ErrorMessage1);
                 UpdateRecord_OnError(PO.Id, ErrorMessage1, SyncObjName);
             }
@@ -117,7 +117,7 @@ public without sharing class QBIntegrationQueue {
                 system.debug('Project Id ' + expense.buildertek__Project__r.buildertek__Customer__c);
                 acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c, buildertek__QB_Record_URL__c, buildertek__QBO_SyncToken__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: expense.buildertek__Project__r.buildertek__Customer__c limit 1];
             }
-            List<buildertek__Expense_Line__c> expenseLines = [SELECT Id, Name, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: expenseRecordId];
+            List<buildertek__Expense_Line__c> expenseLines = [SELECT Id, Name, buildertek__Product__c, buildertek__Product_Description__c, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: expenseRecordId];
 
             buildertek__QuickBooks_Setting__mdt QBMetadata = [SELECT Id, DeveloperName,buildertek__Base_Url__c, buildertek__minorversion__c, MasterLabel, buildertek__Access_Token__c, buildertek__Client_Id__c, buildertek__Client_Secret__c, buildertek__Refresh_Token__c, buildertek__Qb_URL__c, buildertek__Scope__c, buildertek__Company_Id__c FROM buildertek__QuickBooks_Setting__mdt LIMIT 1];
             
@@ -165,11 +165,37 @@ public without sharing class QBIntegrationQueue {
                 UpdateExpense(expense.Id, InvoiceQBId, QBMetadata, QBInvSyncTocken, PayMethodId);
             }
             else{
+                // // Assuming you have the JSON response as a string
+                // String jsonResponse = Expense_Response.getBody();
+
+                // // Parse the JSON response
+                // Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(jsonResponse);
+
+                // // Extract message and code
+                // Map<String, Object> fault = (Map<String, Object>) responseMap.get('Fault');
+                // if (fault != null) {
+                //     List<Object> errors = (List<Object>) fault.get('Error');
+                //     if (errors != null && !errors.isEmpty()) {
+                //         Map<String, Object> error = (Map<String, Object>) errors[0];
+                //         String errorMessage = (String) error.get('Message');
+                //         String errorCode = (String) error.get('code');
+
+                //         // Use in if-else condition
+                //         if ('5010'.equals(errorCode)) {
+                //             // Handle Stale Object Error
+                //             System.debug('Stale Object Error: ' + errorMessage);
+                //         } else {
+                //             // Handle other errors
+                //             System.debug('Other error: ' + errorMessage);
+                //         }
+                //     }
+                // }
+
                 QBException.QB_response( Expense_Response.getStatusCode(),  Expense_Response.getBody(), 'QBIntegrationQueue', 'sync_invoice_in_QB');
                 QBOErrorJSON Response_Error = QBOErrorJSON.parse(Expense_Response.getBody());
                 QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
                 falut = Response_Error.Fault;
-                String ErrorMessage = 'Error During Item Callout :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                String ErrorMessage = 'Error During Line syncing :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
                 // UpdateSalesInvoice_OnError(expense.Id, ErrorMessage);
                 QBIntegrationQueue.UpdateRecord_OnError(expense.Id, ErrorMessage, SyncObjName);
             }
@@ -208,7 +234,7 @@ public without sharing class QBIntegrationQueue {
                 QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
                 falut = Response_Error.Fault;
                 String ErrorMessage = 'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
-                String ErrorMessage1 = 'Error During Vendor Callout :- ' + 'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                String ErrorMessage1 = 'Error During Vendor syncing :- ' + 'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
                 // UpdateAccount_OnError(acc.Id, ErrorMessage);
                 UpdateRecord_OnError(acc.Id, ErrorMessage, 'Account');
                 UpdateRecord_OnError(SObjRecord.Id, ErrorMessage1, SyncObjName);
@@ -265,12 +291,12 @@ public without sharing class QBIntegrationQueue {
             }
 
             else if(SyncObjName == 'buildertek__Expense__c'){
-                ItemList = [SELECT Id, Name, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: SObejctRecord.Id];
+                ItemList = [SELECT Id, Name, buildertek__Product__c, buildertek__Product_Description__c, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: SObejctRecord.Id];
                 for(sObject Item : ItemList){
                     // Type casting --> sObject to Payable invoice Lines....
                     buildertek__Expense_Line__c Items = (buildertek__Expense_Line__c)Item;
                     if(Items.buildertek__QB_Id__c == null){
-                        ItemsWithoutQBId.add(Items.Name);
+                        ItemsWithoutQBId.add(Items.buildertek__Product_Description__c);
                         ItemToSync.add(Items);
                     }
                 }
@@ -306,7 +332,7 @@ public without sharing class QBIntegrationQueue {
                     system.debug('queryRes : ' + queryRes);
                     if(queryRes.maxResults != null){
                         queryItemsList = queryRes.Item;
-                        system.debug('No Of Duplicate Name Items In QB ' + queryRes.Item.size());
+                        system.debug('Number Of Duplicate Name Items In QB ' + queryRes.Item.size());
                     }
                 }
                 // -------- 
@@ -320,14 +346,20 @@ public without sharing class QBIntegrationQueue {
                 if(queryItemsList.size() > 0){
                     
                     for(QBBatchResJSON.Item queryItem : queryItemsList){
-                        queryItems_Map.put(queryItem.Name, queryItem);
+                        queryItems_Map.put(queryItem.Name.toLowerCase(), queryItem);
                     }
                     system.debug('Duplicate Name Items In QB' + queryItems_Map.keySet());
 
                     // Filter Duplicate Name SF Items And SF Items To Create IN QB...
                     for(sObject item : ItemToSync){
-
-                        String ItemName = string.valueOf(item.get('Name'));
+                        String ItemName;
+                        if (SyncObjName == 'buildertek__Expense__c') {
+                            ItemName = string.valueOf(item.get('buildertek__Product_Description__c')).toLowerCase();  
+                        } else {
+                            ItemName = string.valueOf(item.get('Name')).toLowerCase();
+                        }
+                        System.debug('ItemName----> '+ItemName);
+                        // String ItemName = string.valueOf(item.get('Name'));
                         String DupliacteItemName = queryItems_Map.get(ItemName).Name;
 
                         if(ItemName != DupliacteItemName){
@@ -341,7 +373,14 @@ public without sharing class QBIntegrationQueue {
                     ItemstoCreate = ItemstoCreate_Map.values();
 
                     for(sObject item : ItemToSync){
-                        String ItemName = string.valueOf(item.get('Name'));
+                        String ItemName;
+                        if (SyncObjName == 'buildertek__Expense__c') {
+                            ItemName = string.valueOf(item.get('buildertek__Product_Description__c')).toLowerCase();  
+                        } else {
+                            ItemName = string.valueOf(item.get('Name')).toLowerCase();
+                        }
+                        System.debug('ItemName----> '+ItemName);
+                        // String ItemName = string.valueOf(item.get('Name'));
                         Id CreteItemId;
                         if(ItemstoCreate_Map.keySet().size() > 0){
                             CreteItemId = ItemstoCreate_Map.get(ItemName).Id;
@@ -357,12 +396,26 @@ public without sharing class QBIntegrationQueue {
                     System.debug('.... None of the Line have Duplicate Name In QB .....');
                     // ItemstoCreate = ItemToSync;
                     for(sObject item : ItemToSync){
-                        String ItemName = string.valueOf(item.get('Name'));
+                        String ItemName;
+                        if (SyncObjName == 'buildertek__Expense__c') {
+                            ItemName = string.valueOf(item.get('buildertek__Product_Description__c'));  
+                        } else {
+                            ItemName = string.valueOf(item.get('Name'));
+                        }
+                        System.debug('ItemName----> '+ItemName);
+                        // String ItemName = string.valueOf(item.get('Name'));
                         ItemstoCreate_Map.put(ItemName, item);
                     }
 
                     for(sObject item : ItemToSync){
-                        String ItemName = string.valueOf(item.get('Name'));
+                        String ItemName;
+                        if (SyncObjName == 'buildertek__Expense__c') {
+                            ItemName = string.valueOf(item.get('buildertek__Product_Description__c'));  
+                        } else {
+                            ItemName = string.valueOf(item.get('Name'));
+                        }
+                        System.debug('ItemName----> '+ItemName);
+                        // String ItemName = string.valueOf(item.get('Name'));
                         Id CreteItemId;
                         if(ItemstoCreate_Map.keySet().size() > 0){
                             CreteItemId = ItemstoCreate_Map.get(ItemName).Id;
@@ -541,7 +594,7 @@ public without sharing class QBIntegrationQueue {
                             QBOErrorJSON Response_Error = QBOErrorJSON.parse(Items_Response.getBody());
                             QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
                             falut = Response_Error.Fault;
-                            String ErrorMessage1 = 'Error During Co Line Callout :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                            String ErrorMessage1 = 'Error During Line syncing :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
                             // UpdateContractorInvoice_OnError(CoInv.Id, ErrorMessage1);
                             UpdateRecord_OnError(SObejctRecord.Id, ErrorMessage1, SyncObjName);
     
@@ -780,7 +833,7 @@ public without sharing class QBIntegrationQueue {
                     QBOErrorJSON Response_Error = QBOErrorJSON.parse(term_QB_ResponseBody.getBody());
                     QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
                     falut = Response_Error.Fault;
-                    String ErrorMessage1 = 'Error During Term Callout :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                    String ErrorMessage1 = 'Error During Term syncing :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
                     // UpdateContractorInvoice_OnError(CoInv.Id, ErrorMessage1);
                     UpdateRecord_OnError(CoInv.Id, ErrorMessage1, SyncObjName);
 
@@ -818,7 +871,7 @@ public without sharing class QBIntegrationQueue {
                 QBOErrorJSON Response_Error = QBOErrorJSON.parse(QB_Bill_Response.getBody());
                 QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
                 falut = Response_Error.Fault;
-                String ErrorMessage1 = 'Error During Bill Callout :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                String ErrorMessage1 = 'Error During Bill syncing :- '+ ' Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
                 // UpdateContractorInvoice_OnError(CoInv.Id, ErrorMessage1);
                 UpdateRecord_OnError(SobjectRecord.Id, ErrorMessage1, SyncObjName);
                 
@@ -1037,7 +1090,7 @@ public without sharing class QBIntegrationQueue {
                 acc = [SELECT ID, Name,buildertek__Email_Address__c,Fax,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__QB_Type__c,buildertek__BT_Account_Type__c, Description,ShippingCity,ShippingStreet,ShippingState,ShippingPostalCode,ShippingLatitude,ShippingLongitude,ShippingCountry,Phone,BillingCity,BillingStreet,BillingState,BillingPostalCode,BillingLatitude,BillingLongitude,BillingCountry FROM Account WHERE Id =: expense.buildertek__Vendor__c limit 1];
             }
 
-            List<buildertek__Expense_Line__c> expenseLines = [SELECT Id, Name, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: recordId];
+            List<buildertek__Expense_Line__c> expenseLines = [SELECT Id, Name, buildertek__Product__c, buildertek__Product_Description__c, buildertek__BT_Expense__c,buildertek__BT_Expense__r.Name,buildertek__Total__c,buildertek__Description__c,buildertek__Quantity__c,buildertek__QB_Id__c,buildertek__QBO_Name__c,buildertek__QBO_SyncToken__c,buildertek__Price__c FROM buildertek__Expense_Line__c WHERE buildertek__BT_Expense__c =: recordId];
 
             if(expenseLines.size() == 0){
                 return 'no_expenselines';
@@ -1216,7 +1269,7 @@ public without sharing class QBIntegrationQueue {
     
         public static void UpdateExpense(String invoice_Id, String QB_invoice_Id, buildertek__QuickBooks_Setting__mdt  QBMetadata, String QBInvSyncTocken, String PaymentMethodId){
             try {
-                system.debug('sales Invoice going to Update');
+                system.debug('Expense going to Update');
                 String qbInvoiceURL = QBMetadata.buildertek__Qb_URL__c + 'expense?txnId=' + QB_invoice_Id;
                 buildertek__Expense__c Invoice = [SELECT Id, Name, buildertek__Vendor__c,buildertek__QB_Id__c,buildertek__QBO_SyncToken__c,buildertek__Project__r.buildertek__Customer__c,buildertek__Total_Expense__c,buildertek__Tax_Rate__c FROM buildertek__Expense__c WHERE ID =:invoice_Id LIMIT 1];
                 Invoice.buildertek__QB_Id__c = QB_invoice_Id;
@@ -1283,7 +1336,7 @@ public without sharing class QBIntegrationQueue {
                             QBOErrorJSON Response_Error = QBOErrorJSON.parse(PaymentMethod_ResponseBody.getBody());
                             QBOErrorJSON.Fault falut = new QBOErrorJSON.Fault();
                             falut = Response_Error.Fault;
-                            String ErrorMessage = 'Error During Tax Rate Callout :- '+'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
+                            String ErrorMessage = 'Error During Tax Rate syncing :- '+'Message : ' + falut.Error[0].Message +', Detail : '+ falut.Error[0].Detail;
                             // UpdateSalesInvoice_OnError(expense.Id, ErrorMessage);
                             QBIntegrationQueue.UpdateRecord_OnError(expense.Id, ErrorMessage, SyncObjName);
                         }
