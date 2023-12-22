@@ -166,4 +166,59 @@
     //     component.set("v.open", false);
     //     component.set("v.showProductFields", false);
     // },
+    importMasterWalkThrough: function (component, event, helper) {
+        // var evt = $A.get("e.force:navigateToComponent");
+        //     evt.setParams({
+        //         componentDef: "c:ImportMasterWalkThrough",
+        //         componentAttributes: {
+        //             rfqRecordId: component.get("v.recordId"),
+        //         }
+        //     });
+        // evt.fire(); 
+        $A.createComponents(
+            [
+                [
+                    "aura:html",
+                    {
+                        HTMLAttributes: {
+                            class: "slds-text-heading_medium slds-hyphenate",
+                        },
+                    },
+                ],
+                [
+                    "c:ImportMasterWalkThrough",
+                    {
+                        rfqRecordId: component.get("v.recordId"),
+                        onCancel: function () {
+                            component.get("v.modalPromise").then(function (modal) {
+                                modal.close();
+                            });
+                            $A.get("e.force:refreshView").fire();
+                        },
+                        onSuccess: function (file) {
+                            $A.get("e.c:BT_SpinnerEvent")
+                                .setParams({ action: "HIDE" })
+                                .fire();
+                            component.get("v.modalPromise").then(function (modal) {
+                                modal.close();
+                            });
+                            $A.get("e.force:refreshView").fire();
+                        },
+                    },
+                ],
+            ],
+            function (components, status) {
+                if (status === "SUCCESS") {
+                    var modalPromise = component.find("overlay").showCustomModal({
+                        body: components[1],
+                        footer: components[1].find("footer"),
+                        showCloseButton: true,
+                        cssClass: "",
+                        closeCallback: function () { },
+                    });
+                    component.set("v.modalPromise", modalPromise);
+                }
+            }
+        );
+    },
 });

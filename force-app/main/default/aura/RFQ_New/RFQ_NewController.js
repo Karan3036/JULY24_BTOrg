@@ -4,6 +4,7 @@
         var context = '';
         var parentRecordId = '';
         component.set("v.parentRecordId", parentRecordId);
+        console.log('parentRecordId---->',component.get("v.parentRecordId"));
         if (value != null) {
             context = JSON.parse(window.atob(value));
             parentRecordId = context.attributes.recordId;

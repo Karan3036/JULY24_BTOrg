@@ -97,7 +97,7 @@ public without sharing class QBMap {
             
             for (buildertek__Billable_Lines__c item : SILine) {
                 String lineId = item.Id;
-                String LineName = item.buildertek__Item_Name__c +'-'+ item.Name;
+                String LineName = item.buildertek__Item_Name__c;
                 Boolean taxable = true;
                 DateTime yourDate = Datetime.now();
                 Date invStartDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
@@ -134,7 +134,7 @@ public without sharing class QBMap {
 
     public static String mapInvoiceDataBatch(buildertek__Billings__c inv, String CustomerId, Map<Id, List<String>> lineIdsMap, String taxCodeId, String TermQBId) {
         try {
-            System.debug(' in mapInvoiceData method');
+            System.debug(' in mapInvoiceData method==> '+lineIdsMap);
             String invId = inv.Id;
             String invQBId = inv.buildertek__QB_Id__c;
             DateTime yourDate = Datetime.now();

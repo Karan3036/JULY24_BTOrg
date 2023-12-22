@@ -69,8 +69,8 @@ public with sharing class QBIntegrationQueue_SIFlow {
                     // this condition define wheather You want to countine the integration or not...
                     if(SI_Wrapper.SyncObjName != 'Account'){ 
                         // sync_TaxRate_in_QB(SILines, SI, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, Create_Payment, SyncObjName);
-                        sync_item_in_QB(SI_Wrapper.SILines, SI_Wrapper.SI, CustomerQBId, SI_Wrapper.QBMetadata, SI_Wrapper.Get_Access_Token, SI_Wrapper.receiptID, SI_Wrapper.SyncObjName);
-                        // sync_lines_to_items(SI_Wrapper.SILines, SI_Wrapper.SI, CustomerQBId, SI_Wrapper.QBMetadata, SI_Wrapper.Get_Access_Token, SI_Wrapper.receiptID, SI_Wrapper.SyncObjName);
+                        // sync_item_in_QB(SI_Wrapper.SILines, SI_Wrapper.SI, CustomerQBId, SI_Wrapper.QBMetadata, SI_Wrapper.Get_Access_Token, SI_Wrapper.receiptID, SI_Wrapper.SyncObjName);
+                        sync_lines_to_items(SI_Wrapper.SILines, SI_Wrapper.SI, CustomerQBId, SI_Wrapper.QBMetadata, SI_Wrapper.Get_Access_Token, SI_Wrapper.receiptID, SI_Wrapper.SyncObjName);
                     }
                     UpdateAccount(SI_Wrapper.acc.Id, CustomerQBId, SI_Wrapper.QBMetadata, SyncToken, 'Customer');
                 }
@@ -502,7 +502,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
             // Sync sales Inovice Lines
                 for(buildertek__Billable_Lines__c Items : ItemList){
                     if(Items.buildertek__QB_Id__c == null){
-                        ItemsWithoutQBId.add(Items.Name);
+                        ItemsWithoutQBId.add(Items.buildertek__Item_Name__c);
                         ItemToSync.add(Items);
                     }
                 }
@@ -558,7 +558,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                     // Filter Duplicate Name SF Items And SF Items To Create IN QB...
                     for(buildertek__Billable_Lines__c item : ItemToSync){
 
-                        String ItemName = item.Name;
+                        String ItemName = item.buildertek__Item_Name__c.toLowerCase();
                         String DupliacteItemName = queryItems_Map.get(ItemName).Name;
 
                         if(ItemName != DupliacteItemName){
@@ -572,7 +572,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                     ItemstoCreate = ItemstoCreate_Map.values();
 
                     for(buildertek__Billable_Lines__c item : ItemToSync){
-                        String ItemName = item.Name;
+                        String ItemName = item.buildertek__Item_Name__c.toLowerCase();
     
                         Id CreteItemId;
                         if(ItemstoCreate_Map.keySet().size() > 0){
@@ -589,12 +589,12 @@ public with sharing class QBIntegrationQueue_SIFlow {
                     System.debug('.... None of the Line have Duplicate Name In QB .....');
                     // ItemstoCreate = ItemToSync;
                     for(buildertek__Billable_Lines__c item : ItemToSync){
-                        String ItemName = item.Name;
+                        String ItemName = item.buildertek__Item_Name__c.toLowerCase();
                         ItemstoCreate_Map.put(ItemName, item);
                     }
 
                     for(buildertek__Billable_Lines__c item : ItemToSync){
-                        String ItemName = item.Name;
+                        String ItemName = item.buildertek__Item_Name__c.toLowerCase();
                         Id CreteItemId;
                         if(ItemstoCreate_Map.keySet().size() > 0){
                             CreteItemId = ItemstoCreate_Map.get(ItemName).Id;
@@ -632,7 +632,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                     
                             // API Callout to Sync Items in QB...
                             String Items_EndPoint = '/v3/company/' + QBMetadata.buildertek__Company_Id__c + '/batch?minorversion=' + QBMetadata.buildertek__minorversion__c;
-                            String Items_RequestBody = QBMap.MapItemDataToBatch(itemsBatch, SyncObjName); 
+                            String Items_RequestBody = QBMap.MapInvoiceLineToBatch(itemsBatch); 
                             System.debug('Items_RequestBody ' +Items_RequestBody);
                             HttpResponse Items_Response = QBCallOutService.QBAPICallOut(Items_EndPoint , Items_RequestBody, Get_Access_Token);
                             system.debug('Item Batch API Status Code >> ' + Items_Response.getStatusCode());
@@ -652,7 +652,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                             system.debug(' --- NewCreatedItem_Map ---- : ' + NewCreatedItem_Map);
 
                             for(buildertek__Billable_Lines__c item : QBItemsToAssign){
-                                string ItemName = item.Name;
+                                string ItemName = item.buildertek__Item_Name__c.toLowerCase();
                                 NewCreatedItemToAssign_Map.put(item.Id, NewCreatedItem_Map.get(ItemName));
                             }
                             system.debug(' --- NewCreatedItemToAssign_Map ---- : ' + NewCreatedItemToAssign_Map);
@@ -691,7 +691,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                                 System.debug('lineIdsMap >> ' + lineIdsMap);
                                 
                                 sync_TaxRate_in_QB(SILines, SI, lineIdsMap, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, SyncObjName);
-                                UpdateSIline(ItemstoCreate, lineIdsMap);
+                                UpdateSIline(ItemList, lineIdsMap);
                             }
                         }
                         else{
@@ -734,7 +734,7 @@ public with sharing class QBIntegrationQueue_SIFlow {
                         System.debug('lineIdsMap When Items To Create is NUll>> ' + lineIdsMap);
 
                         sync_TaxRate_in_QB(SILines, SI, lineIdsMap, CustomerQBId, QBMetadata, Get_Access_Token, receiptID, SyncObjName);
-                        UpdateSIline(ItemstoCreate, lineIdsMap);
+                        UpdateSIline(ItemList, lineIdsMap);
                     }
                 }
             }
