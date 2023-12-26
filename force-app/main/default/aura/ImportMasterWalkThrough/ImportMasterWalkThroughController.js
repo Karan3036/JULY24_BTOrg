@@ -99,7 +99,8 @@
     },
 	
 	closeModel : function(component, event, helper){
-	    $A.get("e.force:closeQuickAction").fire();    
+	    // $A.get("e.force:closeQuickAction").fire();
+        component.get("v.onCancel")();    
 	},
 	
 	importWTLines : function(component, event, helper){
@@ -123,19 +124,20 @@
                         var result = response.getReturnValue();  
                         console.log({result});
                         if(result.Status === 'Success'){
-                            var toastEvent = $A.get("e.force:showToast");
-                            toastEvent.setParams({
-                                "title": "Success!",
-                                "message": result.Message,
-                                "type": 'Success'
-                            });
-                            toastEvent.fire(); 
-                            $A.get("e.force:closeQuickAction").fire();  
-                            window.setTimeout(
-                                $A.getCallback(function() {
-                                    document.location.reload(true);    
-                                }), 1000
-                            );
+                            component.get("v.onSuccess")();
+                            // var toastEvent = $A.get("e.force:showToast");
+                            // toastEvent.setParams({
+                            //     "title": "Success!",
+                            //     "message": result.Message,
+                            //     "type": 'Success'
+                            // });
+                            // toastEvent.fire(); 
+                            // // $A.get("e.force:closeQuickAction").fire();  
+                            // window.setTimeout(
+                            //     $A.getCallback(function() {
+                            //         document.location.reload(true);    
+                            //     }), 1000
+                            // );
                         }else{
                             var toastEvent = $A.get("e.force:showToast");
                             toastEvent.setParams({

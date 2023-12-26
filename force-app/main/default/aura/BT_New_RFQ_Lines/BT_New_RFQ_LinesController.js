@@ -167,58 +167,64 @@
     //     component.set("v.showProductFields", false);
     // },
     importMasterWalkThrough: function (component, event, helper) {
-        // var evt = $A.get("e.force:navigateToComponent");
-        //     evt.setParams({
-        //         componentDef: "c:ImportMasterWalkThrough",
-        //         componentAttributes: {
-        //             rfqRecordId: component.get("v.recordId"),
-        //         }
-        //     });
-        // evt.fire(); 
-        $A.createComponents(
-            [
+        if (component.get("v.rfqRecord.buildertek__Status__c") == "New"){
+            $A.createComponents(
                 [
-                    "aura:html",
-                    {
-                        HTMLAttributes: {
-                            class: "slds-text-heading_medium slds-hyphenate",
+                    [
+                        "aura:html",
+                        {
+                            HTMLAttributes: {
+                                class: "slds-text-heading_medium slds-hyphenate",
+                            },
                         },
-                    },
+                    ],
+                    [
+                        "c:ImportMasterWalkThrough",
+                        {
+                            rfqRecordId: component.get("v.recordId"),
+                            onCancel: function () {
+                                component.get("v.modalPromise").then(function (modal) {
+                                    modal.close();
+                                });
+                            },
+                            onSuccess: function () {
+                                component.get("v.modalPromise").then(function (modal) {
+                                    modal.close();
+                                });
+                                $A.get("e.force:refreshView").fire();
+                                var toastEvent = $A.get("e.force:showToast");
+                                    toastEvent.setParams({
+                                        mode: "sticky",
+                                        message: "RFQ Lines are Created Successfully.",
+                                        type: "success",
+                                        duration: "3000",
+                                        mode: "dismissible",
+                                    });
+                                toastEvent.fire();
+                            },
+                        },
+                    ],
                 ],
-                [
-                    "c:ImportMasterWalkThrough",
-                    {
-                        rfqRecordId: component.get("v.recordId"),
-                        onCancel: function () {
-                            component.get("v.modalPromise").then(function (modal) {
-                                modal.close();
-                            });
-                            $A.get("e.force:refreshView").fire();
-                        },
-                        onSuccess: function (file) {
-                            $A.get("e.c:BT_SpinnerEvent")
-                                .setParams({ action: "HIDE" })
-                                .fire();
-                            component.get("v.modalPromise").then(function (modal) {
-                                modal.close();
-                            });
-                            $A.get("e.force:refreshView").fire();
-                        },
-                    },
-                ],
-            ],
-            function (components, status) {
-                if (status === "SUCCESS") {
-                    var modalPromise = component.find("overlay").showCustomModal({
-                        body: components[1],
-                        footer: components[1].find("footer"),
-                        showCloseButton: true,
-                        cssClass: "",
-                        closeCallback: function () { },
-                    });
-                    component.set("v.modalPromise", modalPromise);
+                function (components, status) {
+                    if (status === "SUCCESS") {
+                        console.log('calling this before opening model');
+                        var modalPromise = component.find("overlay").showCustomModal({
+                            body: components[1],
+                        });
+                        component.set("v.modalPromise", modalPromise);
+                    }
                 }
-            }
-        );
+            );
+        } else {
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                mode: "sticky",
+                message: "Cannot create RFQ line. RFQ status must be 'New'.",
+                type: "error",
+                duration: "3000",
+                mode: "dismissible",
+            });
+            toastEvent.fire();
+        }   
     },
 });
