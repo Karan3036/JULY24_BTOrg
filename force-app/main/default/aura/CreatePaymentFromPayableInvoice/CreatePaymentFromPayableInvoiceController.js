@@ -1,5 +1,5 @@
 ({
     doInit : function(component, event, helper) {
-        helper.createRFQ(component, helper);
+        helper.createPayment(component, helper);
 	},
 })

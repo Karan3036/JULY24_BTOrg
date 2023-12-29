@@ -273,12 +273,22 @@ public with sharing class InvoiceTrigger_HDL {
     public void onAfterInsertSI(List<buildertek__Billings__c> newSalesInvoiceList) {
         try {
             Set<Id> ChangeOrderIds = new Set<Id>();
+            Set<Id> projectIdsToUpdate = new Set<Id>();
+
             for (buildertek__Billings__c SalesInvoiceLine : newSalesInvoiceList) {
-                ChangeOrderIds.add(SalesInvoiceLine.buildertek__Change_Order__c);
+                if (SalesInvoiceLine.buildertek__Change_Order__c != null) {
+                    ChangeOrderIds.add(SalesInvoiceLine.buildertek__Change_Order__c);
+                }
+                if (SalesInvoiceLine.buildertek__Project__c != null) {
+                    projectIdsToUpdate.add(SalesInvoiceLine.buildertek__Project__c);
+                }
             }
             
             if (!ChangeOrderIds.isEmpty()) {
                 updateAmountOnChangeOrder(ChangeOrderIds);
+            }
+            if (!projectIdsToUpdate.isEmpty()) {
+                updateAmountOnProject(projectIdsToUpdate);
             }
         } catch (Exception ex) {
             System.debug('Error: ' + ex.getMessage());
@@ -292,12 +302,15 @@ public with sharing class InvoiceTrigger_HDL {
     public void onAfterUpdateSI(List<buildertek__Billings__c> newSalesInvoiceList, Map<Id, buildertek__Billings__c> oldSalesInvoiceMap) {
         try {
             Set<Id> changeOrderIdsToUpdate = new Set<Id>();
+            Set<Id> projectIdsToUpdate = new Set<Id>();
     
             for (buildertek__Billings__c SalesInvoiceLine : newSalesInvoiceList) {
                 buildertek__Billings__c oldSILine = oldSalesInvoiceMap.get(SalesInvoiceLine.Id);
     
                 if (SalesInvoiceLine.buildertek__Change_Order__c != oldSILine.buildertek__Change_Order__c ||
-                    SalesInvoiceLine.buildertek__Total_Amount_Tax__c != oldSILine.buildertek__Total_Amount_Tax__c) {
+                    SalesInvoiceLine.buildertek__Total_Amount_Tax__c != oldSILine.buildertek__Total_Amount_Tax__c || 
+                    SalesInvoiceLine.buildertek__Status__c != oldSILine.buildertek__Status__c ||
+                    SalesInvoiceLine.buildertek__Receipts__c != oldSILine.buildertek__Receipts__c) {
                         if (oldSILine.buildertek__Change_Order__c != null) {
                             changeOrderIdsToUpdate.add(oldSILine.buildertek__Change_Order__c);
                         }
@@ -305,11 +318,24 @@ public with sharing class InvoiceTrigger_HDL {
                             changeOrderIdsToUpdate.add(SalesInvoiceLine.buildertek__Change_Order__c);
                         }
                 }
+                if (SalesInvoiceLine.buildertek__Project__c != oldSILine.buildertek__Project__c ||
+                    SalesInvoiceLine.buildertek__Receipts__c != oldSILine.buildertek__Receipts__c) {
+                        if (oldSILine.buildertek__Project__c != null) {
+                            projectIdsToUpdate.add(oldSILine.buildertek__Project__c);
+                        }
+                        if (SalesInvoiceLine.buildertek__Project__c != null) {
+                            projectIdsToUpdate.add(SalesInvoiceLine.buildertek__Project__c);
+                        }
+                }
             }
     
             if (!changeOrderIdsToUpdate.isEmpty()) {
                 updateAmountOnChangeOrder(changeOrderIdsToUpdate);
             }
+            if (!projectIdsToUpdate.isEmpty()) {
+                updateAmountOnProject(projectIdsToUpdate);
+            }
+
         } catch (Exception ex) {
             System.debug('Error: ' + ex.getMessage());
     
@@ -324,12 +350,22 @@ public with sharing class InvoiceTrigger_HDL {
     public void onAfterDeleteSI(List<buildertek__Billings__c> oldSalesInvoiceList) {
         try {
             Set<Id> changeOrderIdsToUpdate = new Set<Id>();
+            Set<Id> projectIdsToUpdate = new Set<Id>();
+
             for (buildertek__Billings__c SalesInvoiceLine : oldSalesInvoiceList) {
-                changeOrderIdsToUpdate.add(SalesInvoiceLine.buildertek__Change_Order__c);
+                if (SalesInvoiceLine.buildertek__Change_Order__c != null) {
+                    changeOrderIdsToUpdate.add(SalesInvoiceLine.buildertek__Change_Order__c);
+                }
+                if (SalesInvoiceLine.buildertek__Project__c != null) {
+                    projectIdsToUpdate.add(SalesInvoiceLine.buildertek__Project__c);
+                }
             }
-            System.debug('changeOrderIdsToUpdate---->'+changeOrderIdsToUpdate);
+
             if (!changeOrderIdsToUpdate.isEmpty()) {
                 updateAmountOnChangeOrder(changeOrderIdsToUpdate);
+            }
+            if (!projectIdsToUpdate.isEmpty()) {
+                updateAmountOnProject(projectIdsToUpdate);
             }
         } catch (Exception ex) {
             System.debug('Error: ' + ex.getMessage());
@@ -343,7 +379,7 @@ public with sharing class InvoiceTrigger_HDL {
     public void updateAmountOnChangeOrder(Set<Id> ChangeOrderIds) {
         try {
             Map<Id, AggregateResult> totalAmountMap = new Map<Id, AggregateResult>();
-            for (AggregateResult aggregatedResult : [SELECT buildertek__Change_Order__c, SUM(buildertek__Total_Amount_Tax__c) totalAmount FROM buildertek__Billings__c WHERE buildertek__Change_Order__c IN :ChangeOrderIds AND buildertek__Status__c != 'Canceled' GROUP BY buildertek__Change_Order__c]){
+            for (AggregateResult aggregatedResult : [SELECT buildertek__Change_Order__c, SUM(buildertek__Total_Amount_Tax__c) totalAmount, SUM(buildertek__Receipts__c) totalReceiptAmount FROM buildertek__Billings__c WHERE buildertek__Change_Order__c IN :ChangeOrderIds AND buildertek__Status__c != 'Canceled' GROUP BY buildertek__Change_Order__c]){
                 Id ChangeOrderId = (Id)aggregatedResult.get('buildertek__Change_Order__c');
                 totalAmountMap.put(ChangeOrderId, aggregatedResult);
             }
@@ -354,19 +390,63 @@ public with sharing class InvoiceTrigger_HDL {
                 if(totalAmountMap.containsKey(coID)) {
                     AggregateResult aggregatedResult = totalAmountMap.get(coID);
                     Decimal totalAmount = (Decimal)aggregatedResult.get('totalAmount');
+                    Decimal totalReceiptAmount = (Decimal)aggregatedResult.get('totalReceiptAmount');
 
                     buildertek__Change_Order__c co = new buildertek__Change_Order__c(Id = coID);
                     co.buildertek__Total_Invoiced__c = totalAmount;
+                    co.buildertek__Total_Receipts__c = totalReceiptAmount;
                     changeOrderToUpdate.add(co);
                 } else {
                     buildertek__Change_Order__c co = new buildertek__Change_Order__c(Id = coID);
                     co.buildertek__Total_Invoiced__c = 0;
+                    co.buildertek__Total_Receipts__c = 0;
                     changeOrderToUpdate.add(co);
                 }
             }
             System.debug('changeOrderToUpdate: ' + changeOrderToUpdate);
             if (!changeOrderToUpdate.isEmpty()) {
                 update changeOrderToUpdate;
+            }
+
+        } catch (Exception ex) {
+            System.debug('Error: ' + ex.getMessage());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(ex);
+            }
+        }
+    }
+
+    public void updateAmountOnProject(Set<Id> ProjectIds) {
+        try {
+            Map<Id, AggregateResult> totalAmountMap = new Map<Id, AggregateResult>();
+            for (AggregateResult aggregatedResult : [SELECT buildertek__Project__c, SUM(buildertek__Total_Amount_Tax__c) totalAmount, SUM(buildertek__Receipts__c) totalReceiptAmount FROM buildertek__Billings__c WHERE buildertek__Project__c IN :ProjectIds GROUP BY buildertek__Project__c]){
+                Id ProjectId = (Id)aggregatedResult.get('buildertek__Project__c');
+                totalAmountMap.put(ProjectId, aggregatedResult);
+            }
+            
+            List<buildertek__Project__c> ProjectToUpdate = new List<buildertek__Project__c>();
+            
+            for (Id projectID :ProjectIds) {
+                if(totalAmountMap.containsKey(projectID)) {
+                    AggregateResult aggregatedResult = totalAmountMap.get(projectID);
+                    Decimal totalAmount = (Decimal)aggregatedResult.get('totalAmount');
+                    Decimal totalReceiptAmount = (Decimal)aggregatedResult.get('totalReceiptAmount');
+
+                    buildertek__Project__c project = new buildertek__Project__c(Id = projectID);
+                    project.buildertek__Sales_Invoice_Total__c = totalAmount;
+                    project.buildertek__Total_Receipts__c = totalReceiptAmount;
+                    ProjectToUpdate.add(project);
+                } else {
+                    buildertek__Project__c project = new buildertek__Project__c(Id = projectID);
+                    project.buildertek__Sales_Invoice_Total__c = 0;
+                    project.buildertek__Total_Receipts__c = 0;
+                    ProjectToUpdate.add(project);
+                }
+            }
+            System.debug('ProjectToUpdate: ' + ProjectToUpdate);
+            if (!ProjectToUpdate.isEmpty()) {
+                update ProjectToUpdate;
             }
 
         } catch (Exception ex) {

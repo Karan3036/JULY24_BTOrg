@@ -40,6 +40,7 @@ trigger ProjectTaskTrigger on buildertek__Project_Task__c(after insert, after up
                 }
             } else if (Trigger.isUpdate){
                 if (Trigger.isAfter){
+                    system.debug('in after update trigger');
                     handler.OnAfterUpdate(Trigger.old, Trigger.new, Trigger.newMap, Trigger.oldMap);
                     handler.OnAfterUpdateOriginalstartandEndDates(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap);
                     handler.insertUpdateMilestones(Trigger.new, Trigger.newMap);
@@ -62,5 +63,9 @@ trigger ProjectTaskTrigger on buildertek__Project_Task__c(after insert, after up
                 NewGanttChartTaskTriggerHandler.upsertMilestoneData(Trigger.old, Trigger.oldMap);
             }
         }
+    }
+
+    if(Trigger.isUpdate || Trigger.isAfter){
+        ProjectTaskTriggerHandler.populateCompletionOnBudgetLine(Trigger.new , Trigger.oldMap);
     }
 }
