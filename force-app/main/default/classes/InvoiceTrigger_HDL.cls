@@ -310,6 +310,9 @@ public with sharing class InvoiceTrigger_HDL {
                 if (SalesInvoiceLine.buildertek__Change_Order__c != oldSILine.buildertek__Change_Order__c ||
                     SalesInvoiceLine.buildertek__Total_Amount_Tax__c != oldSILine.buildertek__Total_Amount_Tax__c || 
                     SalesInvoiceLine.buildertek__Status__c != oldSILine.buildertek__Status__c ||
+                    SalesInvoiceLine.buildertek__Approved_CO__c != oldSILine.buildertek__Approved_CO__c ||
+                    SalesInvoiceLine.buildertek__Amount__c != oldSILine.buildertek__Amount__c ||
+                    SalesInvoiceLine.buildertek__Tax_Rate__c != oldSILine.buildertek__Tax_Rate__c ||
                     SalesInvoiceLine.buildertek__Receipts__c != oldSILine.buildertek__Receipts__c) {
                         if (oldSILine.buildertek__Change_Order__c != null) {
                             changeOrderIdsToUpdate.add(oldSILine.buildertek__Change_Order__c);
@@ -319,6 +322,10 @@ public with sharing class InvoiceTrigger_HDL {
                         }
                 }
                 if (SalesInvoiceLine.buildertek__Project__c != oldSILine.buildertek__Project__c ||
+                    SalesInvoiceLine.buildertek__Total_Amount_Tax__c != oldSILine.buildertek__Total_Amount_Tax__c ||
+                    SalesInvoiceLine.buildertek__Approved_CO__c != oldSILine.buildertek__Approved_CO__c ||
+                    SalesInvoiceLine.buildertek__Amount__c != oldSILine.buildertek__Amount__c ||
+                    SalesInvoiceLine.buildertek__Tax_Rate__c != oldSILine.buildertek__Tax_Rate__c ||
                     SalesInvoiceLine.buildertek__Receipts__c != oldSILine.buildertek__Receipts__c) {
                         if (oldSILine.buildertek__Project__c != null) {
                             projectIdsToUpdate.add(oldSILine.buildertek__Project__c);

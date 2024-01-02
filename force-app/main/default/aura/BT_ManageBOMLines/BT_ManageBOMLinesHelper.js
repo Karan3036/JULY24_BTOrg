@@ -273,8 +273,8 @@
         $A.enqueueAction(action1);
     },
 
-    getPoLinesList: function (component, event, helper, pageNumber, pageSize) {
-        component.set("v.isLoading", false);
+    getPoLinesList: function (component, event, helper, pageNumber, pageSize, headerIndex) {
+        component.set("v.isLoading", true);
 
         var vendorValue = component.get("v.searchVendorFilter");
         var categoryValue = component.get("v.searchCategoryFilter");
@@ -415,7 +415,8 @@
                     helper,
                     groupByData,
                     result.fieldtypemap,
-                    JSON.parse(result.sObjectRecordsList)
+                    JSON.parse(result.sObjectRecordsList),
+                    headerIndex
                 );
                 //component.set("v.totalRecords", component.get("v.masterBudgetsList").length);
 
@@ -440,7 +441,8 @@
         helper,
         mapData,
         fieldtypemap,
-        sObjectRecordsList
+        sObjectRecordsList,
+        headerIndex
     ) {
         try {
 
@@ -452,6 +454,9 @@
                     sObjectRecordsList[kkk]
                 );
             }
+
+            var massupdateIndex = JSON.parse(JSON.stringify(component.get("v.massupdateIndex")));
+            console.log('formate data massupdateIndex ', massupdateIndex);
             //alert(sObjectRecordsMap);
 
             for (var i in mapData) {
@@ -622,89 +627,101 @@
                 } else {
                     newObj["groupName"] = result[i][0];
                 }
-                newObj["groupData"] = result[i][1];
+                // newObj["groupData"] = result[i][1];
+                var newObj_groupData = result[i][1];
 
                 //dynamic field
                 var selectedFields = component.get("v.bomLineselectedFields").split(",");
                 var mainList = [];
                 var sObjectRecordsList = [];
                 //alert('arrkeys '+i+arrkeys);
-                for (var j in newObj["groupData"]) {
+                for (var j in newObj_groupData) {
                     //alert(obj.groupedRecords[j].Name);
-                    totalRecords += 1;
-                    let newList = [];
-                    if (selectedFields.indexOf("Id") < 0) {
-                        selectedFields.unshift("Id");
-                    }
-                    // // console.log(newObj['groupData'][j])
-                    for (var k = 0; k < selectedFields.length; k++) {
-                        var AllRowListMap = new Map(Object.entries(newObj["groupData"][j]));
-                        // // console.log('*****************',AllRowListMap);
-                        var keyId = Array.from(AllRowListMap.keys())[0];
-                        var mapKey = selectedFields[k];
-                        var strrecord = JSON.stringify(
-                            Object.entries(newObj["groupData"][j])
-                        );
-                        let indexObj = {};
-                        indexObj.fieldType = fieldtypemap[mapKey];
-                        if (strrecord.indexOf(mapKey) > 0) {
-                            if (mapKey.indexOf("__c") > 0) {
-                                indexObj.Key = mapKey;
-                                indexObj.Value = AllRowListMap.get(mapKey);
-                                indexObj.Id = AllRowListMap.get(keyId);
-                            }
+                    // totalRecords += 1;
+                    // let newList = [];
+                    // if (selectedFields.indexOf("Id") < 0) {
+                    //     selectedFields.unshift("Id");
+                    // }
+                    // // // console.log(newObj['groupData'][j])
+                    // for (var k = 0; k < selectedFields.length; k++) {
+                    //     var AllRowListMap = new Map(Object.entries(newObj_groupData[j]));
+                    //     // // console.log('*****************',AllRowListMap);
+                    //     var keyId = Array.from(AllRowListMap.keys())[0];
+                    //     var mapKey = selectedFields[k];
+                    //     var strrecord = JSON.stringify(
+                    //         Object.entries(newObj_groupData[j])
+                    //     );
+                    //     let indexObj = {};
+                    //     indexObj.fieldType = fieldtypemap[mapKey];
+                    //     if (strrecord.indexOf(mapKey) > 0) {
+                    //         if (mapKey.indexOf("__c") > 0) {
+                    //             indexObj.Key = mapKey;
+                    //             indexObj.Value = AllRowListMap.get(mapKey);
+                    //             indexObj.Id = AllRowListMap.get(keyId);
+                    //         }
 
-                            if (mapKey.indexOf("__r") > 0) {
-                                // // console.log('^^^^^^^'+(mapKey));
-                                // // console.log('^^^^^^^'+JSON.stringify(AllRowListMap.get(mapKey)));
-                                // // console.log('^^^^^^^'+JSON.stringify(AllRowListMap));
-                                // // console.log('^^^^^^^ out'+JSON.stringify(AllRowListMap.get(mapKey)));
-                                if (AllRowListMap.get(mapKey) != undefined) {
-                                    // // console.log('^^^^^^^ inn'+AllRowListMap.get(mapKey));
-                                    var AllRowListMap2 = new Map(
-                                        Object.entries(AllRowListMap.get(mapKey))
-                                    );
-                                    var mapKey2 = Array.from(AllRowListMap2.keys())[0];
-                                    indexObj.Key = mapKey;
-                                    indexObj.Value = AllRowListMap2.get(mapKey2);
-                                    indexObj.Id = AllRowListMap.get(keyId);
-                                }
-                            }
-                            if (mapKey == "Name") {
-                                indexObj.Key = mapKey;
-                                indexObj.Value = AllRowListMap.get(mapKey);
-                                indexObj.Id = AllRowListMap.get(keyId);
-                            }
-                            if (mapKey == "Id") {
-                                indexObj.Key = mapKey;
-                                indexObj.Value = AllRowListMap.get(mapKey);
-                                indexObj.Id = AllRowListMap.get(keyId);
-                                indexObj.showVendorIcon = newObj["groupData"][j]["showIcon"];
-                            }
-                        } else {
-                            indexObj.Key = mapKey;
-                            indexObj.Value = "";
-                            indexObj.Id = AllRowListMap.get(keyId);
-                            indexObj.showVendorIcon = newObj["groupData"][j]["showIcon"];
-                        }
+                    //         if (mapKey.indexOf("__r") > 0) {
+                    //             // // console.log('^^^^^^^'+(mapKey));
+                    //             // // console.log('^^^^^^^'+JSON.stringify(AllRowListMap.get(mapKey)));
+                    //             // // console.log('^^^^^^^'+JSON.stringify(AllRowListMap));
+                    //             // // console.log('^^^^^^^ out'+JSON.stringify(AllRowListMap.get(mapKey)));
+                    //             if (AllRowListMap.get(mapKey) != undefined) {
+                    //                 // // console.log('^^^^^^^ inn'+AllRowListMap.get(mapKey));
+                    //                 var AllRowListMap2 = new Map(
+                    //                     Object.entries(AllRowListMap.get(mapKey))
+                    //                 );
+                    //                 var mapKey2 = Array.from(AllRowListMap2.keys())[0];
+                    //                 indexObj.Key = mapKey;
+                    //                 indexObj.Value = AllRowListMap2.get(mapKey2);
+                    //                 indexObj.Id = AllRowListMap.get(keyId);
+                    //             }
+                    //         }
+                    //         if (mapKey == "Name") {
+                    //             indexObj.Key = mapKey;
+                    //             indexObj.Value = AllRowListMap.get(mapKey);
+                    //             indexObj.Id = AllRowListMap.get(keyId);
+                    //         }
+                    //         if (mapKey == "Id") {
+                    //             indexObj.Key = mapKey;
+                    //             indexObj.Value = AllRowListMap.get(mapKey);
+                    //             indexObj.Id = AllRowListMap.get(keyId);
+                    //             indexObj.showVendorIcon = newObj_groupData[j]["showIcon"];
+                    //         }
+                    //     } else {
+                    //         indexObj.Key = mapKey;
+                    //         indexObj.Value = "";
+                    //         indexObj.Id = AllRowListMap.get(keyId);
+                    //         indexObj.showVendorIcon = newObj_groupData[j]["showIcon"];
+                    //     }
 
-                        newList.push(indexObj);
-                    }
-                    /* newList.unshift({'Key':'showVenordIcon','showVenordIcon': newObj['groupData'][j]['showIcon'] })
-                            delete newObj['groupData'][j]['showIcon'];*/
-                    delete newObj["groupData"][j]["showIcon"];
-                    mainList.push(newList);
+                    //     newList.push(indexObj);
+                    // }
+                    // /* newList.unshift({'Key':'showVenordIcon','showVenordIcon': newObj['groupData'][j]['showIcon'] })
+                    //         delete newObj['groupData'][j]['showIcon'];*/
+                    // delete newObj_groupData[j]["showIcon"];
+                    // mainList.push(newList);
                     sObjectRecordsList.push(
-                        sObjectRecordsMap.get(newObj["groupData"][j].Id)
+                        sObjectRecordsMap.get(newObj_groupData[j].Id)
                     );
                     //alert(sObjectRecordsMap.get(newObj['groupData'][j].Id));
                 }
 
-                newObj.groupedRecordsTmp = mainList;
+                // newObj.groupedRecordsTmp = mainList;
                 newObj.sObjectRecordsList = sObjectRecordsList;
+                
+                // if(massupdateIndex.includes(parseInt(i))){
+                //     console.log(' Index match : ', i);
+                //     newObj["massUpdate"] = true;
+                // }
+                // else{
+                //     newObj["massUpdate"] = false;
+                // }
+            
+                newObj["massUpdate"] = false;
 
                 groupData.push(newObj);
             }
+
 
             component.set("v.totalBOMlines", totalRecords);
             component.set("v.dataByGroup", groupData);
@@ -743,7 +760,7 @@
         component.set("v.isLoading", false);
     },
 
-    MassUpdateHelper: function(component, event, helper){
+    MassUpdateHelper: function(component, event, helper, headerIndex){
         // debugger;
         component.set("v.isLoading", true);
         var x = component.get("v.dataByGroup");
@@ -764,12 +781,21 @@
         var state = response.getState();
         var Result = response.getReturnValue();
         if (Result === "successfull") {
+                var pageNumber = component.get("v.PageNumber");
+                var pageSize = component.get("v.pageSize");
 
-            helper.ToastMessageUtilityMethod(component, "Success", 'Records Updated Succcessfully', 'success', 3000);
-            var pageNumber = component.get("v.PageNumber");
-            var pageSize = component.get("v.pageSize");
-            helper.getPoLinesList(component, event, helper, pageNumber, pageSize);
-            component.set("v.massUpdateEnable", false);
+                var groupData = component.get("v.dataByGroup");
+                groupData[headerIndex].massUpdate = false;
+                component.set("v.dataByGroup", groupData);
+                
+                var massupdateIndex = component.get("v.massupdateIndex");
+                massupdateIndex = massupdateIndex.filter(ele => ele !== headerIndex)
+                component.set("v.massupdateIndex", massupdateIndex);
+                console.log('formate data apex call ', massupdateIndex);
+                
+                helper.getPoLinesList(component, event, helper, pageNumber, pageSize, headerIndex);
+                helper.ToastMessageUtilityMethod(component, "Success", 'Records Updated Succcessfully', 'success', 3000);
+            // component.set("v.massUpdateEnable", false);
             // component.set("v.isLoading", false);
         }
         else {

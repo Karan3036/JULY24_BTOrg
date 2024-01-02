@@ -239,7 +239,7 @@
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    width: 100%;
+    /* width: 100%; */
 }
 
 .THIS .slds-table_bordered tbody td{
