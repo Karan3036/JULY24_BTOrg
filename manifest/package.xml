@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <members>ExpenseLineTrigger</members>
-        <name>ApexTrigger</name>
+        <members>ManageBOMlinesController</members>
+        <name>ApexClass</name>
     </types>
     
     <version>57.0</version>

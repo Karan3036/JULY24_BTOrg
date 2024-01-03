@@ -172,11 +172,19 @@ public with sharing class DescribeHandler{
     //get Object type
     public static String getSObjectType(String sobjectName, String filedName){
         String targetSobj = '';
+        System.debug('sobjectName-->'+sobjectName);
         SObjectType sobjType = Schema.getGlobalDescribe().get(sobjectName);
+        System.debug('sobjType-->'+sobjType);
         if(sobjType == null){
             throw new DescribeHandlerException('The object ' + sobjectName + ' is not accessible');
         }
         Map<String,Schema.SObjectField> mfields = sobjType.getDescribe().fields.getMap();
+        for (String fieldName : mfields.keySet()) {
+            Schema.SObjectField field = mfields.get(fieldName);
+            System.debug('Field Name: ' + fieldName + ', Field Type: ' + field.getDescribe().getType());
+        }
+        // System.debug('mfields--->'+mfields);
+        System.debug('filedName--->'+filedName);
         Schema.SObjectField singleField=mfields.get(filedName);
         if(singleField == null){
             throw new DescribeHandlerException('The field (' + singleField + ') is not accessible for the object ' + sobjectName);

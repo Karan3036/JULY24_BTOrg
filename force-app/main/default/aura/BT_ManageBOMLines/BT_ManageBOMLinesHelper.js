@@ -725,6 +725,7 @@
 
             component.set("v.totalBOMlines", totalRecords);
             component.set("v.dataByGroup", groupData);
+            component.set("v.Init_dataByGroup", groupData);
             console.log('Inside formatDataByGroups >> ', component.get("v.dataByGroup"));
             // console.log("groupData===");
             // console.log({ groupData });

@@ -61,6 +61,7 @@
     <aura:attribute name="selectedTableRowIds" type="List" />
     <aura:attribute name="selectedRows" type="List" />
     <aura:attribute name="dataByGroup" type="Object" />
+    <aura:attribute name="Init_dataByGroup" type="Object" />
     <aura:attribute name="cloneDataByGroup" type="Object" />
     <aura:attribute name="dataGroupByVendor" type="Object" />
     <aura:attribute name="selectedRecordMap" type="Object" />
@@ -166,10 +167,11 @@
     <aura:attribute name="totalBOMlines" type="Integer" />
     <aura:attribute name="massupdateIndex" type="List" />
     <!-- BUIL-3754 START -->
-    <!-- <aura:handler name="onSelectEvt" event="c:BT_LookupEvent" action="{!c.handleLookUpEvent}" />   -->
+    <aura:handler name="onSelectEvt" event="c:BT_LookupEvent" action="{!c.handleLookUpEvent}" />  
     <aura:handler name="oSelectedRecordEvent" event="c:BT_LightningLookupEvent" action="{!c.ProductSelectHandler}" />
     <aura:attribute name="indexvalue" type="Integer" />
     <aura:attribute name="pricebookId" type="String" />
+    <aura:attribute name="productfamily" type="String" default="All Families"/>
     
     <lightning:navigation aura:id="goToPrevious" />
 
@@ -248,6 +250,7 @@
                             <tbody>
                                 <aura:iteration  items="{!groupItem.sObjectRecordsList}" var="row" indexVar="index">
                                     <tr>
+                                        <!-- BUIL-3754 START-->
                                         <td role="gridcell" tabindex="-1">
                                             <span class="slds-grid slds-grid_align-spread">
                                                 <div class="slds-truncate">
@@ -256,7 +259,6 @@
                                             </span>
                                         </td>
                                         <aura:iteration items="{!v.fieldValues}" var="field">
-                                            <!-- BUIL-3754 START-->
                                             <aura:if isTrue="{!field.name == 'buildertek__BT_Price_Book__c'}">
                                                 <td style = "padding-right:5px;"> 
                                                     <c:BT_LookupFields selectedRecordId="{!row.buildertek__BT_Price_Book__c}" childObjectName="buildertek__Select_Sheet__c" phaseIndex="{!phaseIndex}" index="{!index}"
@@ -277,10 +279,21 @@
                                                         parentId="{!row.buildertek__BT_Price_Book__c}" prodctfamly="{!v.productfamily}" phaseIndex="{!phaseIndex}" index="{!index}" />
                                                 </td>
                                             </aura:if>
+                                            <!-- <aura:if isTrue="{!field.name == 'buildertek__Vendor__c'}">
+                                                <td style = "padding-right:5px; max-width: 10rem;"> 
+                                                    <c:BT_LookUp _field="buildertek__Vendor__c" 
+									                  _sobject="buildertek__Product__c" 
+									                  _value="{!row.buildertek__Vendor__c}"
+									                  _label=""
+									                  _filter="{!row.buildertek__Product__c}"
+									                  />
+                                                </td>
+                                            </aura:if> -->
+                                            
                                             <aura:if isTrue="{!!(OR(OR(field.name == 'buildertek__BT_Price_Book__c', field.name == 'buildertek__Total_Sales_Price__c'), field.name == 'buildertek__Product__c'))}">
                                                 <aura:if isTrue="{!field.type == 'REFERENCE'}">
                                                     <td style = "padding-right:5px;" > 
-                                                        <c:BT_FieldSetMassUpdate aura:id="childComp" record="{!row}" index="{!index}" field="{!field}"
+                                                        <c:BT_FieldSetMassUpdate record="{!row}" index="{!index}" field="{!field}"
                                                             isMassUpdateEnable="{!groupItem.massUpdate}"
                                                             childObjectName="buildertek__Select_Sheet__c"
                                                             ObjectName="buildertek__Select_Sheet__c"
@@ -288,7 +301,7 @@
                                                     </td>
                                                 <aura:set attribute="else">
                                                     <td style = "padding-right:5px; width: 7rem;" > 
-                                                        <c:BT_FieldSetMassUpdate aura:id="childComp" record="{!row}" index="{!index}" field="{!field}"
+                                                        <c:BT_FieldSetMassUpdate record="{!row}" index="{!index}" field="{!field}"
                                                             isMassUpdateEnable="{!groupItem.massUpdate}"
                                                             childObjectName="buildertek__Select_Sheet__c"
                                                             ObjectName="buildertek__Select_Sheet__c"
@@ -460,7 +473,7 @@
                                         
                                         <aura:iteration items="{!v.fieldValues}" var="field" indexVar="columnIndex">
                                             <aura:if isTrue="{!field.name == 'Name'}">
-                                                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                                                <td style="max-width: 16rem; overflow: hidden; text-overflow: ellipsis;" >
                                                     <ui:outputURL value="{!'/one/one.app?#/sObject/'+ row.Id + '/view'}"
                                                                         label="{!row.Name}" />
                                                 </td>
@@ -468,7 +481,7 @@
                                                     <aura:if isTrue="{!(field.label == 'Standard?')}">
                                                         <td>
                                                             
-                                                            <c:BT_FieldSetMassUpdate aura:id="childComp" record="{!row}" index="{!index}" field="{!field}"
+                                                            <c:BT_FieldSetMassUpdate record="{!row}" index="{!index}" field="{!field}"
                                                                                      isMassUpdateEnable="{!groupItem.massUpdate}"
                                                                                      childObjectName="buildertek__Select_Sheet__c"
                                                                                      ObjectName="buildertek__Select_Sheet__c"
@@ -479,15 +492,15 @@
                                                             <aura:if isTrue="{! or( or(field.type == 'DOUBLE',field.type == 'CURRENCY'), field.type == 'PERCENT') }">
                                                                 
                                                                 <td style = "padding-right:5px; padding-left: 16px;" > 
-                                                                    <c:BT_FieldSetMassUpdate aura:id="childComp" record="{!row}" index="{!index}" field="{!field}"
+                                                                    <c:BT_FieldSetMassUpdate record="{!row}" index="{!index}" field="{!field}"
                                                                                              isMassUpdateEnable="{!groupItem.massUpdate}"
                                                                                              childObjectName="buildertek__Select_Sheet__c" 
                                                                                              ObjectName="buildertek__Select_Sheet__c"
                                                                                              callingCmpName="BT_ManageBOMLines"/>
                                                                 </td>
                                                                 <aura:set attribute="else">
-                                                                    <td>  
-                                                                        <c:BT_FieldSetMassUpdate  aura:id="childComp" record="{!row}" index="{!index}" field="{!field}"
+                                                                    <td style="max-width: 16rem; overflow: hidden; text-overflow: ellipsis;">  
+                                                                        <c:BT_FieldSetMassUpdate record="{!row}" index="{!index}" field="{!field}"
                                                                                                     isMassUpdateEnable="{!groupItem.massUpdate}"
                                                                                                     childObjectName="buildertek__Select_Sheet__c" 
                                                                                                     ObjectName="buildertek__Select_Sheet__c"

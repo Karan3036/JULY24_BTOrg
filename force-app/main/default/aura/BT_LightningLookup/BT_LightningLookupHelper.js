@@ -8,6 +8,8 @@
     //   console.log({productfamily});
 
     // }
+    console.log('parentId : ----->' , component.get("v.parentId"));
+    console.log('FAMILY : ----->' , component.get("v.prodctfamly"));
      var action = component.get("c.getProductRecords");
      action.setStorable();
       // set param to method  
@@ -18,9 +20,9 @@
             'parentId' : component.get("v.parentId"),
             'prodctfamly' : component.get("v.prodctfamly")
           });
-      // set a callBack  
-      console.log( component.get("v.filter"));  
-      console.log( component.get("v.prodctfamly"));
+      // // set a callBack  
+      // console.log( component.get("v.filter"));  
+      // console.log( component.get("v.prodctfamly"));
 
      
 
@@ -29,7 +31,6 @@
             var state = response.getState();
             if (state === "SUCCESS") {
                 var storeResponse = response.getReturnValue();
-                console.log({storeResponse});
               // if storeResponse size is equal 0 ,display No Result Found... message on screen.                }
                 if (storeResponse.length == 0) {
                     component.set("v.Message", 'No Result Found...');
@@ -41,10 +42,10 @@
             }
  
         });
-        console.log(component.get("v.parentId") + '----------------------------->>>>>>>>');
+        // console.log(component.get("v.parentId") + '----------------------------->>>>>>>>');
       // enqueue the Action  
         $A.enqueueAction(action);
-        console.log('listof record-->',component.get("v.listOfSearchRecords"));
+        console.log('listof record-->',component.get("v.listOfSearchRecords").length);
 
     
 	}

@@ -17,7 +17,7 @@
         window.setTimeout(
             $A.getCallback(function() {
                 component.set("v.listOfSearchRecords", null );
-                console.log('list of records4' + component.get("v.listOfSearchRecords"));
+                console.log('list of records' + component.get("v.listOfSearchRecords"));
                 var forclose = component.find("searchRes");
                 $A.util.addClass(forclose, 'slds-is-close');
                 $A.util.removeClass(forclose, 'slds-is-open');    
@@ -59,7 +59,7 @@
         }
         else{ 
              component.set("v.listOfSearchRecords", null ); 
-             console.log('list of records1' + component.get("v.listOfSearchRecords"));
+             console.log('list of records' + component.get("v.listOfSearchRecords"));
 
              var forclose = component.find("searchRes");
                $A.util.addClass(forclose, 'slds-is-close');
@@ -81,7 +81,7 @@
          
          component.set("v.SearchKeyWord",'');
          component.set("v.listOfSearchRecords", null );
-         console.log('list of records2' + component.get("v.listOfSearchRecords"));
+         console.log('list of records' + component.get("v.listOfSearchRecords"));
 
          component.set("v.selectedRecord", {} );  
          var getInputkeyWord = component.get("v.SearchKeyWord");
@@ -101,6 +101,9 @@
         component.set('v.childValue' , '');
         component.set('v.costcodeValue' , '');
         component.set('v.unitcostValue' , '');
+        component.set('v.product' , '');
+        component.set('v.productName' , '');
+        component.set('v.vendorId' , '');
          
         
     },
@@ -177,7 +180,7 @@
                 
                 component.set("v.SearchKeyWord",'');
                 component.set("v.listOfSearchRecords", null );
-                console.log('list of records3' + component.get("v.listOfSearchRecords"));
+                console.log('list of records' + component.get("v.listOfSearchRecords"));
 
                 component.set("v.selectedRecord", {} );  
                 var getInputkeyWord = component.get("v.SearchKeyWord");

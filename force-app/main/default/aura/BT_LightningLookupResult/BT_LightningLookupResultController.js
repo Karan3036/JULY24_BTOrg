@@ -10,7 +10,12 @@
     // call the event   
       var compEvent = component.getEvent("oSelectedRecordEvent");
     // set the Selected sObject Record to the event attribute.  
-         compEvent.setParams({"recordByEvent" : getSelectRecord,"recordByEventstring": component.get("v.ObjectAPIName")});  
+         compEvent.setParams({
+          "recordByEvent" : getSelectRecord,
+          "recordByEventstring": component.get("v.ObjectAPIName"),
+          "phaseIndex" : component.get("v.phaseIndex"),
+          "index": component.get("v.index"),
+        });  
     // fire the event  
          compEvent.fire();
     },

@@ -2,7 +2,8 @@
 	initiateTargetSObject : function(component) {
         var sobject = component.get("v._sobject");
         var field = component.get("v._field");
-        
+        console.log('sobject--->',sobject);
+        console.log('field--->',field);
         //Call remote action to query result
         var getTargetSObjectName = component.get("c.getTargetSObjectName");
         getTargetSObjectName.setStorable();

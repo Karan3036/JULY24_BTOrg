@@ -129,9 +129,9 @@
           groupData[headerIndex].massUpdate = false;
           component.set("v.dataByGroup", groupData);
 
-          var massupdateIndex = component.get("v.massupdateIndex");
-          massupdateIndex = massupdateIndex.filter(ele => ele !== headerIndex)
-          component.set("v.massupdateIndex", massupdateIndex);
+          // var massupdateIndex = component.get("v.massupdateIndex");
+          // massupdateIndex = massupdateIndex.filter(ele => ele !== headerIndex)
+          // component.set("v.massupdateIndex", massupdateIndex);
 
 
           // component.set("v.massUpdateEnable", false);
@@ -203,7 +203,8 @@
 
       ProductSelectHandler: function(component, event, helper){
       try{
-        component.set("v.isLoading", true);
+        var action = component.get('c.spinnerSpin');
+        $A.enqueueAction(action);
         console.log("product id : ", JSON.parse(JSON.stringify(event.getParam("recordByEvent"))));
         var index = event.getParam("index");
         var headerIndex = event.getParam("phaseIndex")
@@ -213,20 +214,22 @@
 
         if(product){
           var groupData = component.get("v.dataByGroup");
+          var groupData2 = component.get("v.dataByGroup");
           groupData[headerIndex].sObjectRecordsList[index].buildertek__Product__r = product;
           groupData[headerIndex].sObjectRecordsList[index].buildertek__Product__c = product.Id;
           groupData[headerIndex].sObjectRecordsList[index].Name = product.Name;
           groupData[headerIndex].sObjectRecordsList[index].buildertek__Vendor__c = product.buildertek__Vendor__c;
+
+          groupData[headerIndex].massUpdate = false;
+          component.set("v.dataByGroup", groupData);
+
           groupData[headerIndex].massUpdate = true;
           component.set("v.dataByGroup", groupData);
-          // groupData[headerIndex].massUpdate = true;
-          // component.set("v.dataByGroup", groupData);
           // groupData[headerIndex].sObjectRecordsList[index].massUpdate = true;
             // component.set("v.dataByGroup", groupData);
           console.log('dataByGroup : ', component.get("v.dataByGroup"));
-
-          // var childComp = component.find("childComp");
-          // childComp.doinitFromParent();
+          console.log('dataByGroup : ', component.get("v.Init_dataByGroup"));
+          
 
           // var divId =  groupData[headerIndex].groupName+'_'+headerIndex;
           // console.log('div Id : ', divId);
@@ -242,6 +245,11 @@
       } catch (error) {
         console.log('error im child to parent call : ', error.stack);
       } 
+      },
+
+
+      spinnerSpin : function(component, event, helper){
+        component.set("v.isLoading", true);
       },
 
      
