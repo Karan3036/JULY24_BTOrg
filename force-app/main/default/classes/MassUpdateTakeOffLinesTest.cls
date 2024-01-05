@@ -46,10 +46,11 @@ public class MassUpdateTakeOffLinesTest{
         buildertek__Plans__c plantype = [Select Id FROm buildertek__Plans__c LIMIT 1];
         
         MassUpdateTakeOffLines updaterecord = new MassUpdateTakeOffLines();
-        MassUpdateTakeOffLines.getCount(takeOff[0].Id);
+        // MassUpdateTakeOffLines.getCount(takeOff[0].Id);
 		MassUpdateTakeOffLines.getFieldSet();
-        MassUpdateTakeOffLines.getName(takeOff[0].Id);
-        MassUpdateTakeOffLines.getParentId(takeOff[0].Id);
+        // MassUpdateTakeOffLines.getName(takeOff[0].Id);
+        // MassUpdateTakeOffLines.getParentId(takeOff[0].Id);
+        MassUpdateTakeOffLines.getTakeoffInfo(takeOff[0].Id);
         MassUpdateTakeOffLines.getRecords(takeOff[0].Id,'[]',1,1,'d','c','b','a');
         MassUpdateTakeOffLines.updateRecords(takeOff[0].Id,'[]','[]',1,1,'d','c','b','a');
         MassUpdateTakeOffLines.deleteProject(takeOff[0].Id,takeOffLines[0].Id,'[]',1,1,'d','c','b','a');

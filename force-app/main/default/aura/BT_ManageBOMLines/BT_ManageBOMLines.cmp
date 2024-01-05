@@ -169,9 +169,17 @@
     <!-- BUIL-3754 START -->
     <aura:handler name="onSelectEvt" event="c:BT_LookupEvent" action="{!c.handleLookUpEvent}" />  
     <aura:handler name="oSelectedRecordEvent" event="c:BT_LightningLookupEvent" action="{!c.ProductSelectHandler}" />
+    <aura:handler name="oClearRecordEvent" event="c:BT_LightningLookupEvent" action="{!c.clearSelectedHandler}" />
+
     <aura:attribute name="indexvalue" type="Integer" />
     <aura:attribute name="pricebookId" type="String" />
     <aura:attribute name="productfamily" type="String" default="All Families"/>
+    <aura:html tag="style">
+        .slds-dropdown {
+            z-index: 90 !important;
+            top: 100% !important;
+        }
+    </aura:html>
     
     <lightning:navigation aura:id="goToPrevious" />
 
@@ -220,14 +228,14 @@
                 </div>
             </div>
             <!-- </div>  -->
-            <div id="{!groupItem.groupName+'_'+phaseIndex}" class="customDataTable" style="overflow-y:auto;overflow-x:scroll;"><!-- aura:id = "tableByGroup" aura:id="poTable"-->
+            <div id="{!groupItem.groupName+'_'+phaseIndex}" class="customDataTable" style="overflow-x: auto;overflow-y: scroll;"><!-- aura:id = "tableByGroup" aura:id="poTable"-->
                 <aura:if isTrue="{!groupItem.massUpdate}">
                     <div style = "background-color:white;" >
                         <table  class="slds-table slds-table--bordered" style="width: max-content; max-width: 200%;">
                             <thead>
                                 <tr style="{!groupItem.massUpdate ? '':''}">
-                                    <th scope="col" tabindex="-1" aria-label="Row Number" style="width: 52px;">
-                                        <div class="slds-cell-fixed" style="width: 52px; outline: none;">
+                                    <th scope="col" tabindex="-1" aria-label="Row Number" style="width: 52px; background-color: white;">
+                                        <div class="slds-cell-fixed" style="width: 52px; outline: none; display: none;">
                                             <span class="slds-th__action"><span title="Row Number" class="slds-truncate">
                                                 </span></span>
                                         </div>
@@ -236,7 +244,7 @@
                                         <aura:if isTrue="{!or(rec.label == 'Build Phase',rec.label == 'List Price')}">
                                            <th style="padding-right:3.1rem;"> &nbsp;{!rec.label} </th>
                                             <aura:set attribute="else">
-                                               <th> &nbsp;{!rec.label}</th>
+                                               <th style="background-color: white;"> &nbsp;{!rec.label}</th>
                                             </aura:set>
                                         </aura:if>
                                     </aura:iteration>
@@ -260,7 +268,7 @@
                                         </td>
                                         <aura:iteration items="{!v.fieldValues}" var="field">
                                             <aura:if isTrue="{!field.name == 'buildertek__BT_Price_Book__c'}">
-                                                <td style = "padding-right:5px;"> 
+                                                <td style = "padding-right:5px; min-width: 13rem; max-width : 13rem;"> 
                                                     <c:BT_LookupFields selectedRecordId="{!row.buildertek__BT_Price_Book__c}" childObjectName="buildertek__Select_Sheet__c" phaseIndex="{!phaseIndex}" index="{!index}"
                                                         fieldName="{!field.name}" record="{!row}"
                                                         callingCmpName="BT_ManageBOMLines"
@@ -273,7 +281,7 @@
                                                     </td>
                                             </aura:if>
                                             <aura:if isTrue="{!field.name == 'buildertek__Product__c'}">
-                                                <td style = "padding-right:5px; max-width: 10rem;"> 
+                                                <td style = "padding-right:5px; max-width: 13rem; min-width: 13rem;"> 
                                                     <c:BT_LightningLookup objectAPIName="Product2" IconName="standard:product"
                                                         selectedRecord="{!row.buildertek__Product__r}" aura:id="productId"
                                                         parentId="{!row.buildertek__BT_Price_Book__c}" prodctfamly="{!v.productfamily}" phaseIndex="{!phaseIndex}" index="{!index}" />
@@ -292,7 +300,7 @@
                                             
                                             <aura:if isTrue="{!!(OR(OR(field.name == 'buildertek__BT_Price_Book__c', field.name == 'buildertek__Total_Sales_Price__c'), field.name == 'buildertek__Product__c'))}">
                                                 <aura:if isTrue="{!field.type == 'REFERENCE'}">
-                                                    <td style = "padding-right:5px;" > 
+                                                    <td style = "padding-right:5px; min-width: 13rem; max-width : 13rem;" > 
                                                         <c:BT_FieldSetMassUpdate record="{!row}" index="{!index}" field="{!field}"
                                                             isMassUpdateEnable="{!groupItem.massUpdate}"
                                                             childObjectName="buildertek__Select_Sheet__c"
@@ -382,8 +390,8 @@
                         <table class="slds-table slds-table--bordered">
                             <thead>
                                 <tr class="slds-line-height_reset">
-                                    <th scope="col" tabindex="-1" aria-label="Row Number" style="width: 52px;">
-                                        <div class="slds-cell-fixed" style="width: 52px; outline: none;">
+                                    <th scope="col" tabindex="-1" aria-label="Row Number" style="width: 52px; background-color: white;">
+                                        <div class="slds-cell-fixed" style="width: 52px; outline: none; display: none;">
                                             <span><span title="Row Number" class="slds-truncate">
                                                 </span></span>
                                         </div>
@@ -407,7 +415,7 @@
                                     <th scope="col" style="width:2rem;"></th>
                                     <th scope="col" style="width:2rem;"></th> -->
                                     <aura:iteration items="{!v.bomLineFieldsSettings}" var="rec" indexVar="SettingsIndex">
-                                        <th aria-label="Name" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col"
+                                        <th aria-label="Name" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col" style="background-color: white;"
                                             data-sortBy="{!rec.value}" name="{!rec.value}" data-sortGroupIndex="{!phaseIndex}" onclick="{!c.handleSort}" title="{!rec.value}">
                                             <div data-sortBy="{!rec.value}" name="{!rec.value}" style="display: none;">{!rec.label}</div>
                                             <a data-sortBy="{!rec.value}" style="display: flex; justify-content: start; padding-block: 6px;" name="{!rec.value}" class="slds-text-link_reset" href="#" role="button" tabindex="0">
@@ -475,7 +483,7 @@
                                             <aura:if isTrue="{!field.name == 'Name'}">
                                                 <td style="max-width: 16rem; overflow: hidden; text-overflow: ellipsis;" >
                                                     <ui:outputURL value="{!'/one/one.app?#/sObject/'+ row.Id + '/view'}"
-                                                                        label="{!row.Name}" />
+                                                                        label="{!row.Name}" target="_blank"/>
                                                 </td>
                                                 <aura:set attribute="else">
                                                     <aura:if isTrue="{!(field.label == 'Standard?')}">

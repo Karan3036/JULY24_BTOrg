@@ -8,8 +8,6 @@
     //   console.log({productfamily});
 
     // }
-    console.log('parentId : ----->' , component.get("v.parentId"));
-    console.log('FAMILY : ----->' , component.get("v.prodctfamly"));
      var action = component.get("c.getProductRecords");
      action.setStorable();
       // set param to method  

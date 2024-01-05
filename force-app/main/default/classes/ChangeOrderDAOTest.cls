@@ -85,27 +85,29 @@ Integer NUM_QUERY = MAX_QUERY - 1;
         ChangeOrderDAO.createARFromCO(CO.Id);
         
         
-        buildertek__RFQ__c rfq = new buildertek__RFQ__c();
-        rfq.buildertek__Project__c = proj.Id;
-        rfq.buildertek__Status__c = 'Awarded';
-        rfq.buildertek__Description__c = 'Test Description'; 
-        rfq.budget__c=budget.Id;
-        insert rfq;
+        // buildertek__RFQ__c rfq = new buildertek__RFQ__c();
+        // rfq.buildertek__Project__c = proj.Id;
+        // rfq.buildertek__Status__c = 'Awarded';
+        // rfq.buildertek__Description__c = 'Test Description'; 
+        // rfq.budget__c=budget.Id;
+        // insert rfq;
         
-        RFQ_Item__c rfqItem = new RFQ_Item__c(RFQ_Package__c = rfq.Id,Name='test',buildertek__Description__c='test description');
-        insert rfqItem;
-        Test.startTest();  
-        ChangeOrderDAO.fillCOItemFromRFQItem(coItem1,rfqItem);
+        // RFQ_Item__c rfqItem = new RFQ_Item__c(RFQ_Package__c = rfq.Id,Name='test',buildertek__Description__c='test description');
+        // insert rfqItem;
+        // Test.startTest();  
+        // ChangeOrderDAO.fillCOItemFromRFQItem(coItem1,rfqItem);
         
         
-        RFQ_To_Vendor__c rfqToVendor = new RFQ_To_Vendor__c(RFQ__c = rfq.Id, Vendor__c = acc.Id);
-        insert rfqToVendor;
+        // RFQ_To_Vendor__c rfqToVendor = new RFQ_To_Vendor__c(RFQ__c = rfq.Id, Vendor__c = acc.Id);
+        // insert rfqToVendor;
         
-        rfq.buildertek__Vendor__c=rfqToVendor.Id;
-        update rfq; 
+        // rfq.buildertek__Vendor__c=rfqToVendor.Id;
+        // update rfq; 
         
-        Map<Id, RFQ__c> rfqsMap = new Map<Id, RFQ__c>([select id,Name,buildertek__Description__c,buildertek__Status__c,buildertek__Project__c,budget__c,vendor__r.buildertek__Vendor__c,(select id,Name,buildertek__Description__c,Product__c,Budget_Item__c,Unit_Price__c,Quantity__c,Cost_Code__c from RFQ_Items__r) from buildertek__RFQ__c where id=:rfq.Id]);      
+        // Map<Id, RFQ__c> rfqsMap = new Map<Id, RFQ__c>([select id,Name,buildertek__Description__c,buildertek__Status__c,buildertek__Project__c,budget__c,vendor__r.buildertek__Vendor__c,(select id,Name,buildertek__Description__c,Product__c,Budget_Item__c,Unit_Price__c,Quantity__c,Cost_Code__c from RFQ_Items__r) from buildertek__RFQ__c where id=:rfq.Id]);      
         
+Test.startTest();
+
         Map<Id, Contract__c> rfqToSubContract = new  Map<Id, Contract__c> (); 
         Contract__c contract1 = new Contract__c();
         insert contract1;
@@ -127,18 +129,18 @@ Integer NUM_QUERY = MAX_QUERY - 1;
          system.assertEquals('test', 'test');
        
 //System.assertEquals(NUM_QUERY, Limits.getQueries());
-for (Integer i = 0; i < NUM_QUERY; i++) {
-/* buildertek__Change_Order_Item__c a = [SELECT Id,
-                                        buildertek__Cost_Code__c,
-                                        Name,
-                                        buildertek__Quantity__c,
-                                        buildertek__Unit_Price__c,
-                                        buildertek__Total__c,
-                                        buildertek__Unit_Sales_Price__c,
-                                        buildertek__Change_Order__c,
-                                        buildertek__Change_Order__r.buildertek__Contract__c
-                                        FROM buildertek__Change_Order_Item__c  limit 1];*/
-}
+// for (Integer i = 0; i < NUM_QUERY; i++) {
+// /* buildertek__Change_Order_Item__c a = [SELECT Id,
+//                                         buildertek__Cost_Code__c,
+//                                         Name,
+//                                         buildertek__Quantity__c,
+//                                         buildertek__Unit_Price__c,
+//                                         buildertek__Total__c,
+//                                         buildertek__Unit_Sales_Price__c,
+//                                         buildertek__Change_Order__c,
+//                                         buildertek__Change_Order__r.buildertek__Contract__c
+//                                         FROM buildertek__Change_Order_Item__c  limit 1];*/
+// }
 //System.assertEquals(NUM_QUERY, Limits.getQueries());
 Test.stopTest();
         

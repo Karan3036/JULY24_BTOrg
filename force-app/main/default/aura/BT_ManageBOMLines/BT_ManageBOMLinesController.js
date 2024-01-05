@@ -88,7 +88,7 @@
               $A.getCallback(function () {
                 component.set("v.isLoading", false);
               }),
-              3000
+              5000
             );
           }
           else{
@@ -122,26 +122,31 @@
 
       onMassUpdateCancel: function(component, event, helper){
         try {
+          component.set("v.isLoading", true);
           var headerIndex = event.getSource().get("v.title");
-          console.log('headerIndex :: ', headerIndex);
+          // console.log('headerIndex :: ', headerIndex);
 
           var groupData = component.get("v.dataByGroup");
           groupData[headerIndex].massUpdate = false;
+          var Init_dataByGroup = component.get("v.Init_dataByGroup");
+          groupData[headerIndex] = JSON.parse(JSON.stringify(Init_dataByGroup[headerIndex]));
           component.set("v.dataByGroup", groupData);
+          // $A.get('e.force:refreshView').fire();
+          // component.set("v.isLoading", false);
 
-          // var massupdateIndex = component.get("v.massupdateIndex");
-          // massupdateIndex = massupdateIndex.filter(ele => ele !== headerIndex)
-          // component.set("v.massupdateIndex", massupdateIndex);
+          var massupdateIndex = component.get("v.massupdateIndex");
+          massupdateIndex = massupdateIndex.filter(ele => ele !== headerIndex)
+          component.set("v.massupdateIndex", massupdateIndex);
 
 
           // component.set("v.massUpdateEnable", false);
           // component.set("v.isLoading", true);
-          // window.setTimeout(
-          //     $A.getCallback(function () {
-          //       component.set("v.isLoading", false);
-          //     }),
-          //     3000
-          //   );
+          window.setTimeout(
+              $A.getCallback(function () {
+                component.set("v.isLoading", false);
+              }),
+              1500
+            );
 
         } catch (error) {
           console.log('Error in onMassUpdateCancel : ', error.stack);
@@ -200,57 +205,47 @@
           console.log('error im child to parent call : ', error.stack);
         } 
       },
+      
 
-      ProductSelectHandler: function(component, event, helper){
+    ProductSelectHandler: function(component, event, helper){
       try{
-        var action = component.get('c.spinnerSpin');
-        $A.enqueueAction(action);
-        console.log("product id : ", JSON.parse(JSON.stringify(event.getParam("recordByEvent"))));
-        var index = event.getParam("index");
-        var headerIndex = event.getParam("phaseIndex")
-        var product = JSON.parse(JSON.stringify(event.getParam("recordByEvent")));
-        console.log("headerIndex : ", headerIndex);
-        console.log("index : ", index);
+        component.set("v.isLoading", true);
+        var setProduct = true;
 
-        if(product){
-          var groupData = component.get("v.dataByGroup");
-          var groupData2 = component.get("v.dataByGroup");
-          groupData[headerIndex].sObjectRecordsList[index].buildertek__Product__r = product;
-          groupData[headerIndex].sObjectRecordsList[index].buildertek__Product__c = product.Id;
-          groupData[headerIndex].sObjectRecordsList[index].Name = product.Name;
-          groupData[headerIndex].sObjectRecordsList[index].buildertek__Vendor__c = product.buildertek__Vendor__c;
-
-          groupData[headerIndex].massUpdate = false;
-          component.set("v.dataByGroup", groupData);
-
-          groupData[headerIndex].massUpdate = true;
-          component.set("v.dataByGroup", groupData);
-          // groupData[headerIndex].sObjectRecordsList[index].massUpdate = true;
-            // component.set("v.dataByGroup", groupData);
-          console.log('dataByGroup : ', component.get("v.dataByGroup"));
-          console.log('dataByGroup : ', component.get("v.Init_dataByGroup"));
-          
-
-          // var divId =  groupData[headerIndex].groupName+'_'+headerIndex;
-          // console.log('div Id : ', divId);
-          // const updatedPhase = document.getElementById(divId);
-          // updatedPhase.rerender();
-        }
+        // to avoid lag after set product...
         window.setTimeout(
           $A.getCallback(function () {
-            component.set("v.isLoading", false);
+            helper.setProduct(component, event, helper, setProduct); 
           }),
-          500
+          1000
+        );
+        
+      } catch (error) {
+        console.log('error im child to parent call : ', error.stack);
+      } 
+    },
+
+    
+
+    clearSelectedHandler :  function(component, event, helper){
+      try{
+        component.set("v.isLoading", true);
+        var setProduct = false;   // Clear product...
+
+        window.setTimeout(
+          $A.getCallback(function () {
+            helper.setProduct(component, event, helper, setProduct); 
+          }),
+          1000
         );
       } catch (error) {
         console.log('error im child to parent call : ', error.stack);
       } 
-      },
+    },
 
 
-      spinnerSpin : function(component, event, helper){
-        component.set("v.isLoading", true);
-      },
+    spinnerSpin : function(component, event, helper){
+    },
 
      
 })

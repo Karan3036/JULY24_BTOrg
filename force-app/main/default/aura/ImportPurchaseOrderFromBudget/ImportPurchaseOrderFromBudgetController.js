@@ -2,31 +2,33 @@
 	doInit : function(component, event, helper) {
         try {
             $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
-            var action = component.get("c.getMasterPO");
+            var action = component.get("c.getAllPO");
             action.setCallback(this, function(response){
                 var result = response.getReturnValue();
                 console.log('result---> ',result);
                 $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 if(result != null){
+                    component.set("v.RecordExist", true);
                     var pageSize = component.get("v.pageSize");
-                    component.set("v.masterPOList", result);
-                    component.set("v.totalRecords", component.get("v.masterPOList").length);
+                    component.set("v.allPurchaseOrderList", result);
+                    component.set("v.totalRecords", component.get("v.allPurchaseOrderList").length);
                     component.set("v.startPage",0);
                     component.set("v.endPage",pageSize);
                     var PaginationList = [];
                     for(var i=0; i< pageSize; i++){
-                        if(component.get("v.masterPOList").length> i)
+                        if(component.get("v.allPurchaseOrderList").length> i)
                             PaginationList.push(result[i]);    
                     }
                     component.set('v.PaginationList', PaginationList);
                 } else {
-                    var toastEvent = $A.get("e.force:showToast");
-                    toastEvent.setParams({
-                        "title": "Error!",
-                        "message": 'Something went wrong.',
-                        "type": 'Error'
-                    });
-                    toastEvent.fire();
+                    component.set("v.RecordExist", false);
+                    // var toastEvent = $A.get("e.force:showToast");
+                    // toastEvent.setParams({
+                    //     "title": "Error!",
+                    //     "message": 'Something went wrong.',
+                    //     "type": 'Error'
+                    // });
+                    // toastEvent.fire();
                 }
             });
             $A.enqueueAction(action);
@@ -66,7 +68,7 @@
         console.log('isChecked--> ',isChecked);
         var checkboxes = component.find("checkContractor");
         var allrecord = [];
-        allrecord = component.get("v.masterPOList");
+        allrecord = component.get("v.allPurchaseOrderList");
         if (isChecked == true) {
             if (Array.isArray(checkboxes)) {
                 checkboxes.forEach(function (checkbox) {
@@ -102,7 +104,7 @@
             var selectedRecordIds = component.get("v.checkedRecordIds");
             console.log('selectedRecordIds.length---->' + selectedRecordIds.length);
             if(selectedRecordIds.length > 0){
-                var action = component.get("c.checkUpdatePricingField");
+                var action = component.get("c.importPOasBudgetLine");
                 action.setParams({
                     poIds : selectedRecordIds,
                     recordId : component.get("v.recordId")
@@ -160,7 +162,7 @@
 	
 	next: function (component, event, helper) {
         try {
-            var sObjectList = component.get("v.masterPOList");
+            var sObjectList = component.get("v.allPurchaseOrderList");
             var end = component.get("v.endPage");
             var start = component.get("v.startPage");
             var pageSize = component.get("v.pageSize");
@@ -184,7 +186,7 @@
     },
     previous: function (component, event, helper) {
         try {
-            var sObjectList = component.get("v.masterPOList"); 
+            var sObjectList = component.get("v.allPurchaseOrderList"); 
             var end = component.get("v.endPage");
             var start = component.get("v.startPage");
             var pageSize = component.get("v.pageSize");
