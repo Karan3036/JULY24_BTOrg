@@ -5,6 +5,13 @@
             loadData();
         }
 </script>-->
+<head>
+  <style>
+      @page {
+          size: A3;
+      }
+  </style>
+</head>
 
 <apex:form >
 <!--<apex:actionFunction name="loadData" action="{!createPDF}" /> -->

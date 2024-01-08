@@ -480,27 +480,27 @@
                 } else {
                     // if(this.filesCount == this.fileInputLenght){ 
                         //alert(this.fileIds.length);
-                        console.log('this.fileIds ==> '+this.fileIds);
-                        component.set("v.selectedFillIds",this.fileIds);
-                        $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
-                        this.send(component, event, helper);
-                        this.filesCount = 0;
-                        this.fileInputLenght = 0;
-                        this.fileIds = [];
+                        // console.log('this.fileIds ==> '+this.fileIds);
+                        // component.set("v.selectedFillIds",this.fileIds);
+                        // $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
+                        // this.send(component, event, helper);
+                        // this.filesCount = 0;
+                        // this.fileInputLenght = 0;
+                        // this.fileIds = [];
                        
                     // }
                 }
-                // if(this.filesCount == this.fileInputLenght){ 
-                //     //alert(this.fileIds.length);
-                //     console.log('this.fileIds ==> '+this.fileIds);
-                //     component.set("v.selectedFillIds",this.fileIds);
-                //     $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
-                // 	this.send(component, event, helper);
-                //     this.filesCount = 0;
-                //     this.fileInputLenght = 0;
-                //     this.fileIds = [];
+                if(this.filesCount == this.fileInputLenght){ 
+                    //alert(this.fileIds.length);
+                    console.log('this.fileIds ==> '+this.fileIds);
+                    component.set("v.selectedFillIds",this.fileIds);
+                    $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
+                	this.send(component, event, helper);
+                    this.filesCount = 0;
+                    this.fileInputLenght = 0;
+                    this.fileIds = [];
                    
-                // }
+                }
                 // handel the response errors        
             } else if (state === "INCOMPLETE") { 
                 //component.set("v.Spinner", false); 
