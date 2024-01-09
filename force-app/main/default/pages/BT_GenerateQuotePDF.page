@@ -9,15 +9,16 @@
   <style>
       @page {
           size: A3;
+          margin: 5px !important;
       }
-      .middle-box{
-        padding: 10px 10px !important;
+      .pdfMiddleBox{
+        padding: 10px 20px !important;
       }
-      .left-box{
-        width: 45% !important;
+      .pdfLeftBox{
+        width: 49% !important;
       }
-      .right-box{
-        width: 45% !important;
+      .pdfRightBox{
+        width: 49% !important;
       }
   </style>
 </head>

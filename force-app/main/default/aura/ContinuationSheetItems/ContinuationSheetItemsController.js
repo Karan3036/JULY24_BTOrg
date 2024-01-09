@@ -2302,6 +2302,16 @@ component.set("v.Spinner", true);
                     toastEvent.fire();
                 }
             }  else{
+                var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        title : 'Error',
+                        message: 'Something went wrong.',
+                        duration:' 5000',
+                        key: 'info_alt',
+                        type: 'Error',
+                        mode: 'dismissible'
+                    });
+                    toastEvent.fire();
                 component.set("v.Spinner", false);
             }   
         });
