@@ -1,63 +1,18 @@
 ({
-    getParameterByName: function (component, event, name) {
-		name = name.replace(/[\[\]]/g, "\\$&");
-		var url = window.location.href;
-		var regex = new RegExp("[?&]" + name + "(=1\.([^&#]*)|&|#|$)");
-		var results = regex.exec(url);
-		if (!results) return null;
-		if (!results[2]) return '';
-		return decodeURIComponent(results[2].replace(/\+/g, " "));
-	},
-
-	getCustomerId: function (component, event, helper, parentRecordId) {
-		var action4 = component.get("c.getCustomerId")
-		action4.setParams({
-			recordId: parentRecordId
+	getPayableInvoiceInfo: function (component, event, helper, parentRecordId) {
+		var action = component.get("c.getPayableInfo")
+		action.setParams({
+			recordId: component.get("v.recordId")
 		});
-		action4.setCallback(this, function (response) {
+		action.setCallback(this, function (response) {
 			if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
 				component.set("v.Spinner", false);
 				var customerId = response.getReturnValue();
-				// console.log('customerId-->>',{customerId});
 				component.set("v.customerId", customerId);
 				console.log('customerId-->>',component.get("v.customerId"));
 			}
 		});
-		$A.enqueueAction(action4); 
-	},
-
-	getFieldSetwithProject: function (component, event, helper) {
-		var action3 = component.get("c.getFieldSet");
-		action3.setParams({
-			objectName: 'buildertek__Purchase_Order__c',
-			fieldSetName: 'buildertek__NewPOfromProject'
-		});
-		action3.setCallback(this, function (response) {     
-			if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
-				component.set("v.Spinner", false);
-				var listOfFields0 = JSON.parse(response.getReturnValue());
-				console.log('listOfFields1-->>',{listOfFields0});
-				component.set("v.listOfFields1", listOfFields0);
-			}
-		});
-		$A.enqueueAction(action3);
-	},
-
-	getFieldSetforPOLine: function (component, event, helper) {
-		var action5 = component.get("c.getFieldSet");
-        action5.setParams({
-            objectName: 'buildertek__Purchase_Order_Item__c',
-            fieldSetName: 'buildertek__POLinefromProject'
-        });
-        action5.setCallback(this, function (response) {     
-            if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
-                component.set("v.Spinner", false);
-                var listOfFields0 = JSON.parse(response.getReturnValue());
-                console.log('listOfFieldsofPOLine-->>',{listOfFields0});
-                component.set("v.listOfFieldsofPOLine", listOfFields0);
-            }
-        });
-        $A.enqueueAction(action5);
+		$A.enqueueAction(action); 
 	},
 
 	setupListofPOItem: function (component, event, helper) {

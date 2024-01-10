@@ -1,10 +1,10 @@
-<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride" access="global" controller="New_PO_ComponentController">
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="CreatePaymentFromPIController">
 
 <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 <ltng:require styles="{!$Resource.ModalPreview62moreMedia}"/>
 <lightning:notificationsLibrary aura:id="notifLib"/>
 <lightning:workspaceAPI aura:id="workspace"/>
-<aura:attribute name="listOfFields0" type="List" />
+<aura:attribute name="listOfFields" type="List" />
 <aura:attribute name="isSaveNew" type="boolean" default="false"/>
 <aura:attribute name="saveAndNew" type="Boolean" default="false" />
 <aura:attribute name="parentRecordId" type="String" default="" />
@@ -44,7 +44,7 @@
                     <div class="slds-p-around_medium" style="background-color:white;">
                         <h2 class="slds-section-title--divider">Information</h2>
                         <lightning:layout multipleRows="true">
-                            <aura:iteration items="{!v.listOfFields0}" var="field">
+                            <aura:iteration items="{!v.listOfFields}" var="field">
                                 <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
                                     <aura:if isTrue="{!and(field.name!='buildertek__Project__c',field.name!='buildertek__Vendor__c')}">
                                         <lightning:inputField fieldName="{!field.name}" />
