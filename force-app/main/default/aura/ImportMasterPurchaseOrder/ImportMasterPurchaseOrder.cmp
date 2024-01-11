@@ -70,7 +70,7 @@
                     </aura:iteration>
                 </tbody>
             </table>
-            <br />
+            <!-- <br /> -->
 
         </div>
     </div>

@@ -79,8 +79,39 @@ public class PaymentApplicationTriggerHandler {
         }
     }
     
+    public void updateRecords(Map<String, String> recordtypeMap, List<buildertek__SOV_Payment_Application__c> recordsToUpdate) {
+        System.debug('recordtypeMap :-->' +recordtypeMap);
+        List<buildertek__SOV_Payment_Application__c> payAppUpdate = new List<buildertek__SOV_Payment_Application__c>();
+        for (buildertek__SOV_Payment_Application__c app : recordsToUpdate) {
+            if (app.buildertek__PA_Type__c != app.RecordType.Name) {
+                app.RecordTypeId = recordtypeMap.get(app.buildertek__PA_Type__c);
+                payAppUpdate.add(app);
+                System.debug('in if :--->' + payAppUpdate);
+            }
+        }
+        if (!payAppUpdate.isEmpty()) {
+            
+            update recordsToUpdate;
+        }
+    }
+    
+    
     public void OnAfterupdate(List<buildertek__SOV_Payment_Application__c> oldPayment, List<buildertek__SOV_Payment_Application__c> newPayment,Map<Id, buildertek__SOV_Payment_Application__c> oldPaymetnMap, Map<Id, buildertek__SOV_Payment_Application__c> newPaymentMap){
-        
+    
+        Map<String, String> rtMap = new Map<String, String>();
+        for (RecordType rt : [Select Id, Name from RecordType where SobjectType = 'buildertek__SOV_Payment_Application__c']) {
+            rtMap.put(rt.Name, rt.Id);
+        }
+        List<Id> appToUpdate = new List<Id>();
+        for (buildertek__SOV_Payment_Application__c app : newPayment) {
+            appToUpdate.add(app.Id);
+        }
+        if (!appToUpdate.isEmpty()) {
+            List<buildertek__SOV_Payment_Application__c> updateAppList = [SELECT Id, Name, RecordTypeId,RecordType.Name , buildertek__PA_Type__c  FROM buildertek__SOV_Payment_Application__c where Id =:appToUpdate];
+            System.debug('updateAppList :-->' +updateAppList);
+            updateRecords(rtMap,updateAppList);
+        } 
+
         system.debug('calling');
         String portalCode = '';
         string userName = userInfo.getUserId();
