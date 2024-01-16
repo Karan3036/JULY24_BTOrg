@@ -36,7 +36,7 @@
     },
 
     getAllSOVToImportInPO: function (component, event, helper) {
-
+        $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
         var action = component.get("c.getAllSOV");
         action.setParams({
             projectId : component.get("v.ProjectId")

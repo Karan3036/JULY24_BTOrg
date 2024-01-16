@@ -62,7 +62,7 @@ public with sharing class ImportSOVLineToPOController {
 
                 newBudgetLine.buildertek__Purchase_Order__c = recordId;
                 newBudgetLine.Name = SOVLine.Name;
-                newBudgetLine.buildertek__SOV_Line_Id__c = SOVLine.Id;
+                newBudgetLine.buildertek__BT_Schedule_of_Value_Lines__c = SOVLine.Id;
                 newBudgetLine.buildertek__Description__c = SOVLine.buildertek__Description_of_Work__c;
                 newBudgetLine.buildertek__Quantity__c = 1;
                 newBudgetLine.buildertek__Unit_Price__c = SOVLine.buildertek__Scheduled_Value__c;
@@ -117,7 +117,7 @@ public with sharing class ImportSOVLineToPOController {
             List<buildertek__Schedule_of_Value_Lines__c> sovLinesToUpdate = new List<buildertek__Schedule_of_Value_Lines__c>();
 
             for (buildertek__Purchase_Order_Item__c newPOItem : newPOLinelst) {
-                buildertek__Schedule_of_Value_Lines__c sovLine = sovLineMap.get(newPOItem.buildertek__SOV_Line_Id__c);
+                buildertek__Schedule_of_Value_Lines__c sovLine = sovLineMap.get(newPOItem.buildertek__BT_Schedule_of_Value_Lines__c);
                 if (sovLine != null) {
                     sovLine.buildertek__BT_Purchase_Order_Line__c = newPOItem.Id;
                     sovLinesToUpdate.add(sovLine);

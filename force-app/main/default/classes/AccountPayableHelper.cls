@@ -53,7 +53,7 @@ public with sharing class AccountPayableHelper {
         Set<Id> invoiceIds = new Set<Id>();
         for(buildertek__Account_Payable__c pay : updatedPayableList){ 
             purchaseOderIdSet.add(pay.buildertek__Purchase_Order__c); 
-            
+
             if (pay.buildertek__Net_Amount__c != oldPayableMap.get(pay.Id).buildertek__Net_Amount__c) {
                 invoiceIds.add(pay.Id);
             }
@@ -185,7 +185,6 @@ public with sharing class AccountPayableHelper {
         }
     }
     
-
     public static void onbeforeUpdate(buildertek__Account_Payable__c[] updatedPayableList){ 
         for(buildertek__Account_Payable__c inv : updatedPayableList){ 
             if(inv.buildertek__Terms__c == 'Due on Receipt'){
