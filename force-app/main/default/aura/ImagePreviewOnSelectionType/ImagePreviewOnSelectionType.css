@@ -1,0 +1,72 @@
+.THIS .titleStyle{
+    font-family: Inter;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: 0em;
+    text-align: left;
+    margin-left: 5px;
+}
+
+.THIS .image-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.THIS .grid-image {
+    min-width: 100%;
+    min-height: 100%;
+    width: 100%;
+    height: auto;
+    border: 1px solid grey;
+    border-radius: 15px;
+    margin: 5px; /* Adjust the margin as needed */
+}
+
+.THIS .rkdiv .slds-is-open>.slds-accordion__content{
+    display: flex;
+    flex-direction: row;
+    width: -webkit-fill-available;
+    overflow: auto;
+}
+
+.THIS .rkdiv .slds-accordion{
+    width: -webkit-fill-available;
+}
+
+.THIS .rkdiv .slds-accordion__summary-action{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    width: 100%;
+    height: 30px;
+    padding-left: 15px;
+    background-color: rgba(27, 82, 151, 1.0);
+    color: white;
+    border-radius: 4px;
+    /* right: 2rem;
+    position: relative; */
+}
+
+/* .THIS .rkdiv .slds-accordion__summary{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    width: 100%;
+    height: 30px;
+    padding-left: 15px;
+    background-color: rgba(27, 82, 151, 1.0);
+    color: white;
+    right: 2rem;
+    position: relative;
+} */
+
+.THIS .rkdiv .slds-accordion__list-item{
+    margin-bottom: 1vh;
+    margin-top: 1vh;
+}
+
+/* .THIS .rkdiv lightning-primitive-icon{
+    position: relative;
+    left: 75rem; 
+} */

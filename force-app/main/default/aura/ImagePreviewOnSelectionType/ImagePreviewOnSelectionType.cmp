@@ -1,0 +1,28 @@
+<aura:component controller="ImagePreviewController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global">
+
+    <force:recordData aura:id="forceRecordCmp" recordId="{!v.recordId}" fields="Id, Name" targetFields="{!v.selectionType}" targetError="{!v.recordLoadError}" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="contentDocsList" type="List" />
+    <aura:attribute name="activeSections" type="List"/>
+    <aura:attribute name="activeSectionsMessage" type="String" default="" />
+    <aura:attribute name="selectionType" type="Object"/>
+    <aura:attribute name="recordLoadError" type="String"/>
+
+    <lightning:card>
+        <div class="titleStyle">{!v.selectionType.Name}</div>
+        <div class="rkdiv" style="display: flex; flex-wrap: wrap; overflow: auto; max-height:57.4vh;height:auto;margin: 5px;">
+            <lightning:accordion allowMultipleSectionsOpen="true" onsectiontoggle="{! c.handleSectionToggle }" activeSectionName="{! v.activeSections }">
+                <aura:iteration items="{!v.contentDocsList}" var="contentDocsItem">
+                    <lightning:accordionSection label="{!contentDocsItem.key}">
+                        <aura:iteration items="{!contentDocsItem.value}" var="optionItem">
+                            <div style="flex: 0 0 calc(16.6667% - 10px); margin: 5px;">
+                                <img style="min-width: 100%; min-height: 100%; width: 100%; height: 175px; border: 1px solid grey; border-radius: 15px;" src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem}" />
+                            </div>
+                        </aura:iteration>
+                    </lightning:accordionSection>
+                </aura:iteration>
+            </lightning:accordion>
+        </div>
+    </lightning:card>
+
+</aura:component>
