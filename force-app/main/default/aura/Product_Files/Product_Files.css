@@ -10,21 +10,7 @@
     font-size: medium;
 
 }
-.THIS .image-grid {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.THIS .grid-image {
-    min-width: 100%;
-    min-height: 100%;
-    width: 100%;
-    height: auto;
-    border: 1px solid grey;
-    border-radius: 15px;
-    margin: 5px; /* Adjust the margin as needed */
-}
-.THIS div.a {
+.THIS div.messageDiv {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -86,10 +72,11 @@
     padding: 6px 10px;
     transition: all 0.24s linear;
     border-radius: 4px;
-}
-.THIS .close_img:hover{
     background: rgb(81 83 85 / 80%);
 }
+/* .THIS .close_img:hover{
+    background: rgb(81 83 85 / 80%);
+} */
 .THIS .image_control_bar{
     position: absolute;
     z-index: 1;
@@ -141,20 +128,4 @@
     flex-direction: column;
     --sds-c-icon-color-foreground-default: white;
     
-}
-.THIS .image_distrubution{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.24s linear;
-    padding: 6px 10px;
-    border-radius: 4px;
-    margin-inline: 4px;
-    position: relative;
-}
-.THIS .image_distrubution:hover{
-    background: rgb(81 83 85 / 80%)
 }

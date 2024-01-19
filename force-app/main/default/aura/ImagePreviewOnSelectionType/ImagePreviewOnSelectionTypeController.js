@@ -1,12 +1,21 @@
 ({
     init: function (component, event, helper) {
-        var recordId = component.get("v.recordId");
-        console.log('recordId => ' + recordId);
+        var sobjectname = component.get("v.sObjectName");
 
-        var action = component.get("c.getProductFilesMap");
+        var recordId = component.get("v.selectedImageId");
+        console.log('Categary recordId => ' + recordId);
+        var recordId1 = component.get("v.recordId");
+        console.log('recordId => ' + recordId1);
+        if (sobjectname == 'buildertek__Question_Group__c') {
+            component.set("v.mainRecordId", recordId1);
+        } else if(sobjectname == 'buildertek__Section__c' || sobjectname == 'buildertek__Selection__c'){
+            component.set("v.mainRecordId", recordId);
+        }
+
+        var action = component.get("c.selectionTypeDetail");
 
         action.setParams({
-            recordId: recordId
+            recordId: component.get("v.mainRecordId")
         });
 
         action.setCallback(this, function (response) {
@@ -16,13 +25,12 @@
             if (state === "SUCCESS") {
                 var result = response.getReturnValue();
                 console.log('Result =>', { result });
-                if (result && Object.keys(result).length > 0) {
-                    var contentDocsList = helper.convertMapToList(result);
-                    console.log('contentDocsList--->',contentDocsList);
-                    component.set("v.contentDocsList", contentDocsList);
+                if (result != null) {
+                    component.set("v.SelectionTypeName", result[0].Name);
+                    component.set("v.SelectionTypeId", result[0].Id);
+                    helper.getfilesfromproduct(component, event, helper);
                 } else {
                     component.set("v.displayImage", false);
-                    console.error("Error fetching product files.");
                 }
             } else {
                 console.error("Error fetching product files.");
@@ -44,10 +52,16 @@
 
     handle_img_click: function(component, event, helper){
         try {
-            console.log('in handle images-->');
-            var imageSrc = event.getSource().get("v.src");
-            var imageTitle = 'Image';
-            var imageId = event.getSource().get("v.id")
+
+            var clickedDiv = event.currentTarget;
+            var imageSrc = clickedDiv.getAttribute('data-src');
+            var imageId = clickedDiv.getAttribute('id');
+            var imageTitle = clickedDiv.getAttribute('data-description');
+
+            // Log or use the values as needed
+            console.log("Clicked Image Src: " + imageSrc);
+            console.log("Clicked Image Id: " + imageId);
+            console.log("Clicked Image Description: " + imageTitle);
 
             helper.changeImageHelper(component, event, helper, imageId, false);
             helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, imageId);
@@ -65,6 +79,49 @@
             "recordId": event.currentTarget.dataset.record
         });
         editRecordEvent.fire();
+    },
+
+    accordionAction : function(component, event, helper) {
+		var thisObj = event.target.name;
+        var w3webAccordionListOver = document.getElementById('w3webAccordionListOver');
+        var accordionListAll =  w3webAccordionListOver.querySelectorAll('.slds-accordion__list-item');
+        //alert(accordionListAll.length);
+ 
+        var conainActive = document.getElementById(thisObj).classList.contains('activeRow');
+        for(var i=0; i<accordionListAll.length; i++){
+            accordionListAll[i].classList.remove('activeRow');
+        }
+ 
+        if(conainActive == true){
+            document.getElementById(thisObj).classList.remove('activeRow');
+        }else{
+            document.getElementById(thisObj).classList.toggle('activeRow');        
+        }
+ 
+	},
+
+    stopEventPropogation: function(component, event, helper){
+        event.stopPropagation();
+    },
+    closeImagePreview : function(component, event, helper){
+        component.set("v.Is_ImageHavePreview", false);
+        component.set('v.Show_ImagePreview', false);
+    },
+    Handle_imageLoaded: function(component, event, helper){
+        console.log('image loaded');
+        component.set("v.PreviewImgSpinner", false);
+    },
+    
+    Handle_imageNotLoaded: function(component, event, helper){
+        console.log('image not loaded');
+        component.set("v.Is_ImageHavePreview", false);
+        component.set("v.PreviewImgSpinner", false);
+
+    },
+    ChangeImg: function(component, event, helper){
+        component.set("v.Is_ImageHavePreview", false);
+        component.set('v.Show_ImagePreview', false);
+        helper.changeImageHelper(component, event, helper, null, true);
     },
 
 });

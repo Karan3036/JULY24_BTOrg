@@ -31,16 +31,11 @@
     },
     handle_img_click: function(component, event, helper){
 
-        console.log("Inside click method");
         var clickedDiv = event.currentTarget;
-
-        // Retrieve values from data attributes
         var imageSrc = clickedDiv.getAttribute('data-src');
         var imageId = clickedDiv.getAttribute('id');
         var imageTitle = clickedDiv.getAttribute('data-description');
-        console.log('imageSrc' ,imageSrc);
-        console.log('imageId' ,imageId);
-        console.log('imageTitle',imageTitle);
+        
         helper.changeImageHelper(component, event, helper, imageId, false);  // To set Visibilti of Next - Previuos button for First & last img
         helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, imageId);
 

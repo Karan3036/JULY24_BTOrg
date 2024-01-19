@@ -1,11 +1,13 @@
 .THIS .titleStyle{
-    font-family: Inter;
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 20px;
-    letter-spacing: 0em;
-    text-align: left;
-    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    width: 100%;
+    height: 30px;
+    padding-left: 15px;
+    background-color: rgba(27, 82, 151, 1.0);
+    color: white;
+    font-size: medium;
 }
 
 .THIS .image-grid {
@@ -43,7 +45,7 @@
     padding-left: 15px;
     background-color: rgba(27, 82, 151, 1.0);
     color: white;
-    border-radius: 4px;
+    border-radius: 0px;
     /* right: 2rem;
     position: relative; */
 }
@@ -89,6 +91,213 @@
     fill: rgba(27, 82, 151, 1.0) !important;
 }
 
-.THIS .rkdiv .slds-icon-text-default {
+.THIS .slds-icon-text-default {
     fill: white;
+}
+
+.THIS {
+    background:#fff !important;
+ }
+ 
+.THIS .w3webAccordion {
+    margin:0; 
+    padding:0; 
+    list-style:none;
+}
+.THIS .w3webAccordion li{
+    padding:5px 0 5px 0;
+}
+.THIS .w3webAccordion li .slds-summary-heading{
+    display:flex !important; 
+    padding:0 0 0 20px; 
+    font-size:17px; 
+    position:relative;
+    align-items: center;
+    justify-content: left;
+    width: 100%;
+    height: 30px;
+    padding-left: 15px;
+    background-color: rgba(27, 82, 151, 1.0);
+    color: white;
+    border-radius: 4px;
+} 
+.THIS .w3webAccordion li .slds-summary-heading:before {
+    content:''; 
+    width:17px; 
+    height:17px; 
+    display:inline-block; 
+    background:url(/resource/SLDS2016/assets/icons/utility/chevronright_60.png) no-repeat left top; 
+    background-size:cover; 
+    cursor: pointer; 
+    position:absolute; 
+    left:0; 
+    top:5px;
+}
+ 
+.THIS .w3webAccordion li .slds-summary-heading:hover{
+    color:#04a5ca; 
+    cursor:pointer;
+}
+.THIS .w3webAccordion .slds-accordion__summary{
+    display:initial;
+}
+.THIS .w3webAccordion .slds-accordion__list-item .accordionContent{
+    display:none; 
+    overflow:hidden;
+}
+.THIS .w3webAccordion li.activeRow .slds-summary-heading{
+    color:#04a5ca;
+}
+.THIS .w3webAccordion li.activeRow .accordionContent{
+    display:flex; 
+    padding:5px 0 5px 20px; 
+    font-size:14px;
+    overflow: auto;
+}
+.THIS .w3webAccordion li.activeRow .accordionContent .postImage{
+    display: inline-block; 
+    float: left; 
+    margin-right: 10px;
+}
+.THIS .w3webAccordion li.activeRow .slds-summary-heading:before {
+    content:''; width:18px; 
+    height:17px; 
+    display:inline-block; 
+    background:url(/resource/SLDS2016/assets/icons/utility/chevrondown_60.png) no-repeat left top; 
+    background-size:cover; 
+    cursor: pointer; 
+    position:absolute; 
+    left:0; 
+    top:5px;
+}
+.THIS .readMore{
+    font-size:14px; 
+    font-weight:bold; 
+    display:inline-block; 
+    padding:0 0 0 10px;
+}
+.THIS .readMore a{
+    color:#ff0000; 
+    text-decoration:none;
+}
+.THIS .readMore a:hover{
+    color:#04a5ca; 
+    text-decoration:underline;
+}
+
+.THIS .accordion-icon {
+    margin-right: 10px; /* Adjust as needed for spacing */
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 10px solid; /* Adjust the size of the triangle as needed */
+    transform-origin: 50% 50%;
+    transition: transform 0.3s;; /* Smooth transition for rotation */
+}
+
+.THIS .slds-accordion__summary.active .accordion-icon {
+    transform: rotate(180deg); /* Rotate 90 degrees for open state */
+}
+
+.THIS .rkdivfora a{
+    color: white !important;
+}
+
+.THIS .Next_Previous_btn{
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(0%, -50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.THIS .Previous_img_btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: rgba(0,0,0,.6);
+    cursor: pointer;
+    margin-right: auto;
+    border-bottom-right-radius: 6px;
+    border-top-right-radius: 6px;
+}
+.THIS .Next_img_btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: rgba(0,0,0,.6);
+    cursor: pointer;
+    margin-left: auto;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+}
+.THIS .img_preview_container{
+    position: relative;
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.THIS .img_preview_container img{
+    max-width: 100%;
+    max-height: 100%;
+}
+.THIS .close_img{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 6px 10px;
+    transition: all 0.24s linear;
+    border-radius: 4px;
+    background: rgb(81 83 85 / 80%);
+}
+/* .THIS .close_img:hover{
+    background: rgb(81 83 85 / 80%);
+} */
+.THIS .image_control_bar{
+    position: absolute;
+    z-index: 1;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 4rem;
+    backdrop-filter: blur(0.7px);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    padding-inline: 2rem;
+    opacity: 1;
+    transition: all 0.3s linear;
+}
+.THIS .image_title{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    color: white;
+}
+.THIS.image_preview{
+  /* display: none; */
+  display : flex;
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  background: #000000;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  --sds-c-icon-color-foreground-default: white;
 }
