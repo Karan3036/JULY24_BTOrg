@@ -64,9 +64,31 @@
 .THIS .rkdiv .slds-accordion__list-item{
     margin-bottom: 1vh;
     margin-top: 1vh;
+    width: -webkit-fill-available;
+    margin-left: 1vh 
 }
 
 /* .THIS .rkdiv lightning-primitive-icon{
     position: relative;
     left: 75rem; 
 } */
+
+.THIS .blankStyle{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: -webkit-fill-available;
+    height: 5vh;
+    font-family: Inter;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0em;
+}
+
+.THIS .iconstyle .slds-icon-text-default {
+    fill: rgba(27, 82, 151, 1.0) !important;
+}
+
+.THIS .rkdiv .slds-icon-text-default {
+    fill: white;
+}

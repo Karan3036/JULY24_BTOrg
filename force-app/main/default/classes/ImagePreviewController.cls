@@ -1,36 +1,89 @@
 public with sharing class ImagePreviewController {
+    @AuraEnabled
+    public String status;
 
     @AuraEnabled
-    public static Map<String, List<String>> getProductFilesMap(String recordId) {
-        Map<String, List<String>> resultMap = new Map<String, List<String>>();          
+    public List<ContentDocumentLink> contentLink;
+
+    @AuraEnabled
+    public List<buildertek__Question_Group__c> selectionCategory;
+
+    public class ContentInfo {
+        @AuraEnabled public String buildertekQuestionId;
+        @AuraEnabled public String contentDocumentId;
+        @AuraEnabled public String title;
+
+        public ContentInfo(String buildertekQuestionId, String contentDocumentId, String title) {
+            this.buildertekQuestionId = buildertekQuestionId;
+            this.contentDocumentId = contentDocumentId;
+            this.title = title;
+        }
+    }
+
+    @AuraEnabled
+    public static Map<String, List<ContentInfo>> getProductFilesMap(String recordId) {
+        Map<String, List<ContentInfo>> resultMap = new Map<String, List<ContentInfo>>();          
+
+        // Collect buildertek__Question__c Ids
+        Set<Id> questionIds = new Set<Id>();
+        List<buildertek__Question__c> options = [SELECT Id, Name, buildertek__Question_Group__c, buildertek__Product__c FROM buildertek__Question__c WHERE buildertek__Question_Group__c =: recordId];
+        for (buildertek__Question__c option : options) {
+            questionIds.add(option.buildertek__Product__c);
+        }
+
         try {  
-            List<buildertek__Question__c> options = [SELECT Id, Name, buildertek__Question_Group__c, buildertek__Product__c FROM buildertek__Question__c WHERE buildertek__Question_Group__c =: recordId];
-            System.debug('options => '+options);
+            // Perform ContentDocumentLink query outside of the loop
+            List<ContentDocumentLink> contentLinkList = [SELECT Id, ContentDocumentId, ContentDocument.title, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN :questionIds];
 
-            if (options.size() > 0) {
-                for (buildertek__Question__c option : options) {
-                    List<String> contentDocumentIds = new List<String>();
-                    List<ContentDocumentLink> contentLinkList = [SELECT Id, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =: option.buildertek__Product__c];
-                    System.debug('contentLinkList => '+contentLinkList);
+            for (buildertek__Question__c option : options) {
+                List<ContentInfo> contentInfos = new List<ContentInfo>();
 
-                    if (contentLinkList.size() > 0) {
-                        for (ContentDocumentLink link : contentLinkList) {
-                            contentDocumentIds.add(link.ContentDocumentId);
-                        }
-                        resultMap.put(option.Name, contentDocumentIds);
-                    } else {
-                        System.debug('There Are No Files for Option: ' + option.Name);
-                        resultMap.put(option.Name, new List<String>());
+                for (ContentDocumentLink link : contentLinkList) {
+                    if (link.LinkedEntityId == option.buildertek__Product__c) {
+                        contentInfos.add(new ContentInfo(option.Id, link.ContentDocumentId, link.ContentDocument.title));
                     }
                 }
-            } else {
-                System.debug('There Are No Options');
-            }
 
+                resultMap.put(option.Name, contentInfos);
+            }
         } catch (Exception e) {
-            System.debug('Error => '+e.getMessage());
+            System.debug('Error => ' + e.getMessage());
         }
 
         return resultMap;
+    }
+
+    @AuraEnabled
+    public static ImagePreviewController getSelectionCategoryFiles(String recordId) {
+        try {   
+            List<ContentDocumentLink> contentLinkList = [SELECT Id,ContentDocument.Title, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =: recordId LIMIT 1];
+            List<buildertek__Question_Group__c> selectionCategoryList = [SELECT Id,Name,buildertek__Section__c FROM buildertek__Question_Group__c WHERE buildertek__Section__c =: recordId];
+            System.debug('contentLinkList => '+contentLinkList);
+
+            if (contentLinkList.size() > 0 && selectionCategoryList.size() > 0) {
+                ImagePreviewController files = new ImagePreviewController();
+                files.status = 'success';
+                files.contentLink = contentLinkList;
+                files.selectionCategory = selectionCategoryList;
+                return files;
+            } else{
+                System.debug('There Are No Files');
+                ImagePreviewController files = new ImagePreviewController();
+                files.status = 'There Are No Files.';
+                files.contentLink = null;
+                files.selectionCategory = null;
+                return files;
+            }
+        } catch (Exception e) {
+            System.debug('Exception-->'+e);
+            System.debug('Exception-->'+e.getMessage());
+            System.debug('Exception-->'+e.getLineNumber());
+            System.debug('Exception-->'+e.getStackTraceString());
+            ImagePreviewController files = new ImagePreviewController();
+                files.status = 'error';
+                files.contentLink = null;
+                files.selectionCategory = null;
+                return files;
+        }
     }
 }

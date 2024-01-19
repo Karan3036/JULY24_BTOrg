@@ -118,6 +118,7 @@ public class ContinuationSheetLineTriggerHandler {
             
             if (newPaymentApp.size() > 0){
                 ContinuationSheetLineTriggerHandler.blnSkipconSheetLineUpdateTrigger = false;
+                PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate = true;
                 update newPaymentApp;
                 
                 
@@ -214,6 +215,7 @@ public class ContinuationSheetLineTriggerHandler {
                 
                 if (newPaymentApp.size() > 0){
                     ContinuationSheetLineTriggerHandler.blnSkipconSheetLineUpdateTrigger = false;
+                    PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate = true;
                     update newPaymentApp;
                     
                     System.debug('newPaymentApp ===> '+newPaymentApp);
@@ -345,6 +347,7 @@ public class ContinuationSheetLineTriggerHandler {
             
             if(recordsToUpdate.Size()>0){
                 ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = true;
+                PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate = true;
                 update recordsToUpdate;
                 System.debug('IF recordsToUpdate=====>>>>>'+recordsToUpdate);
                 ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = false; 
@@ -557,6 +560,7 @@ public class ContinuationSheetLineTriggerHandler {
                 newPaymentApp[0].buildertek__Original_Contract_Sum__c = (decimal)agg.get('totalContractSum') - PaymentApp.buildertek__Net_Change_by_Change_Orders__c ;
             }
             ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = true;
+            PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate = true;
             update newPaymentApp;
             ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = false;
         }   
@@ -616,6 +620,7 @@ public class ContinuationSheetLineTriggerHandler {
             
             if(!paymentApp.isEmpty()){
                 ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = true;
+                PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate = true;
                 update paymentApp;
                 ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = false;
             }
@@ -740,6 +745,7 @@ public class ContinuationSheetLineTriggerHandler {
                     }
                     if(!paymentAppList.isEmpty()){
                         ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = true;
+                        PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate = true;
                         update paymentAppList;
                         ContinuationSheetLineTriggerHandler.blnSkipSheetLineTrigger = false;
                     }

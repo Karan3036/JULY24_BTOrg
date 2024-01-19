@@ -3,6 +3,8 @@ public class PaymentApplicationTriggerHandler {
     public static Boolean blnSkipPayAppInsertTrigger = false;
     
     public static Boolean blnSkipPayAppForEmail = false;
+
+    public static Boolean blnSkipAmoutCetrifiedUpate = false;
     
      public static Boolean blnSkipPayAppForupdateOriginal = false;
     
@@ -74,43 +76,35 @@ public class PaymentApplicationTriggerHandler {
                 }
             }
             
-            
-            
         }
     }
-    
-    public void updateRecords(Map<String, String> recordtypeMap, List<buildertek__SOV_Payment_Application__c> recordsToUpdate) {
-        System.debug('recordtypeMap :-->' +recordtypeMap);
-        List<buildertek__SOV_Payment_Application__c> payAppUpdate = new List<buildertek__SOV_Payment_Application__c>();
-        for (buildertek__SOV_Payment_Application__c app : recordsToUpdate) {
-            if (app.buildertek__PA_Type__c != app.RecordType.Name) {
-                app.RecordTypeId = recordtypeMap.get(app.buildertek__PA_Type__c);
-                payAppUpdate.add(app);
-                System.debug('in if :--->' + payAppUpdate);
+
+    // As per the brian's commet on Ticket BUIL-37824... need to add new logic - Update recordType Based on PA Type...
+    public void Sync_PAType_RecordType(List<buildertek__SOV_Payment_Application__c> newPayment,Map<Id, buildertek__SOV_Payment_Application__c> oldPaymetnMap){
+        try {
+            Map<String, String> rtMap = new Map<String, String>();
+            for (RecordType rt : [Select Id, Name from RecordType where SobjectType = 'buildertek__SOV_Payment_Application__c']) {
+                rtMap.put(rt.Name, rt.Id);
             }
-        }
-        if (!payAppUpdate.isEmpty()) {
-            
-            update recordsToUpdate;
+
+            for(buildertek__SOV_Payment_Application__c PA : newPayment){
+                // When PA Type changed....
+                if(PA.buildertek__PA_Type__c != oldPaymetnMap.get(PA.Id).buildertek__PA_Type__c && PA.buildertek__PA_Type__c != PA.RecordType.Name){
+                    PA.RecordTypeId = rtMap.get(PA.buildertek__PA_Type__c);
+                }
+                // When RecordType changed....
+                // else if(PA.RecordType != oldPaymetnMap.get(PA.Id).RecordType && PA.RecordType.Name != PA.buildertek__PA_Type__c){
+                //     PA.buildertek__PA_Type__c = PA.RecordType.Name;
+                // }
+            }
+
+        } catch (Exception e) {
+            system.debug('Exception in Sync_PAType_RecordType : ' + e.getMessage());
         }
     }
     
     
     public void OnAfterupdate(List<buildertek__SOV_Payment_Application__c> oldPayment, List<buildertek__SOV_Payment_Application__c> newPayment,Map<Id, buildertek__SOV_Payment_Application__c> oldPaymetnMap, Map<Id, buildertek__SOV_Payment_Application__c> newPaymentMap){
-    
-        Map<String, String> rtMap = new Map<String, String>();
-        for (RecordType rt : [Select Id, Name from RecordType where SobjectType = 'buildertek__SOV_Payment_Application__c']) {
-            rtMap.put(rt.Name, rt.Id);
-        }
-        List<Id> appToUpdate = new List<Id>();
-        for (buildertek__SOV_Payment_Application__c app : newPayment) {
-            appToUpdate.add(app.Id);
-        }
-        if (!appToUpdate.isEmpty()) {
-            List<buildertek__SOV_Payment_Application__c> updateAppList = [SELECT Id, Name, RecordTypeId,RecordType.Name , buildertek__PA_Type__c  FROM buildertek__SOV_Payment_Application__c where Id =:appToUpdate];
-            System.debug('updateAppList :-->' +updateAppList);
-            updateRecords(rtMap,updateAppList);
-        } 
 
         system.debug('calling');
         String portalCode = '';
@@ -147,8 +141,13 @@ public class PaymentApplicationTriggerHandler {
         
         if(!arPaymentApp.isEmpty()){
             for(buildertek__SOV_Payment_Application__c paymentRec : arPaymentApp){
+                System.debug('Value in Boolean---->'+PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate);
+                if(PaymentApplicationTriggerHandler.blnSkipAmoutCetrifiedUpate){
+                    paymentRec.buildertek__Amount_Certified__c = 0;
+                } else {
+                    paymentRec.buildertek__Amount_Certified__c = paymentRec.buildertek__Current_Payment_Due__c;
+                }
                 
-                paymentRec.buildertek__Amount_Certified__c = paymentRec.buildertek__Current_Payment_Due__c;
                 
                 /* if(paymentRec.buildertek__Status__c == 'Customer Accepted' && paymentRec.RecordType.Name == 'AR'){
 paymentRec.buildertek__Amount_Certified__c = paymentRec.buildertek__Current_Payment_Due__c;
