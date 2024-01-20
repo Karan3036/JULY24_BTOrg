@@ -57,6 +57,7 @@
             var imageSrc = clickedDiv.getAttribute('data-src');
             var imageId = clickedDiv.getAttribute('id');
             var imageTitle = clickedDiv.getAttribute('data-description');
+            component.set("v.outerId", clickedDiv.getAttribute('data-outerid'));
 
             // Log or use the values as needed
             console.log("Clicked Image Src: " + imageSrc);
@@ -106,6 +107,8 @@
     closeImagePreview : function(component, event, helper){
         component.set("v.Is_ImageHavePreview", false);
         component.set('v.Show_ImagePreview', false);
+        helper.setNextPreviousButton(component, event, helper);
+
     },
     Handle_imageLoaded: function(component, event, helper){
         console.log('image loaded');
@@ -119,9 +122,11 @@
 
     },
     ChangeImg: function(component, event, helper){
-        component.set("v.Is_ImageHavePreview", false);
-        component.set('v.Show_ImagePreview', false);
-        helper.changeImageHelper(component, event, helper, null, true);
+
+        // component.set("v.Is_ImageHavePreview", false);
+        // component.set('v.Show_ImagePreview', false);
+        helper.changeNextButton(component, event, helper);
+        // helper.setNextPreviousButton(component, event, helper);
     },
 
 });

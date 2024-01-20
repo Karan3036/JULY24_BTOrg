@@ -9,12 +9,12 @@ public with sharing class ImagePreviewController {
     public List<buildertek__Question_Group__c> selectionCategory;
 
     public class ContentInfo {
-        @AuraEnabled public String buildertekQuestionId;
+        @AuraEnabled public String Id;
         @AuraEnabled public String contentDocumentId;
         @AuraEnabled public String title;
     
-        public ContentInfo(String buildertekQuestionId, String contentDocumentId, String title) {
-            this.buildertekQuestionId = buildertekQuestionId;
+        public ContentInfo(String Id, String contentDocumentId, String title) {
+            this.Id = Id;
             this.contentDocumentId = contentDocumentId;
             this.title = title;
         }
@@ -41,7 +41,7 @@ public with sharing class ImagePreviewController {
     
                 for (ContentDocumentLink link : contentLinkList) {
                     if (link.LinkedEntityId == option.buildertek__Product__c) {
-                        contentInfos.add(new ContentInfo(option.Id, link.ContentDocumentId, link.ContentDocument.title));
+                        contentInfos.add(new ContentInfo(link.Id, link.ContentDocumentId, link.ContentDocument.title));
                     }
                 }
     
