@@ -1,6 +1,7 @@
-<aura:component controller="ImagePreviewController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+<aura:component controller="ImagePreviewController" implements="force:appHostable,force:hasSObjectName,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
     <aura:attribute name="selectionCategory" type="Object"/>
     <aura:attribute name="recordLoadError" type="String"/>
+    <aura:attribute name="sObjectName" type="String"/>
     <aura:attribute name="orgBaseURL" type="string" />
     <aura:attribute name="contentDocsList" type="List" />
     <aura:attribute name="contentDocsId" type="String" />
@@ -10,7 +11,6 @@
     <aura:attribute name="totalPages" type="Integer" />
     <aura:attribute name="displayedCategories" type="List" />
     <aura:attribute name="selectedImageId" type="String" />
-    <aura:attribute name="tempBoolean" type="Boolean" default="true" />
     <aura:attribute name="showPreviousButton" type="Boolean" />
     <aura:attribute name="showSelectionOptions" type="Boolean" default="false"/>
     <aura:attribute name="showNextButton" type="Boolean" />
@@ -18,42 +18,41 @@
     <aura:attribute name="message" type="string" default="Loading Selection Types..." />
     <force:recordData aura:id="forceRecord" recordId="{!v.recordId}" fields="Id, Name" targetFields="{!v.selectionCategory}" targetError="{!v.recordLoadError}" />
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
-    <aura:handler name="change" value="{!v.selectedImageId}" action="{!c.parentIdChanged}"/>
 
     <lightning:card>
         <div class="titleStyle">{!v.selectionCategory.Name}</div>
         <aura:if isTrue="{!v.categoryList.length > 0}">
         <div class="slds-m-around_medium main-file-cmp">
             <div class="side-btn">
-                <aura:if isTrue="{!v.showPreviousButton}">
-                    <button class="slds-button slds-button_icon" onclick="{!c.previousPage}" style="height:40px;">
+                <!-- <aura:if isTrue="{!v.showPreviousButton}"> -->
+                    <button class="slds-button slds-button_icon" onclick="{!c.previousPage}" style="{!v.showPreviousButton == false ? 'display:none;' : ''}">
                         <lightning:icon iconName="utility:left" size="small" alternativeText="Previous" />
                     </button>
-                </aura:if>
+                <!-- </aura:if> -->
             </div>
             <div class="main-file-cmp-2">
                 <aura:iteration items="{!v.displayedCategories}" var="category" indexVar="indexNum">
-                    <div style="flex: 0 0 calc(16.6667% - 19px); margin: 5px; cursor: pointer; position: relative;" id="{!category.Id}" onclick="{!c.handleImageClick}">
+                    <div style="flex: 0 0 calc(16.6667% - 19px); margin: 5px 9.5px; cursor: pointer; position: relative;" id="{!category.Id}" onclick="{!c.handleImageClick}">
                         <img style="min-width: 100%; min-height: 100%; width: 100%; height: 175px; border: 1px solid grey; opacity: 0.3;" src="{!v.contentDocs}" id="{!category.Id}" />
                         <div class="center">{!category.Name}</div>
                     </div>
                 </aura:iteration>
             </div>
             <div class="side-btn">
-                <aura:if isTrue="{!v.showNextButton}">
-                    <button class="slds-button slds-button_icon" onclick="{!c.nextPage}" style="height:40px;"> 
+                <!-- <aura:if isTrue="{!v.showNextButton}"> -->
+                    <button class="slds-button slds-button_icon" onclick="{!c.nextPage}" style="{!v.showNextButton == false ? 'display:none;' : ''}" > 
                         <lightning:icon iconName="utility:right" size="small" alternativeText="Next" />
                     </button>
-                </aura:if>
+                <!-- </aura:if> -->
             </div>
         </div>
         <aura:if isTrue="{!v.showSelectionOptions}">
             <div>
-                    <c:ImagePreviewOnSelectionType selectedImageId="{!v.selectedImageId}" />
+                    <c:ImagePreviewOnSelectionType selectedImageId="{!v.selectedImageId}" sObjectName="{!v.sObjectName}" />
             </div>
         </aura:if>
         <aura:set attribute="else"> 
-            <div class="a">
+            <div class="messageDiv">
                 <h2><b>{!v.message}</b></h2>
             </div>   
         </aura:set>

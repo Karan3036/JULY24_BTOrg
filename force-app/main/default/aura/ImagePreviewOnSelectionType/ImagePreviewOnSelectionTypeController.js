@@ -57,9 +57,11 @@
             var imageSrc = clickedDiv.getAttribute('data-src');
             var imageId = clickedDiv.getAttribute('id');
             var imageTitle = clickedDiv.getAttribute('data-description');
-            component.set("v.outerId", clickedDiv.getAttribute('data-outerid'));
+            var outerId = clickedDiv.getAttribute('data-outerid');
+            // var ImageId = component.get("v.PreviewImageId");
+            // component.set("v.outerId", clickedDiv.getAttribute('data-outerid'));
 
-            helper.changeImageHelper(component, event, helper, imageId, false);
+            helper.changeImageHelper(component, event, helper, imageId, outerId, false);
             helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, imageId);
         } catch (error) {
             console.log('error-->',error);
@@ -117,7 +119,7 @@
     ChangeImg: function(component, event, helper){
         component.set("v.Is_ImageHavePreview", false);
         component.set('v.Show_ImagePreview', false);
-        helper.changeImageHelper(component, event, helper, null, true);
+        helper.changeImageHelper(component, event, helper, null, null, true);
     },
 
 });

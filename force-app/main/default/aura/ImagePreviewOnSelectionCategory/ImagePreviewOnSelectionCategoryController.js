@@ -47,9 +47,4 @@
         console.log('imageId', component.get("v.selectedImageId"));
 
     },
-    parentIdChanged: function(component, event, helper) {
-
-        console.log('imageId 2->', component.get("v.selectedImageId"));
-
-    },
 })

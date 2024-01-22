@@ -75,11 +75,11 @@ public with sharing class ImagePreviewController {
     @AuraEnabled
     public static ImagePreviewController getSelectionCategoryFiles(String recordId) {
         try {   
-            List<ContentDocumentLink> contentLinkList = [SELECT Id,ContentDocument.Title, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =: recordId LIMIT 1];
+            List<ContentDocumentLink> contentLinkList = [SELECT Id,ContentDocument.Title, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId = '0691K00000wF73bQAC'];
             List<buildertek__Question_Group__c> selectionCategoryList = [SELECT Id,Name,buildertek__Section__c FROM buildertek__Question_Group__c WHERE buildertek__Section__c =: recordId];
             System.debug('contentLinkList => '+contentLinkList);
 
-            if (contentLinkList.size() > 0 && selectionCategoryList.size() > 0) {
+            if (selectionCategoryList.size() > 0) {
                 ImagePreviewController files = new ImagePreviewController();
                 files.status = 'success';
                 files.contentLink = contentLinkList;

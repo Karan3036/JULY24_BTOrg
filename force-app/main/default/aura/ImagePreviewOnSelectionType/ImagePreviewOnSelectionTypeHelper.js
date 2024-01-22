@@ -86,7 +86,7 @@
 
     
 
-    changeImageHelper: function(component, event, helper, imageId, next_previus_btn_click) {
+    changeImageHelper: function(component, event, helper, imageIds, outerIds, next_previus_btn_click) {
         try {
             event.stopPropagation();
             var operation;
@@ -112,23 +112,28 @@
                                     var imageSrc = '/sfc/servlet.shepherd/document/download/' + InnerListValue[parseInt(j) - 1].contentDocumentId;
                                     var imageTitle = InnerListValue[parseInt(j) - 1].title;
                                     var previewImageId = InnerListValue[parseInt(j) - 1].contentDocumentId;
+                                    helper.changeImageHelper(component, event, helper, outerId, previewImageId, false);
                                     helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, previewImageId);
                                 } else if (operation == 'Next_Image') {
                                     var imageSrc = '/sfc/servlet.shepherd/document/download/' + InnerListValue[parseInt(j) + 1].contentDocumentId;
                                     var imageTitle = InnerListValue[parseInt(j) + 1].title;
                                     var previewImageId = InnerListValue[parseInt(j) + 1].contentDocumentId;
+                                    helper.changeImageHelper(component, event, helper, previewImageId, false);
                                     helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, previewImageId);
                                 }
-                            } else if (next_previus_btn_click == false) {
+                            } 
+                            else if (next_previus_btn_click == false) {
+                                // Check if it's the first image
                                 if (j == 0) {
                                     component.set("v.NotFirstImg", false);
-                                } else if (j != 0) {
+                                } else {
                                     component.set("v.NotFirstImg", true);
                                 }
     
+                                // Check if it's the last image
                                 if (j == InnerListValue.length - 1) {
                                     component.set("v.NotLastImg", false);
-                                } else if (j != InnerListValue.length - 1) {
+                                } else {
                                     component.set("v.NotLastImg", true);
                                 }
                             }
