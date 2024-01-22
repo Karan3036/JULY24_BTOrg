@@ -59,11 +59,6 @@
             var imageTitle = clickedDiv.getAttribute('data-description');
             component.set("v.outerId", clickedDiv.getAttribute('data-outerid'));
 
-            // Log or use the values as needed
-            console.log("Clicked Image Src: " + imageSrc);
-            console.log("Clicked Image Id: " + imageId);
-            console.log("Clicked Image Description: " + imageTitle);
-
             helper.changeImageHelper(component, event, helper, imageId, false);
             helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, imageId);
         } catch (error) {
@@ -73,9 +68,7 @@
     },
 
     doView: function(component, event, helper) {
-        ////console.log(event.currentTarget.dataset.record);
         var editRecordEvent = $A.get("e.force:navigateToSObject");
-        console.log('event.currentTarget.dataset.record-->',event.currentTarget.dataset.record);
         editRecordEvent.setParams({
             "recordId": event.currentTarget.dataset.record
         });
@@ -122,11 +115,9 @@
 
     },
     ChangeImg: function(component, event, helper){
-
-        // component.set("v.Is_ImageHavePreview", false);
-        // component.set('v.Show_ImagePreview', false);
-        helper.changeNextButton(component, event, helper);
-        // helper.setNextPreviousButton(component, event, helper);
+        component.set("v.Is_ImageHavePreview", false);
+        component.set('v.Show_ImagePreview', false);
+        helper.changeImageHelper(component, event, helper, null, true);
     },
 
 });

@@ -86,52 +86,58 @@
 
     
 
-    changeImageHelper: function(component, event, helper, imageId, nextPreviousBtnClick) {
+    changeImageHelper: function(component, event, helper, imageId, next_previus_btn_click) {
         try {
             event.stopPropagation();
-            const outerId = component.get("v.outerId");
+            var operation;
+            var selectedImageId;
+            var outerId = component.get("v.outerId");
+            var ImageId = component.get("v.PreviewImageId");
+    
+            if (next_previus_btn_click) {
+                operation = event.currentTarget.dataset.name;
+                selectedImageId = component.get("v.PreviewImageId");
+            } else {
+                operation = null;
+                selectedImageId = imageId;
+            }
             const contentDocsList = component.get('v.contentDocsList');
-    
-            for (let i in contentDocsList) {
-                if (contentDocsList[i].key === outerId) {
-                    const innerListValue = contentDocsList[i].innerList[0].value;
-    
-                    for (let j in innerListValue) {
-                        const contentDocumentId = innerListValue[j].contentDocumentId;
-    
-                        if (nextPreviousBtnClick) {
-                            // Logic for Next/Previous button click
-                            if (contentDocumentId === imageId) {
-                                let newIndex;
-    
-                                if (event.currentTarget.dataset.name === 'Next_Image' && parseInt(j) < innerListValue.length - 1) {
-                                    newIndex = parseInt(j) + 1;
-                                } else if (event.currentTarget.dataset.name === 'Previous_Image' && parseInt(j) > 0) {
-                                    newIndex = parseInt(j) - 1;
+            for (var i in contentDocsList) {
+                if (contentDocsList[i].key == outerId) {
+                    var InnerListValue = contentDocsList[i].innerList[0].value;
+                    for (var j in InnerListValue) {
+                        if (InnerListValue[j].contentDocumentId == ImageId) {
+                            if (next_previus_btn_click == true) {
+                                if (operation == 'Previous_Image') {
+                                    var imageSrc = '/sfc/servlet.shepherd/document/download/' + InnerListValue[parseInt(j) - 1].contentDocumentId;
+                                    var imageTitle = InnerListValue[parseInt(j) - 1].title;
+                                    var previewImageId = InnerListValue[parseInt(j) - 1].contentDocumentId;
+                                    helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, previewImageId);
+                                } else if (operation == 'Next_Image') {
+                                    var imageSrc = '/sfc/servlet.shepherd/document/download/' + InnerListValue[parseInt(j) + 1].contentDocumentId;
+                                    var imageTitle = InnerListValue[parseInt(j) + 1].title;
+                                    var previewImageId = InnerListValue[parseInt(j) + 1].contentDocumentId;
+                                    helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, previewImageId);
+                                }
+                            } else if (next_previus_btn_click == false) {
+                                if (j == 0) {
+                                    component.set("v.NotFirstImg", false);
+                                } else if (j != 0) {
+                                    component.set("v.NotFirstImg", true);
                                 }
     
-                                if (newIndex !== undefined) {
-                                    const newImageId = innerListValue[newIndex].contentDocumentId;
-                                    const imageSrc = '/sfc/servlet.shepherd/document/download/' + newImageId;
-                                    component.set("v.PreviewImageSrc", imageSrc);
-                                    component.set("v.PreviewImageId", newImageId);
-                                    helper.setNextPreviousButton(component, event, helper);
+                                if (j == InnerListValue.length - 1) {
+                                    component.set("v.NotLastImg", false);
+                                } else if (j != InnerListValue.length - 1) {
+                                    component.set("v.NotLastImg", true);
                                 }
-                            }
-                        } else {
-                            // Logic for direct image change
-                            if (contentDocumentId === imageId) {
-                                const imageSrc = '/sfc/servlet.shepherd/document/download/' + innerListValue[parseInt(j) + 1].contentDocumentId;
-                                component.set("v.PreviewImageSrc", imageSrc);
-                                component.set("v.PreviewImageId", innerListValue[parseInt(j) + 1].contentDocumentId);
-                                helper.setNextPreviousButton(component, event, helper);
                             }
                         }
                     }
                 }
             }
         } catch (error) {
-            console.log('error in changeImageHelper: ', error.stack);
+            console.log('error in changeImageHelper : ', error.stack);
         }
     },
     

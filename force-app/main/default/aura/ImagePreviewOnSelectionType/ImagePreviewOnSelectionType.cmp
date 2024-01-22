@@ -95,7 +95,7 @@
                             <aura:if isTrue="{!not(empty(contentDocsItem.innerList[0].value))}">
                                 <aura:iteration items="{!contentDocsItem.innerList[0].value}" var="optionItem" indexVar="indexNum">
                                     <div style="flex: 0 0 calc(16.6667% - 10px); margin: 5px;" id="{!optionItem.contentDocumentId}" onclick="{!c.handle_img_click}" data-outerid="{!contentDocsItem.key}" data-cdid="{!optionItem.contentDocumentId}" data-cid="{!optionItem.Id}" data-cdlindex="{!indexNum}" data-description="{!optionItem.title}" data-src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.contentDocumentId}">
-                                        <img style="min-width: 100%; min-height: 100%; width: 100%; height: 175px; border: 1px solid grey;" src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.contentDocumentId}"/>
+                                        <img style="min-width: 100%; min-height: 100%; width: 100%; height: 175px; border: 1px solid grey;cursor:pointer;;" src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.contentDocumentId}"/>
                                     </div>
                                 </aura:iteration>
                                 <aura:set attribute="else">
