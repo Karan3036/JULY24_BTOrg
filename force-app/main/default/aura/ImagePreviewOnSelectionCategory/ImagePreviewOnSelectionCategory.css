@@ -10,6 +10,9 @@
     font-size: large;
 
 }
+.THIS .rkdivfora a{
+    color: white !important;
+}
 .THIS .main-file-cmp {
     flex-direction: row;
     max-height:62.4vh;

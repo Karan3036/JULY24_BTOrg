@@ -15,12 +15,21 @@
     <aura:attribute name="showSelectionOptions" type="Boolean" default="false"/>
     <aura:attribute name="showNextButton" type="Boolean" />
     <aura:attribute name="categoriesPerPage" type="Integer" default="6" />
+    <aura:attribute name="selectedCategoryId" type="String" default="" />
+    <aura:attribute name="selectedCategoryName" type="String" />
+    <aura:attribute name="mainRecordId" type="String" />
     <aura:attribute name="message" type="string" default="Loading Selection Types..." />
     <force:recordData aura:id="forceRecord" recordId="{!v.recordId}" fields="Id, Name" targetFields="{!v.selectionCategory}" targetError="{!v.recordLoadError}" />
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
 
     <lightning:card>
-        <div class="titleStyle">{!v.selectionCategory.Name}</div>
+        <aura:if isTrue="{!v.sObjectName == 'buildertek__Section__c'}">
+            <div class="titleStyle">{!v.selectionCategory.Name}</div>
+            <aura:set attribute="else">
+                <div class="titleStyle rkdivfora"><ui:outputURL value="{!'/one/one.app?#/sObject/'+ v.selectedCategoryId + '/view'}" target="_blank" label="{!v.selectedCategoryName}"/></div>
+            </aura:set>
+        </aura:if>
+        <!-- <div class="titleStyle">{!v.selectionCategory.Name}</div> -->
         <aura:if isTrue="{!v.categoryList.length > 0}">
         <div class="slds-m-around_medium main-file-cmp">
             <div class="side-btn">

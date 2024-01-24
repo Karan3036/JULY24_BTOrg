@@ -1,7 +1,17 @@
 ({
     init : function(component, event, helper) {
-        var recordId = component.get("v.recordId");
-        console.log('recordId => ' + recordId);
+        var sobjectname = component.get("v.sObjectName");
+
+        var recordId = component.get("v.selectedCategoryId");
+        console.log('Categary recordId => ' + recordId);
+        var recordId1 = component.get("v.recordId");
+        console.log('recordId => ' + recordId1);
+        if (sobjectname == 'buildertek__Section__c') {
+            component.set("v.mainRecordId", recordId1);
+        } else if(sobjectname == 'buildertek__Selection__c'){
+            component.set("v.mainRecordId", recordId);
+        }
+
         var orgId = $A.get("$SObjectType.CurrentUser.Id");
         var baseUrl = window.location.protocol + '//' + window.location.hostname + '/' + orgId.substring(0, 15);
         console.log('Organization Base URL: ' + baseUrl);
@@ -9,7 +19,7 @@
         
         var action = component.get("c.getSelectionCategoryFiles");
         action.setParams({
-            recordId: recordId
+            recordId: component.get("v.mainRecordId")
         });
         action.setCallback(this, function (response) {
             var state = response.getState();

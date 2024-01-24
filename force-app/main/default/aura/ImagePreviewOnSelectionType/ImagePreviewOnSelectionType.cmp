@@ -88,14 +88,14 @@
             <lightning:accordion allowMultipleSectionsOpen="true" onsectiontoggle="{! c.handleSectionToggle }" activeSectionName="{! v.activeSections }">
                 <aura:iteration items="{!v.contentDocsList}" var="contentDocsItem">
                     <div style="display: flex;">
-                        <span class="iconstyle" data-record="{!contentDocsItem.key}" onclick="{!c.doView}">
+                        <span class="iconstyle" data-record="{!contentDocsItem.optionId}" onclick="{!c.doView}">
                             <lightning:icon iconName="utility:open" size="x-small" style="padding-top: 17px;cursor:pointer;"/>
                         </span>
-                        <lightning:accordionSection label="{!contentDocsItem.innerList[0].key}">
-                            <aura:if isTrue="{!not(empty(contentDocsItem.innerList[0].value))}">
-                                <aura:iteration items="{!contentDocsItem.innerList[0].value}" var="optionItem" indexVar="indexNum">
-                                    <div style="flex: 0 0 calc(16.6667% - 10px); margin: 5px;" id="{!optionItem.contentDocumentId}" onclick="{!c.handle_img_click}" data-outerid="{!contentDocsItem.key}" data-cdid="{!optionItem.contentDocumentId}" data-cid="{!optionItem.Id}" data-cdlindex="{!indexNum}" data-description="{!optionItem.title}" data-src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.contentDocumentId}">
-                                        <img style="min-width: 100%; min-height: 100%; width: 100%; height: 175px; border: 1px solid grey;cursor:pointer;;" src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.contentDocumentId}"/>
+                        <lightning:accordionSection label="{!contentDocsItem.optionName}">
+                            <aura:if isTrue="{!not(empty(contentDocsItem.contentDocumentLinks))}">
+                                <aura:iteration items="{!contentDocsItem.contentDocumentLinks}" var="optionItem" indexVar="indexNum">
+                                    <div style="flex: 0 0 calc(16.6667% - 10px); margin: 5px;" id="{!optionItem.ContentDocumentId}" onclick="{!c.handle_img_click}" data-outerid="{!contentDocsItem.optionId}" data-cdid="{!optionItem.ContentDocumentId}" data-cid="{!optionItem.Id}" data-cdlindex="{!indexNum}" data-description="{!optionItem.ContentDocument.Title}" data-src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.ContentDocumentId}">
+                                        <img style="min-width: 100%; min-height: 100%; width: 100%; height: 175px; border: 1px solid grey;cursor:pointer;;" src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.ContentDocumentId}"/>
                                     </div>
                                 </aura:iteration>
                                 <aura:set attribute="else">

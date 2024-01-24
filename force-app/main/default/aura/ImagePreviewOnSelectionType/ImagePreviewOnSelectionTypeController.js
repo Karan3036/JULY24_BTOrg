@@ -11,8 +11,7 @@
         } else if(sobjectname == 'buildertek__Section__c' || sobjectname == 'buildertek__Selection__c'){
             component.set("v.mainRecordId", recordId);
         }
-
-        var action = component.get("c.selectionTypeDetail");
+        var action = component.get("c.getData");
 
         action.setParams({
             recordId: component.get("v.mainRecordId")
@@ -25,12 +24,18 @@
             if (state === "SUCCESS") {
                 var result = response.getReturnValue();
                 console.log('Result =>', { result });
-                if (result != null) {
-                    component.set("v.SelectionTypeName", result[0].Name);
-                    component.set("v.SelectionTypeId", result[0].Id);
-                    helper.getfilesfromproduct(component, event, helper);
+                if (result.questionGroupDetails != null) {
+                    if(Object.keys(result.productFilesMap).length > 0){
+                        var contentDocsList = helper.convertMapToList(result.productFilesMap);
+                        component.set("v.contentDocsList", contentDocsList);
+                        console.log('contentDocsList--->',contentDocsList);
+                    } else {
+                        component.set("v.displayImage", false);
+                    }
+                    component.set("v.SelectionTypeName", result.questionGroupDetails[0].Name);
+                    component.set("v.SelectionTypeId", result.questionGroupDetails[0].Id);
                 } else {
-                    component.set("v.displayImage", false);
+                    console.error("Error fetching product files.");
                 }
             } else {
                 console.error("Error fetching product files.");
@@ -58,11 +63,9 @@
             var imageId = clickedDiv.getAttribute('id');
             var imageTitle = clickedDiv.getAttribute('data-description');
             var outerId = clickedDiv.getAttribute('data-outerid');
-            // var ImageId = component.get("v.PreviewImageId");
-            // component.set("v.outerId", clickedDiv.getAttribute('data-outerid'));
 
             helper.changeImageHelper(component, event, helper, imageId, outerId, false);
-            helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, imageId);
+            helper.openCustomPreviewHelper(component, event, helper, imageSrc, imageTitle, imageId, outerId);
         } catch (error) {
             console.log('error-->',error);
         }

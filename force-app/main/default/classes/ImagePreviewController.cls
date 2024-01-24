@@ -19,11 +19,51 @@ public with sharing class ImagePreviewController {
             this.title = title;
         }
     }
+
+    public class ApexCalloutWrapper {
+        @AuraEnabled
+        public Map<String, List<ContentDocumentLink>> productFilesMap { get; set; }
+        @AuraEnabled
+        public List<buildertek__Question_Group__c> questionGroupDetails { get; set; }
+    
+        public ApexCalloutWrapper(Map<String, List<ContentDocumentLink>> productFilesMap, List<buildertek__Question_Group__c> questionGroupDetails) {
+            this.productFilesMap = productFilesMap;
+            this.questionGroupDetails = questionGroupDetails;
+        }
+    }
     
     @AuraEnabled
-    public static Map<String, Map<String, List<ContentInfo>>> getProductFilesMap(String recordId) {
-        Map<String, Map<String, List<ContentInfo>>> resultMap = new Map<String, Map<String, List<ContentInfo>>>();          
+    public static ApexCalloutWrapper getData(String recordId) {
+        ApexCalloutWrapper result = new ApexCalloutWrapper(new Map<String, List<ContentDocumentLink>>(), new List<buildertek__Question_Group__c>());
+
+        try {
+            // Call your existing methods and populate the result instance
+            result.productFilesMap = getProductFilesMap(recordId);
+            result.questionGroupDetails = selectionTypeDetail(recordId);
+        } catch (Exception e) {
+            System.debug('Error => ' + e.getMessage());
+        }
+
+        return result;
+    }
+
+    public class FilesWrapper {
+        @AuraEnabled
+        public Map<String, List<ContentDocumentLink>> resultMap { get; set; }
+        @AuraEnabled
+        public String status { get; set; }
     
+        public FilesWrapper(Map<String, List<ContentDocumentLink>> resultMap, String status) {
+            this.resultMap = resultMap;
+            this.status = status;
+        }
+    }
+    
+    @AuraEnabled
+    public static FilesWrapper getProductFilesMap(String recordId) {
+        Map<String, List<ContentDocumentLink>> resultMap = new Map<String, List<ContentDocumentLink>>();
+        String status = 'Success';        
+        
         try {  
             // Collect buildertek__Question__c Ids
             Set<Id> questionIds = new Set<Id>();
@@ -31,31 +71,34 @@ public with sharing class ImagePreviewController {
             for (buildertek__Question__c option : options) {
                 questionIds.add(option.buildertek__Product__c);
             }
-    
+
             // Perform ContentDocumentLink query outside of the loop
             List<ContentDocumentLink> contentLinkList = [SELECT Id, ContentDocumentId, ContentDocument.title, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN :questionIds];
-    
+
             for (buildertek__Question__c option : options) {
-                Map<String, List<ContentInfo>> optionMap = new Map<String, List<ContentInfo>>();
-                List<ContentInfo> contentInfos = new List<ContentInfo>();
-    
+                List<ContentDocumentLink> contentLinks = new List<ContentDocumentLink>();
+
                 for (ContentDocumentLink link : contentLinkList) {
                     if (link.LinkedEntityId == option.buildertek__Product__c) {
-                        contentInfos.add(new ContentInfo(link.Id, link.ContentDocumentId, link.ContentDocument.title));
+                        contentLinks.add(link);
                     }
                 }
-    
-                optionMap.put(option.Name, contentInfos);
-                resultMap.put(option.Id, optionMap);
+
+                // Merge option Name and Id with a symbol for the key
+                String optionKey = option.Name + '__' + option.Id;
+                resultMap.put(optionKey, contentLinks);
             }
         } catch (Exception e) {
             System.debug('Error => ' + e.getMessage());
+            status = 'Fail';
+            resultMap = new Map<String, List<ContentDocumentLink>>();
         }
-    
-        return resultMap;
+
+        return new FilesWrapper(resultMap, status);
     }
 
-    @AuraEnabled
+
+    // @AuraEnabled
     public static List<buildertek__Question_Group__c> selectionTypeDetail(String recordId) {
         try {  
             List<buildertek__Question_Group__c> selecttype = [SELECT Id, Name FROM buildertek__Question_Group__c WHERE Id =: recordId];
@@ -68,7 +111,6 @@ public with sharing class ImagePreviewController {
             System.debug('Error => ' + e.getMessage());
             return null;
         }
-    
     }
     
 
@@ -105,4 +147,20 @@ public with sharing class ImagePreviewController {
                 return files;
         }
     }
+    @AuraEnabled
+    public static List<Map<String, String>> getSelectionCategories(String recordId) {
+        List<Map<String, String>> categories = new List<Map<String, String>>();
+        List<buildertek__Section__c> categoryList = [SELECT Id, Name, buildertek__Selection__c FROM buildertek__Section__c WHERE  buildertek__Selection__c =: recordId ];
+
+        for (buildertek__Section__c category : categoryList) {
+            Map<String, String> categoryMap = new Map<String, String>();
+            categoryMap.put('Id', category.Id);
+            categoryMap.put('Name', category.Name);
+            categories.add(categoryMap);
+        }
+
+        return categories;
+    }
+    
+    
 }
