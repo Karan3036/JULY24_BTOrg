@@ -328,7 +328,7 @@ public without sharing class PurchaseOrderDAO{
     }
 
     /**********************************************************************************************************************
-     Purpose: This method is used to create a AP from PO
+     Purpose: This method is used to create an AP from a PO
      Parameters: List<Purchase_Order__c> pos
      Returns: NA
      Throws [Exceptions]:
@@ -337,28 +337,22 @@ public without sharing class PurchaseOrderDAO{
         system.debug('Inside createAP');
         Map<Id, Account_Payable__c> PoIdbyAp = new Map<Id, Account_Payable__c>();
         Id posRecId;
-        for (Purchase_Order__c po : pos){
-            /* if(Schema.sObjectType.buildertek__Account_Payable__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Purchase_Order__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Project__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Vendor__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Tax__c.isCreateable()){*/
-
+        
+        for (Purchase_Order__c po : pos){           
             Account_Payable__c ap = new Account_Payable__c();
-            //ap.Name = po.Name;
             ap.Purchase_Order__c = po.id;
             System.debug('purchase order iD => ' + ap.Purchase_Order__c);
             ap.Project__c = po.Project__c;
-            ap.Vendor__c = po.Vendor__c;
-
+            ap.Vendor__c = po.Vendor__c;            
+        
             if(po.Tax__c != null){
                 ap.Tax__c = po.Tax__c;
             }
+            
             ap.buildertek__Description__c = po.buildertek__Description__c;
             PoIdbyAp.put(po.id, ap);
             posRecId = po.id;
         }
-        /* }*/
         insert PoIdbyAp.values();
         return PoIdbyAp.get(posRecId).Id;
     }
@@ -399,21 +393,7 @@ public without sharing class PurchaseOrderDAO{
                 apItem.Tax__c = poItem.Tax__c;
             }
             apItems.add(apItem);
-        }
-        /* if(Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Id.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Account_Payable__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Name.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Item_Title__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Description__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Cost_Code__c.isCreateable()&&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Product__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Purchase_Order_Item__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Quantity__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Unit_Price__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Tax__c.isCreateable()){
-        insert apItems;*/
-        /*}*/
-        //system.debug('apItems--->' + apItems);
+        }      
         insert apItems;
     }
 
@@ -432,21 +412,7 @@ public without sharing class PurchaseOrderDAO{
         }
         return null;
     }
-
-    // @AuraEnabled
-    // public static Map<String, String> getpricebooks(String recordId){
-    //     Map<String, String> options = new Map<String, String>();
-
-    //     list<pricebook2> PriceList;
-    //     if (Schema.sObjectType.pricebook2.fields.Id.isAccessible() && Schema.sObjectType.pricebook2.fields.Name.isAccessible()){
-    //         PriceList = [select Id, Name from pricebook2 WHERE Name != null ORDER BY Name ASC];
-    //     }
-    //     for (pricebook2 p : PriceList){
-    //         //Put Picklist Value & Label in Map
-    //         options.put(p.name, p.Id);
-    //     }
-    //     return options;
-    // }
+  
     public class pricebookWrapper{
         @AuraEnabled
         public List<pricebook2> priceWrapList;
