@@ -147,9 +147,24 @@ public with sharing class QuoteDAO{
                                                  group by family];
         list<productfamilyClass> pfwrapperlst = new list<productfamilyClass>();
         if (productfamlylst.size() > 0){
-            for (AggregateResult agg : productfamlylst){
+            // for (AggregateResult agg : productfamlylst){
+            //     productfamilyClass pf = new productfamilyClass();
+            //     pf.productfamilyvalues = string.valueof(agg.get('familyLabel'));
+            //     pfwrapperlst.add(pf);
+            // }
+            List<String> sortedProductFamilies = new List<String>();
+    
+            for (AggregateResult agg : productfamlylst) {
+                sortedProductFamilies.add(String.valueOf(agg.get('familyLabel')));
+            }
+            
+            sortedProductFamilies.sort();
+
+            // List<productfamilyClass> pfwrapperlst = new List<productfamilyClass>();
+
+            for (String family : sortedProductFamilies) {
                 productfamilyClass pf = new productfamilyClass();
-                pf.productfamilyvalues = string.valueof(agg.get('familyLabel'));
+                pf.productfamilyvalues = family;
                 pfwrapperlst.add(pf);
             }
             system.debug('pfwrapperlst---->' + pfwrapperlst);
