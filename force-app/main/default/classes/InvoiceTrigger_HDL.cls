@@ -495,4 +495,29 @@ public with sharing class InvoiceTrigger_HDL {
             
         }
     }
+
+    public void updateCOFieldOnReciepts(Set<Id> SalesInvoiceId, String ChangeorderId) {
+        try {
+            List<buildertek__Receipt__c> receiptListForCOUpdate = new List<buildertek__Receipt__c>();
+
+            List<buildertek__Receipt__c> getReceiptRecord = [SELECT Id, Name, buildertek__BT_Change_Order__c, buildertek__Billing__c FROM buildertek__Receipt__c WHERE buildertek__Billing__c IN :SalesInvoiceId];
+
+            for (buildertek__Receipt__c updateReciept : getReceiptRecord) {
+                updateReciept.buildertek__BT_Change_Order__c = ChangeorderId;
+                receiptListForCOUpdate.add(updateReciept);
+            }
+            
+            if (!receiptListForCOUpdate.isEmpty()) {
+                update receiptListForCOUpdate;
+            }
+
+        } catch (Exception ex) {
+            System.debug('Error: ' + ex.getMessage());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(ex);
+            }
+        }
+    }
+
 }
