@@ -136,10 +136,6 @@ public without sharing class BT_GenerateQuotePDF {
         }
         system.debug('templateBody 2 ----------> '+templateBody2);
         templateBody = templateBody1 + templateBody2;
-        templateBody = templateBody.replaceAll('<p><br></p>', '<br>');
-        templateBody = templateBody.replaceAll('<p>', '<p style="margin-top: 0px !important; margin-bottom: 0px !important; ">'); 
-        templateBody = templateBody.replaceAll('<b>', '<b style="margin-top: 0px !important; margin-bottom: 0px !important; ">'); 
-        templateBody = templateBody.replaceAll('<strong>', '<strong style="margin-top: 0px !important; margin-bottom: 0px !important; ">'); 
         system.debug('Final templateBody ----------> '+templateBody);
         strBody = templateBody;
         system.debug('strBody -----> '+strBody);
@@ -153,8 +149,10 @@ public without sharing class BT_GenerateQuotePDF {
             imageid = imageid.substring(0,15);
             strBody = strBody.replace('###############',imageid);
         }catch( exception ex){
-            
-            
+            List<buildertek__Exception_Log_Store_Option__c> storeExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if(!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true){
+                BT_ExceptionHandler.Store_Exception(ex);
+            }
         }
     
     }

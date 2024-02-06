@@ -1,4 +1,4 @@
-<aura:component controller="QBIntegrationQueue" implements="force:hasSObjectName,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+<aura:component controller="QBIntegrationQueue" implements="force:hasSObjectName,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:isUrlAddressable" access="global" >
 	<aura:attribute name="recordId" type="Id"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}"/>
@@ -135,6 +135,16 @@
                 <div style="margin-block: 10px;">
                     Syncing Expense with Quickbooks... 
                     <br/> Please don't leave this page until Expense is Synced to Quickbook.
+                    <br/>
+                </div>
+            </aura:if>
+
+            <aura:if isTrue="{!v.sObjectName == 'buildertek__Receipt__c'}">
+                <img alt="Creating new record in QuickBook." src="{!$Resource.gearsloading}" style="height:150px !important;"/>
+                <br/>
+                <div style="margin-block: 10px;">
+                    Syncing Receipt with Quickbooks... 
+                    <br/> Please don't leave this page until Receipt is Synced to Quickbook.
                     <br/>
                 </div>
             </aura:if>

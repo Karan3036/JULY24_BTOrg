@@ -680,11 +680,11 @@
     }
 
     component.set("v.dataByGroup", groupData);
-    console.log('From formatDataByGroups >> ', JSON.parse(JSON.stringify(component.get("v.dataByGroup"))));
     // console.log("groupData===");
     // console.log({ groupData });
     component.set("v.cloneDataByGroup", groupData);
     helper.calculateCostAdjustment(component, event, helper);
+    console.log('From formatDataByGroups >> ', JSON.parse(JSON.stringify(component.get("v.dataByGroup"))));
     // $A.get('e.force:refreshView').fire();
     if (
       !component.get("v.massUpdateEnable") &&
@@ -1017,9 +1017,9 @@
         //  bomLineFields[bomLineFields.length] = JSON.parse(uom);
 
         component.set("v.fieldValues", bomLineFields);
-        // console.log(totalCostCol + "TOTAL COST____");
-        // console.log(bomLineFields);
-        // console.log({bomLineFields} , '********************bomLineFields****************');
+        console.log(totalCostCol + "TOTAL COST____");
+        console.log(bomLineFields);
+        console.log({bomLineFields} , '********************bomLineFields****************');
 
       }
 
@@ -1048,7 +1048,7 @@
       var allData = component.get("v.dataByGroup");
       this.storeAllData = allData;
       var v = this.storeAllData;
-      // console.log("storeAllData in var", { v });
+      console.log("storeAllData in var", { v });
       // // console.log('@@dataByGroup FIRST-', allData);
       var map1 = new Map();
       var map2 = new Map();
@@ -1410,7 +1410,7 @@
                     if (!map1.get(testoId)) {
                       markupPercentage = 0;
                     } else {
-                      markupPercentage = 10.5;
+                      markupPercentage = 11.5;
                     }
                   } else {
                     markupPercentage = 11.5;
@@ -1458,7 +1458,7 @@
                       markupPercentage = 11.5;
                     }
                   } else {
-                    markupPercentage = 101.5;
+                    markupPercentage = 11.5;
                   }
                 }
               }
@@ -3707,7 +3707,8 @@
 
   getFieldSetFields: function(component, event){
     try {
-
+      component.set("v.Spinner", true);
+      console.log('Get fieldset');
       var Fields = [];
             var getFields = component.get("c.getFieldSet");
             getFields.setParams({
@@ -3724,11 +3725,12 @@
                     console.log({listOfFields});
                     component.set("v.listOfFields", listOfFields);
                 }
+                component.set("v.Spinner", false);
             });
           $A.enqueueAction(getFields);
       
     } catch (error) {
       console.log('error in getFieldSetFields : ', error.stack);
     }
-  }
+  },
 });

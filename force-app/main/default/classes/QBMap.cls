@@ -1,6 +1,7 @@
 public without sharing class QBMap {
 
-    public static String mapAccountData(Account acc, Integer a){
+    public static String mapAccountData(QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper SI_Wrapper, Integer a){
+        Account acc = SI_Wrapper.acc;
         String accId = acc.Id;
         String QBId = acc.buildertek__QB_Id__c;
         QBCustomerJSON.Customer customer = new QBCustomerJSON.Customer();
@@ -14,8 +15,13 @@ public without sharing class QBMap {
         customer.Notes = acc.Description;
         if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Id__c != ''){
             customer.Id = acc.buildertek__QB_Id__c;
-            customer.SyncToken = acc.buildertek__QBO_SyncToken__c;
             customer.sparse = true;
+            if(SI_Wrapper.SyncToken == null){
+                customer.SyncToken = acc.buildertek__QBO_SyncToken__c;
+            }
+            else {
+                customer.SyncToken = SI_Wrapper.SyncToken;
+            }
         }
      
         //Create Shipping address
@@ -68,22 +74,14 @@ public without sharing class QBMap {
     public static String  mapTaxRateData(buildertek__Billings__c SI){
         
         QBTaxCodeJSON tax = new QBTaxCodeJSON();
-        // String taxName = 'Tax - ' + string.valueOf(SI.buildertek__Tax_Rate__c);
-        // tax.TaxCode = 'Tax - ' + string.valueOf(SI.buildertek__Tax_Rate__c);	
-        tax.TaxCode = (SI.buildertek__Tax_Rate__c != null) 
-                ? 'Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)
-                : 'Tax - 0.0000';
+        tax.TaxCode = (SI.buildertek__Tax_Rate__c != null)  ? ('Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)) : 'Tax - 0.0000';
 	    tax.TaxRateDetails = new List<QBTaxCodeJSON.TaxRateDetails>();
 
         QBTaxCodeJSON.TaxRateDetails taxrate = new QBTaxCodeJSON.TaxRateDetails();
-        taxrate.RateValue = (SI.buildertek__Tax_Rate__c != null) 
-        ? 'Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)
-        : 'Tax - 0.0000';
+        taxrate.RateValue = (SI.buildertek__Tax_Rate__c != null) ? String.valueOf(SI.buildertek__Tax_Rate__c) : '0.0000';
         taxrate.TaxApplicableOn = 'Sales';
         taxrate.TaxAgencyId = '1';
-        taxrate.TaxRateName = (SI.buildertek__Tax_Rate__c != null) 
-        ? 'Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)
-        : 'Tax - 0.0000';
+        taxrate.TaxRateName = (SI.buildertek__Tax_Rate__c != null) ? ('Tax - ' + String.valueOf(SI.buildertek__Tax_Rate__c)) : 'Tax - 0.0000';
         tax.TaxRateDetails.add(taxrate);
 
         return JSON.serialize(tax);
@@ -132,30 +130,38 @@ public without sharing class QBMap {
         }
     }
 
-    public static String mapInvoiceDataBatch(buildertek__Billings__c inv, String CustomerId, Map<Id, List<String>> lineIdsMap, String taxCodeId, String TermQBId) {
+    public static String mapInvoiceDataBatch(QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper SI_Wrapper) {
         try {
-            System.debug(' in mapInvoiceData method==> '+lineIdsMap);
-            String invId = inv.Id;
-            String invQBId = inv.buildertek__QB_Id__c;
+            System.debug(' in mapInvoiceData method==> '+SI_Wrapper.lineIdsMap);
+            String invId = SI_Wrapper.SI.Id;
+            String invQBId = SI_Wrapper.SI.buildertek__QB_Id__c;
             DateTime yourDate = Datetime.now();
+            System.debug('Current Time  : ' + Datetime.now());
+            System.debug('2 hours delay Time  : ' + Datetime.now().addHours(-8));
+            
             Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
             QBInvoiceJSON invoice = new QBInvoiceJSON();
 
-            if(inv.buildertek__QB_Id__c != null && inv.buildertek__QB_Id__c != ''){
-                invoice.Id = inv.buildertek__QB_Id__c;
+            if(SI_Wrapper.SI.buildertek__QB_Id__c != null && SI_Wrapper.SI.buildertek__QB_Id__c != ''){
+                invoice.Id = SI_Wrapper.SI.buildertek__QB_Id__c;
                 invoice.sparse = true;
-                invoice.SyncToken = inv.buildertek__QBO_SyncToken__c;
+                if(SI_Wrapper.SyncToken == null){
+                    invoice.SyncToken = SI_Wrapper.SI.buildertek__QBO_SyncToken__c;
+                }
+                else {
+                    invoice.SyncToken = SI_Wrapper.SyncToken;
+                }
             }
             
-            invoice.TotalAmt = inv.buildertek__Total_Amount_Tax__c;
-            invoice.Balance = inv.buildertek__Total_Amount_Tax__c;
+            invoice.TotalAmt = SI_Wrapper.SI.buildertek__Total_Amount_Tax__c;
+            invoice.Balance = SI_Wrapper.SI.buildertek__Total_Amount_Tax__c;
             invoice.TxnDate = txnDate;
             invoice.Line = new List<QBInvoiceJSON.line>();
     
             // Iterate through the lineIdsMap to add line items to invoice
             Integer lineNumber = 1;
-            for (String lineId : lineIdsMap.keySet()) {
-                List<String> qbIdAndNameList = lineIdsMap.get(lineId);
+            for (String lineId : SI_Wrapper.lineIdsMap.keySet()) {
+                List<String> qbIdAndNameList = SI_Wrapper.lineIdsMap.get(lineId);
                 String qbId = '';
                 String qbName = '';
                 String qbTotal = '';
@@ -186,10 +192,10 @@ public without sharing class QBMap {
                 ItemRef.name = qbName;
                 ItemRef.value = qbId; // Retrieve the line ID from the map
 
-                if(taxCodeId != null){
+                if(SI_Wrapper.taxCodeId != null){
                     QBInvoiceJSON.TxnTaxDetail TaxDetail = new QBInvoiceJSON.TxnTaxDetail();
                     QBInvoiceJSON.TxnTaxCodeRef taxCodeRef = new QBInvoiceJSON.TxnTaxCodeRef();
-                    taxCodeRef.value = taxCodeId;
+                    taxCodeRef.value = SI_Wrapper.taxCodeId;
     
                     TaxDetail.TxnTaxCodeRef = taxCodeRef;
                     invoice.TxnTaxDetail = TaxDetail;
@@ -204,11 +210,11 @@ public without sharing class QBMap {
             
             invoice.CustomerRef = new QBInvoiceJSON.CustomerRef();
             QBInvoiceJSON.CustomerRef customer = new QBInvoiceJSON.CustomerRef();
-            customer.value = CustomerId;
+            customer.value = SI_Wrapper.QBId;
             invoice.CustomerRef = customer;
 
             QBInvoiceJSON.SalesTermRef term = new QBInvoiceJSON.SalesTermRef();
-            term.value = TermQBId;
+            term.value = SI_Wrapper.TermQBId;
             invoice.SalesTermRef = term;
             
             // System.debug('Invoice request Body :: ' + JSON.serialize(invoice, True).replace('"Long_x":', '"Long":'));
@@ -220,14 +226,29 @@ public without sharing class QBMap {
         }
     }
     
-    public static string mapReceipt_PaymetData(buildertek__Receipt__c receipt, String CustomerId, String invoiceQBOID){
+    public static string mapReceipt_PaymetData(QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper SI_Wrapper){
         try {
+            String CustomerId = SI_Wrapper.QBId; 
+            buildertek__Receipt__c receipt =  SI_Wrapper.receipt;
+            String invoiceQBOID = SI_Wrapper.InvoiceQBId;
 
             DateTime yourDate = Datetime.now();
             Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
 
             QBReceiptJSON QBPayment = new QBReceiptJSON();
             System.debug('PAyment Amount :: ' + receipt.buildertek__Amount__c );
+
+            if(SI_Wrapper.receipt.buildertek__QB_Id__c != null && SI_Wrapper.receipt.buildertek__QB_Id__c != ''){
+                QBPayment.Id = SI_Wrapper.receipt.buildertek__QB_Id__c;
+                QBPayment.sparse = true;
+                if(SI_Wrapper.SyncToken == null){
+                    QBPayment.SyncToken = SI_Wrapper.receipt.buildertek__QBO_SyncToken__c;
+                }
+                else {
+                    QBPayment.SyncToken = SI_Wrapper.SyncToken;
+                }
+            }
+
             if(receipt.buildertek__Amount__c == null ){
                 QBPayment.TotalAmt = 0;
             }
@@ -262,7 +283,8 @@ public without sharing class QBMap {
 
     // ---------------------------------------------------------------------------------------------------------
 
-    public static String mapVendorAccountData(Account acc){
+    public static String mapVendorAccountData(QBIntegrationQueue.qbIntegration_Wrapper qb_wrapper){
+        Account acc = qb_wrapper.acc;
         String accId = acc.Id;
         QBVendorJSON Vendor = new QBVendorJSON();
         
@@ -275,7 +297,12 @@ public without sharing class QBMap {
         // If QB Id is Not Null, Update Vendor in QB Else Create New Vendor In QB.....
         if(acc.buildertek__QB_Id__c != null && acc.buildertek__QB_Id__c != ''){
             Vendor.Id = acc.buildertek__QB_Id__c;
-            Vendor.SyncToken = acc.buildertek__QBO_SyncToken__c;
+            if(qb_wrapper.SyncToken == null){
+                Vendor.SyncToken = acc.buildertek__QBO_SyncToken__c;
+            }
+            else {
+                Vendor.SyncToken = qb_wrapper.SyncToken;
+            }
             Vendor.sparse = true;
         }
      
@@ -307,9 +334,13 @@ public without sharing class QBMap {
     }
 
     // Line associated with "Product and Service" in Quickbook....
-    public static String MapItemDataToBatch(List<sObject> sObjectItemList, String SyncObjName) {
+    public static String MapItemDataToBatch(QBIntegrationQueue.qbIntegration_Wrapper qb_wrapper) {
         try {
             System.debug('\n in MapItemDataToBatch \n');
+
+            List<sObject> sObjectItemList = qb_wrapper.sObjectItemList ;
+            String SyncObjName = qb_wrapper.SyncObjName ;
+
             QBBatchReqJSON BatchItemRequest = new QBBatchReqJSON();
             List<sObject> ItemList = new List<sObject>();
 
@@ -384,19 +415,39 @@ public without sharing class QBMap {
     }
 
     // Map Contractor Invoice Data or Payable Invoice Data......
-    public static String mapQBBillData(sObject SOBJ, Map<Id, List<String>> lineIdsMap, String VendorQBId, String TermQBId, String SyncObjName){
+    public static String mapQBBillData(QBIntegrationQueue.qbIntegration_Wrapper qb_wrapper){
         try {
+            sObject SOBJ = qb_wrapper.SObejctRecord;
+            Map<Id, List<String>> lineIdsMap = qb_wrapper.lineIdsMap;
+
             String QBOID = null;
             String QBSyncToken = null;
-            if(SyncObjName == 'buildertek__Account_Payable__c'){
+            DateTime yourDate = Datetime.now();
+            Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
+
+            if(qb_wrapper.SyncObjName == 'buildertek__Account_Payable__c'){
                 buildertek__Account_Payable__c record = (buildertek__Account_Payable__c)SOBJ;
                 QBOID = record.buildertek__QB_Id__c;
                 QBSyncToken = record.buildertek__QBO_SyncToken__c;
+
+                if(qb_wrapper.SyncToken == null){
+                    QBSyncToken = record.buildertek__QBO_SyncToken__c;
+                }
+                else {
+                    QBSyncToken = qb_wrapper.SyncToken;
+                }
             }
-            else if(SyncObjName == 'buildertek__Account_Payable_Clone__c'){
+            else if(qb_wrapper.SyncObjName == 'buildertek__Account_Payable_Clone__c'){
                 buildertek__Account_Payable_Clone__c record = (buildertek__Account_Payable_Clone__c)SOBJ;
                 QBOID = record.buildertek__QB_Id__c;
                 QBSyncToken = record.buildertek__QBO_SyncToken__c;
+
+                if(qb_wrapper.SyncToken == null){
+                    QBSyncToken = record.buildertek__QBO_SyncToken__c;
+                }
+                else {
+                    QBSyncToken = qb_wrapper.SyncToken;
+                }
             }
 
             QBBillReqJSON QbBill = new QBBillReqJSON();
@@ -407,11 +458,12 @@ public without sharing class QBMap {
             }
 
             QBBillReqJSON.VendorRef vendor = new QBBillReqJSON.VendorRef();
-            vendor.value = VendorQBId;
+            vendor.value = qb_wrapper.VendorQBId;
             QbBill.VendorRef = vendor;
+            QbBill.TxnDate = txnDate;
 
             QBBillReqJSON.SalesTermRef term = new QBBillReqJSON.SalesTermRef();
-            term.value = TermQBId;
+            term.value = qb_wrapper.TermQBId;
             QbBill.SalesTermRef = term;
             
             QbBill.Line = new list<QBBillReqJSON.Line>();
@@ -463,24 +515,34 @@ public without sharing class QBMap {
         }
     }
 
-    public static String mapPODataBatch(buildertek__Purchase_Order__c inv, String VendorQBId, Map<Id, List<String>> lineIdsMap) {
+    public static String mapPODataBatch(QBIntegrationQueue.qbIntegration_Wrapper qb_wrapper) {
         try {
             System.debug(' in mapPODataBatch method');
-            String invId = inv.Id;
-            String invQBId = inv.buildertek__QB_Id__c;
+            buildertek__Purchase_Order__c po = qb_wrapper.PO;
+            Map<Id, List<String>> lineIdsMap = qb_wrapper.lineIdsMap;
+
+            String invId = po.Id;
+            String invQBId = po.buildertek__QB_Id__c;
             DateTime yourDate = Datetime.now();
             Date txnDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
 
             QBPOJSON purchaseorder = new QBPOJSON();
 
-            if(inv.buildertek__QB_Id__c != null && inv.buildertek__QB_Id__c != ''){
-                purchaseorder.Id = inv.buildertek__QB_Id__c;
+            if(po.buildertek__QB_Id__c != null && po.buildertek__QB_Id__c != ''){
+                purchaseorder.Id = po.buildertek__QB_Id__c;
                 purchaseorder.sparse = true;
-                purchaseorder.SyncToken = inv.buildertek__QBO_SyncToken__c;
+                purchaseorder.SyncToken = po.buildertek__QBO_SyncToken__c;
+
+                if(qb_wrapper.SyncToken == null){
+                    purchaseorder.SyncToken = po.buildertek__QBO_SyncToken__c;
+                }
+                else {
+                    purchaseorder.SyncToken = qb_wrapper.SyncToken;
+                }
             }
             
-            purchaseorder.TotalAmt = inv.buildertek__PO_Total__c;
-            // purchaseorder.TxnDate = txnDate;
+            purchaseorder.TotalAmt = po.buildertek__PO_Total__c;
+            purchaseorder.TxnDate = txnDate;
             purchaseorder.Line = new List<QBPOJSON.line>();
     
             // Iterate through the lineIdsMap to add line items to purchaseorder
@@ -525,7 +587,7 @@ public without sharing class QBMap {
             }
             
             QBPOJSON.VendorRef vendor = new QBPOJSON.VendorRef();
-            vendor.value = VendorQBId;
+            vendor.value = qb_wrapper.VendorQBId;
             purchaseorder.VendorRef = vendor;
             
             return JSON.serialize(purchaseorder, True).replace('"Long_x":', '"Long":');
@@ -535,11 +597,11 @@ public without sharing class QBMap {
         }
     }
 
-    public static String mapExpenseDataBatch(buildertek__Expense__c expense, String VendorQBId, Map<Id, List<String>> lineIdsMap, String PayMethodId) {
+    public static String mapExpenseDataBatch(QBIntegrationQueue.qbIntegration_Wrapper qb_wrapper) {
         try {
-            System.debug('karan test---> ' + expense);
-            System.debug('karan test1---> ' + lineIdsMap);
-            System.debug('VendorQBId---> ' + VendorQBId);
+            buildertek__Expense__c expense = qb_wrapper.expense;
+            Map<Id, List<String>> lineIdsMap = qb_wrapper.lineIdsMap;
+
             String QBOID = null;
             String QBSyncToken = null;
             String paymenttype = null;
@@ -557,6 +619,12 @@ public without sharing class QBMap {
                 QbExpense.Id = QBOID;
                 QbExpense.sparse = true;
                 QbExpense.SyncToken = QBSyncToken;
+                if(qb_wrapper.SyncToken == null){
+                    QbExpense.SyncToken = QBSyncToken;
+                }
+                else {
+                    QbExpense.SyncToken = qb_wrapper.SyncToken;
+                }
             }
             QbExpense.PaymentType = paymenttype;
             QbExpense.TxnDate = txnDate;
@@ -568,12 +636,12 @@ public without sharing class QBMap {
 
             QBExpenseJSON.EntityRef Vendorinfo = new QBExpenseJSON.EntityRef();
             Vendorinfo.name = vendorname; // Replace with the actual value
-            Vendorinfo.value = VendorQBId;
+            Vendorinfo.value = qb_wrapper.VendorQBId;
             Vendorinfo.type = vendortype;
             QbExpense.EntityRef = Vendorinfo;
 
             QBExpenseJSON.PaymentMethodRef paymethod = new QBExpenseJSON.PaymentMethodRef();
-            paymethod.value = PayMethodId;
+            paymethod.value = qb_wrapper.PayMethodId;
             QbExpense.PaymentMethodRef = paymethod;
     
             // QbExpense.CustomField = new List<String>{'CustomField1', 'CustomField2'};
@@ -639,46 +707,6 @@ public without sharing class QBMap {
             return null;
         }
     }    
-
-    public static String MapExpenseToBatch(List<buildertek__Expense_Line__c> SILine) {
-        try {
-            System.debug('\n in createProducts \n');
-            QBBatchReqJSON BatchItemRequest = new QBBatchReqJSON();
-            
-            for (buildertek__Expense_Line__c item : SILine) {
-                String lineId = item.Id;
-                Boolean taxable = true;
-                DateTime yourDate = Datetime.now();
-                Date invStartDate = Date.valueOf(yourDate.format('yyyy-MM-dd'));
-                System.debug('item.buildertek__Price__c >> ' + item.buildertek__Price__c);
-                Decimal UnitePrice = item.buildertek__Price__c != null ? item.buildertek__Price__c : 0;
-                BatchItemRequest.addBatchItem(
-                    String.valueOf(item.Id),
-                    true, // Set TrackQtyOnHand as needed
-                    item.Name,
-                    item.buildertek__Quantity__c,
-                    UnitePrice,
-                    // item.buildertek__Total__c,
-                    'Sales of Product Income',
-                    '79', // Assuming a fixed value for income account value
-                    invStartDate,
-                    'Inventory',
-                    taxable,
-                    'Test acc',
-                    '100',
-                    'Cost of Goods Sold',
-                    '80'
-                );
-            }
-            
-            // Now perform the API callout using QBBatchReqJSON class
-            // createInvoiceLines(BatchItemRequest);
-            return JSON.serialize(BatchItemRequest);
-        } catch (Exception e) {
-            System.debug('Exception in createProduct :: '  + e.getMessage());
-            return null;
-        }
-    }
 
     public static String mapPMData(String pmname){
 

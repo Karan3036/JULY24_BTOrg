@@ -170,18 +170,18 @@ public without sharing class ManageBOMlinesController {
         String jsonSerializeFields = '[';
         jsonSerializeFields += '{"value": "buildertek__BT_Price_Book__c","label": "Pricebook Name"},';
         jsonSerializeFields += '{"value": "buildertek__Product__c","label": "Product"},';
-        jsonSerializeFields += '{"value": "buildertek__Takeoff_Line__c","label": "Takeoff Line"},';
         jsonSerializeFields += '{"value": "Name","label": "Product Name Proposal"},';
+        jsonSerializeFields += '{"value": "buildertek__Takeoff_Line__c","label": "Takeoff Line"},';
         jsonSerializeFields += '{"value": "buildertek__Vendor__c","label": "Vendor"},';
         jsonSerializeFields += '{"value": "buildertek__Quantity__c","label": "Quantity"},';
         jsonSerializeFields += '{"value": "buildertek__BL_UNIT_COST__c","label": "Unit Cost"},';
         // jsonSerializeFields += '{"value": "buildertek__BL_LIST_PRICE__c","label": "List Price"},';
-        jsonSerializeFields += '{"value": "buildertek__UOM_Picklist__c","label": "UOM"},';
+        // jsonSerializeFields += '{"value": "buildertek__UOM_Picklist__c","label": "UOM"},';
+        jsonSerializeFields += '{"value": "buildertek__Extended_Cost__c","label": "Total Cost"},';
         jsonSerializeFields += '{"value": "buildertek__Tax_Percent__c","label": "Tax (%)"},';
         jsonSerializeFields += '{"value": "buildertek__BL_MARKUP__c","label": "Markup"},';
-        jsonSerializeFields += '{"value": "buildertek__Extended_Cost__c","label": "Total Cost"},';
         jsonSerializeFields += '{"value": "buildertek__BL_LIST_PRICE_F__c","label": "Unit Sales Price"},';
-        jsonSerializeFields += '{"value": "buildertek__Total_Sales_Price__c","label": "Total sales Price"}';
+        jsonSerializeFields += '{"value": "buildertek__Total_Sales_Price__c","label": "Total Sales Price"}';
         jsonSerializeFields += ']';
         String FieldsDefaultValues =    '[{"label":"Name","value":"Name"}]';
         String jsonSerializeFields1 =   FieldsDefaultValues;          
@@ -444,18 +444,18 @@ public without sharing class ManageBOMlinesController {
         String jsonSerializeFields = '[';
         jsonSerializeFields += '{"value": "buildertek__BT_Price_Book__c","label": "Pricebook Name"},';
         jsonSerializeFields += '{"value": "buildertek__Product__c","label": "Product"},';
-        jsonSerializeFields += '{"value": "buildertek__Takeoff_Line__c","label": "Takeoff Line"},';
         jsonSerializeFields += '{"value": "Name","label": "Product Name Proposal"},';
+        jsonSerializeFields += '{"value": "buildertek__Takeoff_Line__c","label": "Takeoff Line"},';
         jsonSerializeFields += '{"value": "buildertek__Vendor__c","label": "Vendor"},';
         jsonSerializeFields += '{"value": "buildertek__Quantity__c","label": "Quantity"},';
         jsonSerializeFields += '{"value": "buildertek__BL_UNIT_COST__c","label": "Unit Cost"},';
         // jsonSerializeFields += '{"value": "buildertek__BL_LIST_PRICE__c","label": "List Price"},';
-        jsonSerializeFields += '{"value": "buildertek__UOM_Picklist__c","label": "UOM"},';
+        // jsonSerializeFields += '{"value": "buildertek__UOM_Picklist__c","label": "UOM"},';
+        jsonSerializeFields += '{"value": "buildertek__Extended_Cost__c","label": "Total Cost"},';
         jsonSerializeFields += '{"value": "buildertek__Tax_Percent__c","label": "Tax (%)"},';
         jsonSerializeFields += '{"value": "buildertek__BL_MARKUP__c","label": "Markup"},';
-        jsonSerializeFields += '{"value": "buildertek__Extended_Cost__c","label": "Total Cost"},';
         jsonSerializeFields += '{"value": "buildertek__BL_LIST_PRICE_F__c","label": "Unit Sales Price"},';
-        jsonSerializeFields += '{"value": "buildertek__Total_Sales_Price__c","label": "Total sales Price"}';
+        jsonSerializeFields += '{"value": "buildertek__Total_Sales_Price__c","label": "Total Sales Price"}';
         jsonSerializeFields += ']';
 
         
@@ -584,6 +584,7 @@ public without sharing class ManageBOMlinesController {
     public static string updateBOMlines(String recordId, String updatedRecords){
         try {
             if (String.isNotBlank(updatedRecords)){
+                system.debug('updatedRecords : ' + updatedRecords);
                 List<buildertek__Select_Sheet__c> items = (List<buildertek__Select_Sheet__c>)JSON.deserialize(updatedRecords, List<buildertek__Select_Sheet__c>.class);
                 for (buildertek__Select_Sheet__c item : items){
                     System.debug('<--item-->'+item);
@@ -752,11 +753,5 @@ public without sharing class ManageBOMlinesController {
         @AuraEnabled
         public List<extendedCostWrap> nonSlabLaborMarkupWrap{ get; set; }    
         
-    }
-
-    @AuraEnabled
-    public static List<Account> getAccounts(){
-        List<Account> accounts = [SELECT Id, Name FROM Account ORDER BY Name ASC];
-        return accounts;
     }
 }

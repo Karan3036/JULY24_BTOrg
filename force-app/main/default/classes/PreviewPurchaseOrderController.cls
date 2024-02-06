@@ -12,7 +12,7 @@ public with sharing class PreviewPurchaseOrderController {
             nameList.add('Purchase Order Approved Template');
 
           // temrec = [Select Id, Name, folder.name from Emailtemplate where folder.name = 'BT PO' and Name !=:'Purchase Order Line Template'];
-           temrec = [Select Id, Name, folder.name from Emailtemplate where folder.name = 'BT PO' and Name !=: nameList and  DeveloperName !=:'Purchase_Order_Template'];
+           temrec = [Select Id, Name, folder.name,DeveloperName from Emailtemplate where folder.name = 'BT PO' and Name !=: nameList and  DeveloperName !=:'Purchase_Order_Template'];
            }
        return temrec;
    }
@@ -562,5 +562,18 @@ public with sharing class PreviewPurchaseOrderController {
        }
        
    } 
+   @AuraEnabled
+    public static String getBlobBody(String recordId, String templateId, String fileid){
+
+        pagereference pdf;
+        pdf = Page.buildertek__BT_GenerateQuotePDF;
+        system.debug('*********'+pdf);
+        pdf.getParameters().put('recordId', recordId);
+        pdf.getParameters().put('templateId', templateId);
+        pdf.getParameters().put('fileId', fileId);
+        pdf.setRedirect(true);
+
+        return EncodingUtil.base64Encode(pdf.getContent());
+    }
    
 }

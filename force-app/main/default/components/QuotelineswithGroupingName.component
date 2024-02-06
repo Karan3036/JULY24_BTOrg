@@ -24,8 +24,7 @@
         <tbody>
 
             <apex:repeat value="{!wrapperlst}" var="quoteItem">
-
-                <tr style="line-height: 1.6;">
+                <tr style="line-height: 1.6; {!if(quoteItem.groupName == null, 'display:none','')}">
                     <td style="font-size: 14px;padding: 5px 15px;color:white;text-align: left;border-bottom:  1px solid  #ccc;border-right:  1px solid  #ccc;background-color:rgb(27 82 151);">
                         <apex:outputText value="{!quoteItem.groupName}" />
                     </td>

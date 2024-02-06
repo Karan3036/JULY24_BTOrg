@@ -1,4 +1,4 @@
-public without sharing class CreateQuoteFromBOMController {
+public with sharing class CreateQuoteFromBOMController {
     
     @AuraEnabled
     public static string createQuote(String recordId) {
@@ -13,6 +13,14 @@ public without sharing class CreateQuoteFromBOMController {
             for (buildertek__Quote_Line_Group__c phaseGroup : groupList) {
                 groupMap.put(phaseGroup.Name, phaseGroup);
             }
+
+            if(groupMap.get('No Grouping') == null){
+                buildertek__Quote_Line_Group__c noGroup = new buildertek__Quote_Line_Group__c();
+                noGroup.Name = 'No Grouping';
+                insert noGroup;
+                groupMap.put(noGroup.Name, noGroup);
+            }
+
             buildertek__Quote__c quote = new buildertek__Quote__c();
             if (BOMLineList.size() > 0) {
                 quote.buildertek__Bill_of_Material__c = recordId;
@@ -34,15 +42,14 @@ public without sharing class CreateQuoteFromBOMController {
                     buildertek__Quote_Item__c quoteLine = new buildertek__Quote_Item__c();
                     quoteLine.buildertek__Quote__c = quote.Id;
                     quoteLine.buildertek__Product__c = BOMLine.buildertek__Product__c;
-                    String ProductName = BOMLine.buildertek__Product__r.Name;
-                    quoteLine.Name = ProductName;
-                    quoteLine.buildertek__Item_Name__c = ProductName;
-                    quoteLine.buildertek__Description__c = ProductName;
+                    quoteLine.Name = BOMLine.buildertek__Product__r.Name;
+                    quoteLine.buildertek__Item_Name__c = BOMLine.buildertek__Product__r.Name;
                     quoteLine.buildertek__Quantity__c = BOMLine.buildertek__Quantity__c;
                     quoteLine.buildertek__Markup__c = BOMLine.buildertek__BL_MARKUP__c;
                     quoteLine.buildertek__Unit_Cost__c = BOMLine.buildertek__BL_UNIT_COST__c;
                     quoteLine.buildertek__Vendor__c = BOMLine.buildertek__Vendor__c;
                     quoteLine.buildertek__Build_Phase__c = BOMLine.buildertek__Build_Phase__c;
+                    
                     if (groupMap.get(BOMLine.buildertek__Build_Phase__r.Name) != null){
                         quoteLine.buildertek__Grouping__c = groupMap.get(BOMLine.buildertek__Build_Phase__r.Name).Id;
                     } else{
@@ -51,9 +58,21 @@ public without sharing class CreateQuoteFromBOMController {
 
                     quoteLineList.add(quoteLine);
                 }
+                
                 if (quoteLineList.size() > 0){
                     insert quoteLineList;
-                }   
+                }
+
+                List<buildertek__Quote_Item__c> updateQuoteLine = new List<buildertek__Quote_Item__c>();
+                
+                for (buildertek__Quote_Item__c quoteLine : quoteLineList) {
+                    quoteLine.buildertek__Description__c = quoteLine.Name;
+                    updateQuoteLine.add(quoteLine);
+                }
+
+                if (updateQuoteLine.size() > 0){
+                    update updateQuoteLine;
+                }
             }
             return quote.Id;
 

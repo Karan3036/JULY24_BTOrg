@@ -7,7 +7,7 @@
     fireOnSelectEvt: function (component, event, helper) {
         var fieldName = component.get('v.fieldName');
         console.log('fieldName : ', fieldName);
-        if( fieldName == 'buildertek__BT_Price_Book__c'){
+        // if( fieldName == 'buildertek__BT_Price_Book__c' || fieldName == 'buildertek__Price_Book__c'){
             var id = event.getSource().get('v.value');
             console.log('id---->',id);
             if (component.find("lookupField").get("v.value") != undefined && component.find("lookupField").get("v.value").length == 0) {
@@ -34,12 +34,13 @@
                 var cmpEvent = component.getEvent("oClearRecordEvent");
                 cmpEvent.setParams({
                     "phaseIndex": component.get('v.phaseIndex'),
-                    "index": component.get('v.index')
+                    "index": component.get('v.index'),
+                    "fieldName": component.get("v.fieldName")
                 });
                 cmpEvent.fire();
             }
 
-        }
+        // }
         
     }
 })

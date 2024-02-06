@@ -4,13 +4,12 @@
         var context = '';
         var parentRecordId = '';
         component.set("v.parentRecordId", parentRecordId);
-        console.log('parentRecordId---->',component.get("v.parentRecordId"));
         if (value != null) {
             context = JSON.parse(window.atob(value));
             parentRecordId = context.attributes.recordId;
             console.log(context);
             console.log(parentRecordId);
-            component.set("v.parentRecordId", parentRecordId);
+            // component.set("v.parentRecordId", parentRecordId);
         } else {
             var relatedList = window.location.pathname;
             var stringList = relatedList.split("/");
@@ -20,7 +19,7 @@
                 parentRecordId = stringList[3];
             }
 
-            component.set("v.parentRecordId", parentRecordId);
+            // component.set("v.parentRecordId", parentRecordId);
         }
         if(parentRecordId != null && parentRecordId != ''){
             var action = component.get("c.getobjectName");
@@ -30,8 +29,11 @@
             action.setCallback(this, function (response) {
                 if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
                     var objName = response.getReturnValue();
+                    console.log('objName---->',objName);
                     if(objName == 'buildertek__Project__c'){
                         component.set("v.parentprojectRecordId", parentRecordId);
+                    } else if(objName == 'Opportunity') {
+                        component.set("v.oppRecordId", parentRecordId);
                     }
                 } 
             });

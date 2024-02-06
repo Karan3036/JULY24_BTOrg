@@ -607,6 +607,9 @@
                         <div style="text-align:right;">
                             <lightning:button iconName="utility:back" iconPosition="left" 
                                               label="Back" onclick="{!c.redirectToPreviousCmp}"/>
+
+                            <!-- <lightning:button iconName="utility:edit" iconPosition="left" 
+                            label="Edit Lines" onclick="{!c.Redirect_To_ManageBOMLines}"/> -->
                             <!--<aura:if isTrue="{!v.showBTAdminButton}">
                             <lightning:button label="Create Fabrication Record" onclick="{!c.handleOpenModalButton}" />
                         </aura:if>-->
@@ -754,7 +757,6 @@
                                                 </th>
                                                 <th scope="col" style="width:2rem;"></th>
                                                 <th scope="col" style="width:2rem;"></th>
-                                                <th scope="col" style="width:2rem;"></th>
                                                 <aura:iteration items="{!v.bomLineFieldsSettings}" var="rec" indexVar="SettingsIndex">
                                                     <th aria-label="Name" aria-sort="none" class="slds-is-resizable slds-is-sortable" scope="col"
                                                         data-sortBy="{!rec.value}" name="{!rec.value}" data-sortGroupIndex="{!groupIndex}" onclick="{!c.handleSort}" title="{!rec.value}">
@@ -878,14 +880,6 @@
                                                                         </div>
                                                                     </aura:set>
                                                                 </aura:if>
-                                                            </td>
-                                                            <td>
-                                                                <div id="{!columnValue.Id}" onclick="{!c.openEditBox}"
-                                                                     style="display:inline-block;padding-right:0.3rem;">
-                                                                    <lightning:icon iconName="utility:edit" alternativeText="edit" size="xx-small"
-                                                                                    title="Edit" />
-                                                                </div>
-                                                                
                                                             </td>
                                                             <td>
                                                                 <div id="{!columnValue.Id}" onclick="{!c.openDeleteBox}"
@@ -1243,33 +1237,4 @@
         </aura:if>
     </div>
 
-
-    <aura:if isTrue="{!v.OpenEditPopup}">
-        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <header class="slds-modal__header">
-                    <lightning:buttonIcon iconName="utility:close" onclick="{!c.closeModel}" alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
-                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Edit BOM Line</h2>
-                </header>
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <center>
-                        <lightning:recordEditForm recordId="{!v.EditRecordId}" objectApiName="buildertek__Select_Sheet__c" onsubmit="{!c.saveRecord}">
-                            <aura:iteration items="{!v.listOfFields}" var="field">
-                                <div class="slds-col slds-size_1-of-2 standard_field">
-                                    <lightning:inputField fieldName="{!field.name}" aura:id="inputFields"/>
-                                </div>
-                            </aura:iteration>
-                        </lightning:recordEditForm>
-                    </center>
-                </div>
-                <footer class="slds-modal__footer">
-                    <lightning:button variant="neutral" label="Cancel" title="Cancel" onclick="{!c.closeModel}" />
-                    <lightning:button variant="brand" label="Delete" title="Delete" onclick="{!c.UpdateBOMLines}" />
-                </footer>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open"></div>
-    <!-- </div> -->
-</aura:if>
-    
 </aura:component>

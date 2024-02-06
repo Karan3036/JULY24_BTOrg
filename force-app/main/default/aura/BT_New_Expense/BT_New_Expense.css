@@ -6,3 +6,17 @@
     white-space: nowrap;
     font-size: 20px;
 }
+
+.THIS .modalheight{
+    position: relative;
+    overflow: visible;
+    margin-bottom: 25%;
+}
+
+
+/* .THIS .budgetList {
+    position: absolute;
+    z-index: 100;
+    max-height: 200px !important;
+    overflow: visible;
+} */

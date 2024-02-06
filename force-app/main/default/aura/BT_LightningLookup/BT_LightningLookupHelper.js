@@ -8,7 +8,9 @@
     //   console.log({productfamily});
 
     // }
-     var action = component.get("c.getProductRecords");
+    // Set message to Loading... before during apex callout... Once response received change it accordingly...
+    component.set("v.Message", 'Loading...');
+    var action = component.get("c.getProductRecords");
      action.setStorable();
       // set param to method  
         action.setParams({
@@ -35,6 +37,11 @@
                 } else {
                     component.set("v.Message", '');
                 }
+
+                // for(var i in storeResponse){
+                //   delete storeResponse[i].PricebookEntries;
+                // }
+                // console.log('storeResponse filter : ', storeResponse);
                 // set searchResult list with return value from server.
                 component.set("v.listOfSearchRecords", storeResponse);
             }

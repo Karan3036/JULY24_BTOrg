@@ -2,43 +2,33 @@
     init: function (component, event, helper) {
         var sobjectname = component.get("v.sObjectName");
 
-        var recordId = component.get("v.selectedImageId");
+        var recordId = component.get("v.selectionTypeId");
         console.log('Categary recordId => ' + recordId);
         var recordId1 = component.get("v.recordId");
         console.log('recordId => ' + recordId1);
+
         if (sobjectname == 'buildertek__Question_Group__c') {
             component.set("v.mainRecordId", recordId1);
         } else if(sobjectname == 'buildertek__Section__c' || sobjectname == 'buildertek__Selection__c'){
             component.set("v.mainRecordId", recordId);
         }
-        var action = component.get("c.getData");
+
+        var action = component.get("c.getProductFilesMap");
 
         action.setParams({
             recordId: component.get("v.mainRecordId")
         });
 
         action.setCallback(this, function (response) {
-            var state = response.getState();
-            console.log('Status =>', { state });
+            var result = response.getReturnValue();
+            console.log('Result =>', { result });
 
-            if (state === "SUCCESS") {
-                var result = response.getReturnValue();
-                console.log('Result =>', { result });
-                if (result.questionGroupDetails != null) {
-                    if(Object.keys(result.productFilesMap).length > 0){
-                        var contentDocsList = helper.convertMapToList(result.productFilesMap);
-                        component.set("v.contentDocsList", contentDocsList);
-                        console.log('contentDocsList--->',contentDocsList);
-                    } else {
-                        component.set("v.displayImage", false);
-                    }
-                    component.set("v.SelectionTypeName", result.questionGroupDetails[0].Name);
-                    component.set("v.SelectionTypeId", result.questionGroupDetails[0].Id);
-                } else {
-                    console.error("Error fetching product files.");
-                }
+            if (result.status == 'Success' && Object.keys(result.resultMap).length > 0) {
+                var contentDocsList = helper.convertMapToList(result.resultMap);
+                component.set("v.contentDocsList", contentDocsList);
+                console.log('contentDocsList--->',contentDocsList);
             } else {
-                console.error("Error fetching product files.");
+                component.set("v.displayImage", false);
             }
         });
 
@@ -79,25 +69,6 @@
         });
         editRecordEvent.fire();
     },
-
-    accordionAction : function(component, event, helper) {
-		var thisObj = event.target.name;
-        var w3webAccordionListOver = document.getElementById('w3webAccordionListOver');
-        var accordionListAll =  w3webAccordionListOver.querySelectorAll('.slds-accordion__list-item');
-        //alert(accordionListAll.length);
- 
-        var conainActive = document.getElementById(thisObj).classList.contains('activeRow');
-        for(var i=0; i<accordionListAll.length; i++){
-            accordionListAll[i].classList.remove('activeRow');
-        }
- 
-        if(conainActive == true){
-            document.getElementById(thisObj).classList.remove('activeRow');
-        }else{
-            document.getElementById(thisObj).classList.toggle('activeRow');        
-        }
- 
-	},
 
     stopEventPropogation: function(component, event, helper){
         event.stopPropagation();

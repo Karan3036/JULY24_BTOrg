@@ -27,12 +27,9 @@
             var result = response.getReturnValue();
             console.log('Result =>', {result});
             if (result.status == 'success') {
-                component.set("v.contentDocsList", result.contentLink);
-                component.set("v.contentDocsId", result.contentLink[0].ContentDocumentId);
                 component.set("v.categoryList", result.selectionCategory);
                 helper.initializePagination(component);
                 console.log(result.selectionCategory.length);
-                console.log(component.get("v.contentDocsList"));
             }else if(result.status == 'There Are No Files.') {
                 component.set("v.message", 'There are no Selection Types for this Selection Category.');  
             }else{
@@ -51,10 +48,11 @@
     handleImageClick: function(component, event, helper) {
         var clickedDiv = event.currentTarget;
         var imageId = clickedDiv.getAttribute('id');
+        var imageName = clickedDiv.getAttribute('data-name');
         component.set('v.showSelectionOptions', false);
-        component.set("v.selectedImageId", imageId); 
+        component.set("v.selectionTypeId", imageId);
+        component.set("v.selectionTypeName", imageName); 
         component.set("v.showSelectionOptions", true); 
-        console.log('imageId', component.get("v.selectedImageId"));
 
     },
 })

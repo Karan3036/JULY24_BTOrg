@@ -256,10 +256,6 @@ public without sharing class ConfirmationController{
             createconfirmationPage();
             system.debug(rejectQuotelinerecords + '---------Accept and reject-------------------' + acceptQuotelinerecords);
         } catch (exception e){
-            List<buildertek__Exception_Log_Store_Option__c> storeExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
-            if(!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true){
-                BT_ExceptionHandler.Store_Exception(e);
-            }
         }
     }
 
@@ -398,7 +394,7 @@ public without sharing class ConfirmationController{
         quotelinerecords = [select id, Name, buildertek__Net_Total_Price__c, buildertek__Grouping__c, buildertek__Net_Unit__c, buildertek__Grouping__r.Name, buildertek__Quote__c, buildertek__Status__c
                             from buildertek__Quote_Item__c
                             where buildertek__Quote__c = :recordID
-                            ORDER BY buildertek__Priority__c ASC];
+                            ORDER BY buildertek__Priority__c ASC NULLS LAST, Name ASC];
         //}
         //}
         /* for(buildertek__Quote_Item__c  quoteitem : quotelinerecords){
@@ -578,10 +574,6 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
             imageid = imageid.substring(0, 15);
             strBody = strBody.replace('###############', imageid);
         } catch (exception ex){
-            List<buildertek__Exception_Log_Store_Option__c> storeExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
-            if(!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true){
-                BT_ExceptionHandler.Store_Exception(ex);
-            }
             System.debug('Error Mesage::' + ex.getMessage());
             System.debug('Error Line::' + ex.getLineNumber());
         }
@@ -670,7 +662,7 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
                 quoterec.buildertek__Customer_Accepted_Date__c = nowDT;
                 quoterec.buildertek__Status__c = 'Customer Accepted';
                 quoterec.buildertek__Date_Accepted_by_Customer__c = system.now();
-                quoterec.buildertek__Date_Sent_To_Customer__c = System.today();
+                // quoterec.buildertek__Date_Sent_To_Customer__c = System.today();
                 update quoterec;
 
                 buildertek__RFQ_Template_Settings__c rfqTemplateSettings = buildertek__RFQ_Template_Settings__c.getOrgDefaults();

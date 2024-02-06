@@ -1,7 +1,7 @@
 public without sharing class QBPOMap {
     public static String mapVendorAccountData(Account acc, Integer a){
         String accId = acc.Id;
-        String QBId = acc.QBO_ID__c;
+        String QBId = acc.buildertek__QB_ID__c;
         QBVendorJSON customer = new QBVendorJSON();
 
         String AccountId = acc.Id;
@@ -33,7 +33,7 @@ public without sharing class QBPOMap {
         QBVendorJSON.PrimaryPhone phone = new QBVendorJSON.PrimaryPhone ();
         phone.FreeFormNumber = acc.Phone;
         customer.PrimaryPhone = phone;
-        customer.Id = acc.QBO_ID__c;
+        customer.Id = acc.buildertek__QB_ID__c;
         customer.DisplayName = acc.Name;
 
         return JSON.serialize(customer, True).replace('"Long_x":', '"Long":');

@@ -1092,29 +1092,4 @@
     helper.quote(component, event, helper);
   },
 
-  openEditBox: function(component, event, helper){
-    try {
-      console.log('Inside openEditBox : ');
-      console.log('Record Id openEditBox : ', event.currentTarget.id);
-      var recordId =  event.currentTarget.id;
-
-      // component.set("v.OpenEditPopup", true);
-      // component.set("v.EditRecordId", recordId);
-      
-
-      var editRecordEvent = $A.get("e.force:editRecord");
-        editRecordEvent.setParams({
-            "recordId": recordId
-        });
-        editRecordEvent.fire();
-      
-    } catch (error) {
-      console.log('Error in openEditBox : ', error.stack);
-      
-    }
-  },
-
-  closeModel: function (component, event, helper) {
-    component.set("v.OpenEditPopup", false);
-},
 });

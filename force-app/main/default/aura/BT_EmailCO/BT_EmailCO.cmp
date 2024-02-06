@@ -7,6 +7,7 @@
 	<aura:attribute name="selectedCcContact" type="sObject[]" default="[]"/>
 	<aura:attribute name="selectedFiles" type="sObject[]" default="[]"/>
     <aura:attribute name="selectedFillIds" type="sObject[]" default="[]"/>
+	<aura:attribute name="selectedFilesNew" type="sObject[]" default="[]"/>
 
 	
 	<aura:attribute name="pdfFileName" type="String"/>
@@ -247,8 +248,7 @@
                                                 <div class="slds-modal__container">
                                                     <header class="slds-modal__header">
                                                             <h2 class="slds-text-heading_medium slds-hyphenate">Select Files</h2>
-                                                    </header>
-                                                    
+                                                    </header>    
                                                     <div class="slds-modal__content divModel" id="modal-content-id-1" style="">
                                                         <table class="slds-table slds-table_bordered slds-table_cell-buffer">
                                                             <thead>
@@ -264,7 +264,7 @@
                                                                 <aura:iteration items="{!v.relatedFiles}" var="file">
                                                                     <tr>
                                                                         <td>
-                                                                            <lightning:input type="checkbox" name="{!file}" onchange="{!c.handleCheckboxChange}" />
+                                                                            <lightning:input type="checkbox" name="{!file}" value="{!file.ContentDocumentId}" checked="{!file.isChecked}" onchange="{!c.handleCheckboxChange}" />
                                                                         </td>
                                                                         <td>{!file.Title}</td>
                                                                         <td>{!file.FormattedSize}</td> 
@@ -275,12 +275,10 @@
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                            
                                                     <footer class="slds-modal__footer">
                                                         <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick="{!c.closeFileModel}">Cancel</button>
-                                                        <button class="slds-button slds-button_brand" onclick="{!c.saveFile}">Save</button>
-                                                    </footer>
-                                                
+                                                        <button class="slds-button slds-button_brand" aria-label="save" onclick="{!c.handleSaveButtonClick}">Save</button>
+                                                    </footer>                                                
                                             </div>
                                         </section>
                                         <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
@@ -297,10 +295,7 @@
                                 </div>
                             </div>
                             </lightning:layout>
-                        </div>                                      
-                        
-                    
-                    
+                        </div>                                     
                 </div>
             </div>
             </div>

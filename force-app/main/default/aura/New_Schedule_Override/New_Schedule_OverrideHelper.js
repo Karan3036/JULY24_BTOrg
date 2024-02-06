@@ -31,7 +31,7 @@
 
   savefunc: function (component, event, helper) {
     console.log("===savefunc===");
-
+    debugger
     var newSchId = component.get("v.schedulerecId");
     var masterItems = component.get("v.scheduleLineItems");
     var action = component.get("c.newSchedule");

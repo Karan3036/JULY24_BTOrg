@@ -26,7 +26,7 @@
 			                return 1
 			            return 0 //default return value (no sorting)
 			        });
- 
+					console.log('pbFields-->',pbFields);
             		component.set("v.pricebooks",pbFields);
             	} 
             }

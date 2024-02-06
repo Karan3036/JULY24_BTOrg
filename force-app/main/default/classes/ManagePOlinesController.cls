@@ -1707,6 +1707,19 @@ public with sharing class ManagePOlinesController {
             System.debug('Error At Line::' + e.getLineNumber());
             return null;
         }
+
     }
     
+    @AuraEnabled
+    public static string updateBOMLinesRecord(String updatedData, String recordID){
+        try {
+            buildertek__Select_Sheet__c UpdatedRecord = (buildertek__Select_Sheet__c) JSON.deserialize(updatedData, buildertek__Select_Sheet__c.class);
+            UpdatedRecord.Id = recordID;
+            update UpdatedRecord;
+            return 'Updated Record : ' + UpdatedRecord.Name;
+        } catch (Exception e) {
+            System.debug('exception in updateBOMLinesRecord : ' + e);
+            return null;
+        }
+    }
 }

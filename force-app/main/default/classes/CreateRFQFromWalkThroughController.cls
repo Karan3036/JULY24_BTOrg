@@ -13,6 +13,7 @@ public class CreateRFQFromWalkThroughController {
 
                 buildertek__RFQ__c newRFQrecord = new buildertek__RFQ__c();
                 newRFQrecord.Name = walkthroughrec[0].buildertek__Description__c;
+                newRFQrecord.buildertek__Type__c = 'Standard';
                 newRFQrecord.buildertek__Project__c = walkthroughrec[0].buildertek__Project__c;
                 
                 insert newRFQrecord;

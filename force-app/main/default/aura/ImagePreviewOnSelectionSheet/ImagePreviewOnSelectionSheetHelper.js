@@ -10,14 +10,10 @@
         });
 
         action.setCallback(this, function (response) {
-            var state = response.getState();
-            console.log('Status =>', { state });
-
-            if (state === "SUCCESS") {
-                // Add the "None" option at the top of the list
-                var selectionCategories = response.getReturnValue();
+            var selectionCategories = response.getReturnValue();
+            console.log('selectionCategories--->',selectionCategories);
+            if (selectionCategories != null) {
                 selectionCategories.unshift({ Name: '---None---', Id: null });
-
                 component.set("v.selectionCategories", selectionCategories);
             } else {
                 console.error("Error fetching product files.");

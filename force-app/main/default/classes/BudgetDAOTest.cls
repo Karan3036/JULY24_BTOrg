@@ -8,32 +8,57 @@ Date:  16-Nov-2018
 @isTest
 public class BudgetDAOTest {
     @testSetup static void setupBaseData() {
-        SetupTestData.setupBaseData();
+        //SetupTestData.setupBaseData();
     }
     public static testMethod void test1() {
         Account accRec = new Account(Name = 'Test');
         insert accRec;
-        String budgetid = [Select ID from Budget__c LIMIT 1].Id;
-        Purchase_Order__c po = [Select Id From Purchase_Order__c LIMIT 1];
-        po.Budget__c = budgetid;
-        update po;
-        Project__c proj = [Select Id from Project__c LIMIT 1];
-        BudgetDAO.createBudgetItemFromPOItem([Select Id,Purchase_Order__c,Item_Name__c,Description__c,Cost_Code__c,buildertek__Notes__c from Purchase_Order_Item__c]);
+        // String budgetid = [Select ID from Budget__c LIMIT 1].Id;
+        // Purchase_Order__c po = [Select Id From Purchase_Order__c LIMIT 1];
+        // po.Budget__c = budgetid;
+//        update po;
+        // Project__c proj = [Select Id from Project__c LIMIT 1];
 
-        Budget__c budgetRecs = new Budget__c();
+        
+        buildertek__Project__c proj = new buildertek__Project__c(
+            Name = 'Sample Project',
+            buildertek__Account__c = accRec.Id,
+            buildertek__Project_Manager__c = UserInfo.getUserId(),
+            Project_Tax_Rate__c = 10.5
+        );
+        insert proj;
+        
+                Budget__c budgetRecs = new Budget__c();
         budgetRecs.Name = 'test';
         budgetRecs.Project__c =proj.id;
         insert budgetRecs;
+        
+         buildertek__Purchase_Order__c po = new buildertek__Purchase_Order__c(
+             buildertek__Budget__c = budgetRecs.Id,
+            buildertek__Vendor__c = accRec.Id,
+            buildertek__Project__c = proj.Id,
+            buildertek__Ship_To_Address__c = accRec.Id
+        );
+        insert po;
+
+        buildertek__Purchase_Order_Item__c purchaseOrderItem = new buildertek__Purchase_Order_Item__c(
+            Name = 'Sample Purchase Order Item',
+            buildertek__Purchase_Order__c = po.Id
+        );
+        insert purchaseOrderItem;
+        list<buildertek__Purchase_Order_Item__c> purchaseOrderItemList = new list<buildertek__Purchase_Order_Item__c>();
+        purchaseOrderItemList.add(purchaseOrderItem);
+        BudgetDAO.createBudgetItemFromPOItem(purchaseOrderItemList);
 
         Budget_Item__c budgetITem = new Budget_Item__c();
-        budgetITem.budget__c = budgetid;
+        budgetITem.budget__c = budgetRecs.Id;
         budgetITem.ITem_Name__c = 'Test';
         budgetITem.Name = 'Test';
         String myJSONbudgetITem = JSON.serialize(budgetITem);
         insert budgetITem;
 
         Budget_Item__c budgetITem1 = new Budget_Item__c();
-        budgetITem1.budget__c = budgetid;
+        budgetITem1.budget__c = budgetRecs.Id;
         budgetITem1.ITem_Name__c = 'Test';
         budgetITem1.Name = 'Test';
         insert budgetITem1;

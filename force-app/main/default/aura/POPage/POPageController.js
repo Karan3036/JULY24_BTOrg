@@ -679,6 +679,11 @@
 
 	},
 
+	unSelect: function (component, event, helper){
+		$A.get('e.force:refreshView').fire();
+		this.doInit();
+	},
+
 	massUpdate: function (component, event, helper) {
 		component.set("v.enableMassUpdate", true);
 	},
@@ -1008,6 +1013,24 @@
 		component.set("v.isExpanded", isExpanded);
 
 	},
+
+	changeTab : function(component) {
+        var workspaceAPI = component.find("workspace");
+        workspaceAPI.getFocusedTabInfo().then(function(response) {
+            var focusedTabId = response.tabId;
+            workspaceAPI.openTab({
+                pageReference: {
+                    type: 'standard__navItemPage',
+                    attributes: {
+                        apiName: tabName
+                    }
+                },
+                focus: true
+            }).then(function(response) {
+                workspaceAPI.closeTab({tabId: focusedTabId});
+            });
+        });
+    }
 
 
 })

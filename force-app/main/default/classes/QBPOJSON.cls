@@ -4,7 +4,7 @@ public with sharing class QBPOJSON {
 		public String Id;
 		public Decimal TotalAmt;
 		public String POStatus;
-		public String TxnDate;
+		public Date TxnDate;
 		public String domain;
 		public Boolean sparse;
 		public VendorRef VendorRef;

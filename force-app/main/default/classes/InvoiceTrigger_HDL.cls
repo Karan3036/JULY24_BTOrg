@@ -496,27 +496,30 @@ public with sharing class InvoiceTrigger_HDL {
         }
     }
 
-    public void updateCOFieldOnReciepts(Set<Id> SalesInvoiceId, String ChangeorderId) {
+    public void updateCOFieldOnReceiptsWhenUpdateCOFromSalesInvoice(buildertek__Billings__c[] newReceiptList, Map<Id,buildertek__Billings__c> oldReceiptMap, Map<Id,buildertek__Billings__c> newReceiptMap){
         try {
-            List<buildertek__Receipt__c> receiptListForCOUpdate = new List<buildertek__Receipt__c>();
-
-            List<buildertek__Receipt__c> getReceiptRecord = [SELECT Id, Name, buildertek__BT_Change_Order__c, buildertek__Billing__c FROM buildertek__Receipt__c WHERE buildertek__Billing__c IN :SalesInvoiceId];
-
-            for (buildertek__Receipt__c updateReciept : getReceiptRecord) {
-                updateReciept.buildertek__BT_Change_Order__c = ChangeorderId;
-                receiptListForCOUpdate.add(updateReciept);
+            Set<Id> billingIds = new Set<Id>();
+            for (buildertek__Billings__c billing : newReceiptList) {
+                if (oldReceiptMap.get(billing.Id).buildertek__Change_Order__c != billing.buildertek__Change_Order__c) {
+                    billingIds.add(billing.Id);
+                }
             }
+            List<buildertek__Receipt__c> relatedReceipts = [SELECT Id, buildertek__BT_Change_Order__c,buildertek__Billing__c
+                                                            FROM buildertek__Receipt__c
+                                                            WHERE buildertek__Billing__c IN :billingIds];
             
-            if (!receiptListForCOUpdate.isEmpty()) {
-                update receiptListForCOUpdate;
+            for (buildertek__Receipt__c receipt : relatedReceipts) {
+                if (newReceiptMap.get(receipt.buildertek__Billing__c).buildertek__Change_Order__c != oldReceiptMap.get(receipt.buildertek__Billing__c).buildertek__Change_Order__c) { 
+                    receipt.buildertek__BT_Change_Order__c = newReceiptMap.get(receipt.buildertek__Billing__c).buildertek__Change_Order__c;
+                    receipt.buildertek__Project__c = newReceiptMap.get(receipt.buildertek__Billing__c).buildertek__Project__c;
+                }
             }
 
-        } catch (Exception ex) {
-            System.debug('Error: ' + ex.getMessage());
-            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
-            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
-                BT_ExceptionHandler.Store_Exception(ex);
+            if (!relatedReceipts.isEmpty()) {
+                update relatedReceipts;
             }
+        } catch (Exception e) {
+            System.debug('Error in QBIntegrationOnInsert Trigger handler >> ' + e.getMessage() + '\n' + e);
         }
     }
 

@@ -4,10 +4,6 @@
     },
     handleCategoryChange : function(component, event, helper) {
         console.log('In handleCategoryChange');
-        // var selectedCategoryId = component.find("selectionCategory").get("v.value");
-        // var categoryName = component.find("selectionCategory").get("data-id");
-        // console.log('categoryName--->',categoryName);
-        // console.log('selectedCategoryId--->',selectedCategoryId);
 
         var selectedCategoryId = event.getSource().get("v.value");
         var selectedCategoryName = '';

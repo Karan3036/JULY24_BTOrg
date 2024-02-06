@@ -135,9 +135,13 @@
         let saveNew = component.get('v.isSaveNew');
 
         if (saveNew) {
+            console.log('fields', JSON.stringify(fields));
+            debugger;
             component.find('recordViewForm').submit(fields); // Submit form
             $A.get('e.force:refreshView').fire();
         } else {
+            console.log('fields', JSON.stringify(fields));
+            debugger;
             component.find('recordViewForm').submit(fields); // Submit form
         }
 

@@ -8,6 +8,7 @@
     <aura:attribute name="recordLoadError" type="String"/>
     <aura:attribute name="displayImage" type="boolean" default="true"/>
     <aura:attribute name="sObjectName" type="String" />
+    <force:recordData aura:id="forceRecord" recordId="{!v.recordId}" fields="Id, Name" targetFields="{!v.selectionType}" targetError="{!v.recordLoadError}" />
 
     <!-- ============= New Image Preview ============= -->
     <aura:attribute name="Show_ImagePreview" type="boolean" default="false"/>
@@ -19,15 +20,10 @@
     <aura:attribute name="PreviewImgSpinner" type="boolean" default="false"/>
     <aura:attribute name="NotFirstImg" type="boolean" default="true"/>
     <aura:attribute name="NotLastImg" type="boolean" default="true"/>
-    <aura:attribute name="Open_ShareImg_Modal" type="boolean" default="false"/>
-    <aura:attribute name="ShareImg_Modal_title" type="String" />
-    <aura:attribute name="ShareImg_Modal_btn" type="String" />
-    <aura:attribute name="ShareImg_Link" type="String"/>
     <!-- ============= New Image Preview END ============= -->
 
-    <aura:attribute name="selectedImageId" type="String"/>
-    <aura:attribute name="SelectionTypeName" type="String"/>
-    <aura:attribute name="SelectionTypeId" type="String"/>
+    <aura:attribute name="selectionTypeId" type="String"/>
+    <aura:attribute name="selectionTypeName" type="String"/>
     <aura:attribute name="mainRecordId" type="String"/>
 
     <lightning:card>
@@ -77,9 +73,9 @@
     </aura:if>
 
     <aura:if isTrue="{!v.sObjectName == 'buildertek__Question_Group__c'}">
-        <div class="titleStyle">{!v.SelectionTypeName}</div>
+        <div class="titleStyle">{!v.selectionType.Name}</div>
         <aura:set attribute="else">
-            <div class="titleStyle rkdivfora"><ui:outputURL value="{!'/one/one.app?#/sObject/'+ v.SelectionTypeId + '/view'}" target="_blank" label="{!v.SelectionTypeName}"/></div>
+            <div class="titleStyle rkdivfora"><ui:outputURL value="{!'/one/one.app?#/sObject/'+ v.selectionTypeId + '/view'}" target="_blank" label="{!v.selectionTypeName}"/></div>
         </aura:set>
     </aura:if>
         
@@ -111,35 +107,6 @@
             </aura:set>
         </aura:if>
     </div>
-    
-
-    <!-- <div class="slds">
-        <div class="slds-grid slds-wrap">  
-            <div class="slds-p-horizontalmedium slds-col slds-size_12-of-12">
-                <ul class="slds-accordion w3webAccordion" id="w3webAccordionListOver">
-                    <aura:iteration items="{!v.contentDocsList}" var="contentDocsItem">
-                        <li class="slds-accordion__list-item" id="{!contentDocsItem.key}">
-                            <div class="slds-accordion__summary">                
-                                <h3 class="slds-summary-heading" name="{!contentDocsItem.key}" onclick="{!c.accordionAction}"><ui:outputURL value="{!'/one/one.app?#/sObject/'+ {!contentDocsItem.value[0].buildertekQuestionId} + '/view'}" target="_blank" label="{!contentDocsItem.key}" /></h3>  
-                                <div class="accordionContent">
-                                    <aura:if isTrue="{!not(empty(contentDocsItem.value))}">
-                                        <aura:iteration items="{!contentDocsItem.value}" var="optionItem">
-                                            <div style="flex: 0 0 calc(16.6667% - 10px); margin: 5px;">
-                                                <img style="min-width: 100%; min-height: 100%; width: 100%; height: 175px; border: 1px solid grey;" src="{!orgBaseURL + '/sfc/servlet.shepherd/document/download/' + optionItem.contentDocumentId}" id="{!optionItem}"/>
-                                            </div>
-                                        </aura:iteration>
-                                        <aura:set attribute="else">
-                                            <span class="blankStyle">There are no option images for this Selection Option.</span>
-                                        </aura:set>
-                                    </aura:if> 
-                                </div>
-                            </div>    
-                        </li>
-                    </aura:iteration>
-                </ul>
-            </div>  
-        </div>
-    </div> -->
 
 </lightning:card> 
 

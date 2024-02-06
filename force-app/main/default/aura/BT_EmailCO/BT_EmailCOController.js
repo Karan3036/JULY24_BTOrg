@@ -222,222 +222,40 @@
         console.log(component.get("v.fileName"));
         console.log(component.get("v.selectedfilesFill"));
 
-    }, 
-                
-                
-  // function for clear the Record Selaction 
+    },                 
     clear :function(component,event,heplper){
-        var selectedPillId = event.getSource().get("v.name");
-        console.log('ID :--->',selectedPillId);
-        var AllPillsList = component.get("v.selectedfilesFill"); 
-        console.log('ID LIST:--->',AllPillsList);
-        
-        for(var i = 0; i < AllPillsList.length; i++){
-            if(AllPillsList[i].Id == selectedPillId){
-                AllPillsList.splice(i, 1);
-                component.set("v.selectedfilesFill", AllPillsList);
-            }  
-        }
+        helper.clearPillValues(component, event, helper);
     },                
     closeWindow: function(component, event, helper) {
         $A.get("e.force:closeQuickAction").fire();
     },
      openPopupModel:function(component, event, helper) {
-        $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();        // var Id=  event.currentTarget.dataset.iconattr;
-        // component.set("v.quoteLineId",Id);
-        component.set("v.selectedFile", []);
-        console.log('1');
+        $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();    
+        var selectedFile = component.get("v.selectedFile");
+        component.set("v.selectedFile", selectedFile);
         helper.getFileList(component, event, helper);
     },    
     closeFileModel : function (component,event,helper) {
+        var selectedFiles = component.get("v.selectedFiles") || [];
+        var selectedFiles2 = component.get("v.selectedFiles2") || [];
+
+        selectedFiles = selectedFiles.filter(function(file) {
+            return !selectedFiles2.includes(file);
+        });
+        component.set("v.selectedFiles", selectedFiles);
+        component.set("v.selectedFiles2", []);
+        console.log('selectedFiles after cancel:', selectedFiles);
         component.set("v.showModel",false);
-        component.set("v.selectedFile", []);
     },  
-    saveFile: function(component, event, helper){
-        var selectedFile = component.get("v.selectedFile");
-        if (selectedFile.length > 0) {
-            component.set("v.showModel",false);
-        }else{
-            var toastEvent = $A.get("e.force:showToast");
-            toastEvent.setParams({
-                mode: 'sticky',
-                message: 'Please select atlease one file.',
-                type : 'error',
-                duration: '5000',
-                mode: 'dismissible'
-            });
-            toastEvent.fire();  
-        }
-    },   
-    // handleCheckboxChange: function(component, event, helper) {
-    //     var fileName = 'No File Selected..';
-    //     var fileId = '';
-    //     var file = event.getSource().get("v.name");
-    //     console.log('fileId : ->', file);
-    
-    //     var selectedFiles = component.get("v.selectedFile") || [];
-    //     if (event.getSource().get("v.checked")) {
-    //         selectedFiles.push(file);
-    //     } else {
-    //         selectedFiles = selectedFiles.filter(function(id) {
-    //             return id.Id !== file.Id;
-    //         });
-    //     }
-    
-    //     selectedFiles = JSON.parse(JSON.stringify(selectedFiles));
-    //     component.set("v.selectedFile", selectedFiles);
-    //     console.log('selectedFiles :->', selectedFiles);
-    
-    //     var fileCount = selectedFiles.length;
-    //     var files = '';
-    //     var mapData = [];
-    //     mapData = component.get("v.selectedfilesFill");
-    
-    //     if (fileCount > 0) {
-    //         for (var i = 0; i < fileCount; i++) {
-    //             fileName = selectedFiles[i].Title;
-    //             fileId = selectedFiles[i].ContentDocumentId;
-    //             var obj = {};
-    //             obj['Name'] = fileName;
-    //             obj['Id'] = fileId;
-    //             mapData.push(obj);
-    
-    //             if (i == 0) {
-    //                 files = fileName;
-    //             } else {
-    //                 files = files + ',' + fileName;
-    //             }
-    //         }
-    //     } else {
-    //         files = fileName;
-    //     }
-    
-    //     component.set("v.fileName", files);
-    //     component.set("v.selectedfilesFill", mapData);
-    //     var fileIds = mapData.map(function(v) {
-    //         return v.Id;
-    //     });
-    //     component.set("v.selectedFillIds", fileIds);
-    
-    //     console.log(component.get("v.fileName"));
-    //     console.log('fileIds :->', fileIds);
-    //     console.log('selected :-->', component.get("v.selectedfilesFill"));
-    // },
-    
-    handleCheckboxChange: function(component, event, helper) {
-        var fileName = 'No File Selected..';
-        var fileId = '';
-        var file = event.getSource().get("v.name");
-        console.log('fileId : ->', file);
-    
-        var selectedFiles = component.get("v.selectedFile") || [];
-    
-        // Check if the file is already in the selectedFiles array
-        var fileIndex = selectedFiles.findIndex(function(selectedFile) {
-            return selectedFile.Id === file.Id;
-        });
-    
-        if (event.getSource().get("v.checked")) {
-            // If the file is not already in the array, add it
-            if (fileIndex === -1) {
-                selectedFiles.push(file);
-            }
-        } else {
-            // If the file is in the array, remove it
-            if (fileIndex !== -1) {
-                selectedFiles.splice(fileIndex, 1);
-            }
-        }
-    
-        // No need to stringify and parse, just set the array
-        component.set("v.selectedFile", selectedFiles);
-        console.log('selectedFiles :->', selectedFiles);
-    
-        var fileCount = selectedFiles.length;
-        var files = '';
-        var mapData = component.get("v.selectedfilesFill") || [];
-    
-        if (fileCount > 0) {
-            for (var i = 0; i < fileCount; i++) {
-                fileName = selectedFiles[i].Title;
-                fileId = selectedFiles[i].ContentDocumentId;
-    
-                // Check if the fileId is already in the mapData
-                var fileInMap = mapData.some(function(mapFile) {
-                    return mapFile.Id === fileId;
-                });
-    
-                // If the fileId is not in the mapData, add it
-                if (!fileInMap) {
-                    var obj = {};
-                    obj['Name'] = fileName;
-                    obj['Id'] = fileId;
-                    mapData.push(obj);
-    
-                    if (i == 0) {
-                        files = fileName;
-                    } else {
-                        files = files + ',' + fileName;
-                    }
-                }
-            }
-        } else {
-            files = fileName;
-        }
-    
-        component.set("v.fileName", files);
-        component.set("v.selectedfilesFill", mapData);
-        var fileIds = mapData.map(function(v) {
-            return v.Id;
-        });
-        component.set("v.selectedFillIds", fileIds);
-    
-        console.log(component.get("v.fileName"));
-        console.log('fileIds :->', fileIds);
-        console.log('selected :-->', component.get("v.selectedfilesFill"));
+    handleSaveButtonClick: function(component, event, helper) {
+        helper.saveButton(component, event, helper);
     },
-    
-    
+
+    handleCheckboxChange: function(component, event, helper) {
+        helper.onChecboxChanges(component, event, helper);
+    },
     handleFileChange: function(component, event, helper) {
-        console.log('handleFilesChange');
-        var fileName = 'No File Selected..';
-        var fileId = '';
-    
-        var existingMapData = component.get('v.selectedfilesFill');
-        var newFilesList = event.getParam('files');
-    
-        var fileCount = newFilesList.length;
-        var files = '';
-        var mapData = existingMapData || [];
-    
-        if (fileCount > 0) {
-            for (var i = 0; i < fileCount; i++) {
-                fileName = newFilesList[i]['name'];
-                fileId = newFilesList[i].documentId;
-    
-                var obj = {};
-                obj['Name'] = fileName;
-                obj['Id'] = fileId;
-    
-                mapData.push(obj);
-            }
-    
-            // Construct the files string after adding all files to mapData
-            files = mapData.map(function(file) {
-                return file.Name;
-            }).join(', ');
-        } else {
-            files = fileName;
-        }
-    
-        component.set('v.selectedfilesFill', mapData);
-        console.log(component.get('v.selectedfilesFill'));
-    }
-    
-    
-
-    
-
-    
+        helper.standardFileUploderFileChange(component, event, helper);
+    },
                 
 })
