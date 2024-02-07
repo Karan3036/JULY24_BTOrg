@@ -41,4 +41,16 @@ trigger ContractTrigger on Contract__c (after delete, after insert, after undele
             handler.updateProjectContractAmount(Trigger.new);
         }
     }
+
+    if(Trigger.isInsert && Trigger.isAfter){
+        handler.onAfterInsert(Trigger.new);
+    }
+
+    if(Trigger.isUpdate && Trigger.isAfter){
+        handler.onAfterUpdate(Trigger.new, Trigger.oldMap);
+    }
+
+    if(Trigger.isDelete && Trigger.isAfter){
+        handler.onAfterDelete(Trigger.old);
+    }
 }
