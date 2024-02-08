@@ -286,7 +286,7 @@ public without sharing class ContractTriggerHandler{
 
     // }
 
-    public void onAfterInsert(List<buildertek__Contract__c> newContractList) {
+    public void onAfterInsertForProject(List<buildertek__Contract__c> newContractList) {
         try {
             Set<Id> ProjectIds = new Set<Id>();
             for (buildertek__Contract__c contract : newContractList) {
@@ -304,7 +304,7 @@ public without sharing class ContractTriggerHandler{
         }
     }
     
-    public void onAfterUpdate(List<buildertek__Contract__c> newContractList, Map<Id, buildertek__Contract__c> oldContractMap) {
+    public void onAfterUpdateForProject(List<buildertek__Contract__c> newContractList, Map<Id, buildertek__Contract__c> oldContractMap) {
         try {
             Set<Id> ProjectIds = new Set<Id>();
     
@@ -312,7 +312,14 @@ public without sharing class ContractTriggerHandler{
                 buildertek__Contract__c oldContract = oldContractMap.get(contract.Id);
     
                 if (contract.buildertek__Project__c != oldContract.buildertek__Project__c ||
-                    contract.buildertek__Total__c != oldContract.buildertek__Total__c) {
+                    contract.buildertek__Contract_Amount__c != oldContract.buildertek__Contract_Amount__c ||
+                    contract.buildertek__Tax_Rate__c != oldContract.buildertek__Tax_Rate__c ||
+                    contract.buildertek__Discount_Amount__c != oldContract.buildertek__Discount_Amount__c ||
+                    contract.buildertek__Markup_Amount__c != oldContract.buildertek__Markup_Amount__c ||
+                    contract.buildertek__Markup__c != oldContract.buildertek__Markup__c ||
+                    contract.buildertek__Discount__c != oldContract.buildertek__Discount__c ||
+                    contract.buildertek__Status__c != oldContract.buildertek__Status__c ||
+                    contract.RecordTypeId != oldContract.RecordTypeId) {
                         if(oldContract.buildertek__Project__c != null){
                             ProjectIds.add(oldContract.buildertek__Project__c);
                         }
@@ -337,7 +344,7 @@ public without sharing class ContractTriggerHandler{
         }
     }    
 
-    public void onAfterDelete(List<buildertek__Contract__c> oldContractList) {
+    public void onAfterDeleteForProject(List<buildertek__Contract__c> oldContractList) {
         try {
             Set<Id> ProjectIds = new Set<Id>();
             for (buildertek__Contract__c contract : oldContractList) {
@@ -358,30 +365,29 @@ public without sharing class ContractTriggerHandler{
     public void updateAmountOnProject(Set<Id> ProjectIds) {
         try {
             Map<Id, AggregateResult> totalAmountMap = new Map<Id, AggregateResult>();
-            for (AggregateResult aggregatedResult : [SELECT buildertek__Project__c, SUM(buildertek__Contract_Amount_Tax_Discount_SH__c) totalTaxAmount FROM buildertek__Contract__c WHERE buildertek__Project__c IN :ProjectIds GROUP BY buildertek__Project__c]){
+            for (AggregateResult aggregatedResult : [SELECT buildertek__Project__c, SUM(buildertek__Contract_Amount_Tax_Discount_SH__c) totalTaxAmount FROM buildertek__Contract__c WHERE buildertek__Project__c IN :ProjectIds AND buildertek__Status__c = 'Approved' AND  RecordType.Name = 'Prime Contract' GROUP BY buildertek__Project__c]){
                 Id ProId = (Id)aggregatedResult.get('buildertek__Project__c');
                 totalAmountMap.put(ProId, aggregatedResult);
             }
             
-            List<buildertek__Project__c> expenseToUpdate = new List<buildertek__Project__c>();
+            List<buildertek__Project__c> projectToUpdate = new List<buildertek__Project__c>();
             
             for (Id ProjectId :ProjectIds) {
+                buildertek__Project__c project = new buildertek__Project__c(Id = ProjectId);
                 if(totalAmountMap.containsKey(ProjectId)) {
                     AggregateResult aggregatedResult = totalAmountMap.get(ProjectId);
                     Decimal totalTaxAmount = (Decimal)aggregatedResult.get('totalTaxAmount');
 
-                    buildertek__Project__c expense = new buildertek__Project__c(Id = ProjectId);
-                    expense.buildertek__Contract_Amount__c = totalTaxAmount;
-                    expenseToUpdate.add(expense);
+                    project.buildertek__Contract_Amount__c = totalTaxAmount;
+                    projectToUpdate.add(project);
                 } else {
-                    buildertek__Project__c expense = new buildertek__Project__c(Id = ProjectId);
-                    expense.buildertek__Contract_Amount__c = 0;
-                    expenseToUpdate.add(expense);
+                    project.buildertek__Contract_Amount__c = 0;
+                    projectToUpdate.add(project);
                 }
             }
-            System.debug('expenseToUpdate: ' + expenseToUpdate);
-            if (!expenseToUpdate.isEmpty()) {
-                update expenseToUpdate;
+            System.debug('projectToUpdate: ' + projectToUpdate);
+            if (!projectToUpdate.isEmpty()) {
+                update projectToUpdate;
             }
 
         } catch (Exception ex) {
