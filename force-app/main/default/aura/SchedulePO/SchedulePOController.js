@@ -1,8 +1,22 @@
 ({
 	doInit : function(component, event, helper) {
 	    helper.getPODetails(component, event, helper);
-		helper.getSchedules(component, event, helper);
-		helper.fetchPickListVal(component, 'phaseId', 'buildertek__Phase__c');
+		// helper.getSchedules(component, event, helper);
+		// helper.fetchPickListVal(component, 'phaseId', 'buildertek__Phase__c');
+        var getFields = component.get("c.getFieldSet");
+        getFields.setParams({
+            objectName: 'buildertek__Project_Task__c',
+            fieldSetName: 'buildertek__New_Fieldset_For_Po'
+        });
+        getFields.setCallback(this, function (response) {
+            if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
+                var listOfFields = JSON.parse(response.getReturnValue());
+                console.log({listOfFields});
+                component.set("v.listOfFields", listOfFields);
+                // component.set("v.isLoading", false);
+            }
+        });
+        $A.enqueueAction(getFields);
 	},
 	 
 	clearSelectedValue : function(component, event, helper) {

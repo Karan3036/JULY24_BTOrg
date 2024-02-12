@@ -5,7 +5,7 @@ public with sharing class ImportMasterProjectTakeoff{
 
         masterProjecttakeofflst = [SELECT Id, Name, buildertek__Community__c, buildertek__Community__r.Name, buildertek__Project__c, buildertek__Project__r.Name, buildertek__Type__c, buildertek__Plan_Type__c
                                    FROM buildertek__Project_Takeoff__c
-                                   WHERE buildertek__Type__c = 'Master' AND ID != :recordId];
+                                   WHERE buildertek__Type__c = 'Master' AND ID != :recordId ORDER BY Name ASC];
 
 
         List<MasterProjectTakeoffClass> MasterProjectTakeoffClassList = new List<MasterProjectTakeoffClass>();
