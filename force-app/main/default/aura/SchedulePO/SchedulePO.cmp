@@ -1,10 +1,10 @@
-<aura:component controller="SchedulePOController" implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:isUrlAddressable,lightning:actionOverride,force:hasSObjectName">
+<aura:component controller="SchedulePOController" implements="force:appHostable,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes,lightning:actionOverride,force:hasRecordId,forceCommunity:availableForAllPageTypes">
      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
      <aura:attribute name="scheduleString" type="string" />
      <aura:attribute name="Schedules" type="list" />  
      <aura:attribute name="ScheduleId" type="string" />
-     <aura:attribute name="taskRecord" type="Project_Task__c" default="{ 'sobjectType': 'Project_Task__c',
-                                                                                   'Name':''}"/>
+     <!-- <aura:attribute name="taskRecord" type="Project_Task__c" default="{ 'sobjectType': 'Project_Task__c',
+                                                                                   'Name':''}"/> -->
      <aura:attribute name="Spinner" type="boolean" default="false"/>
      <aura:attribute name="isNewTask" type="boolean" />
      <aura:attribute name="isNewTasks" type="boolean" />
@@ -40,8 +40,8 @@
      <header class="slds-modal__header">
         <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Task</h2>
      </header>   
-    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"  >
-        <lightning:recordEditForm aura:id="recordViewForm" objectApiName="buildertek__Account_Payable__c" onsubmit="{!c.handleSubmit}" density="Comfy" >
+    <div class="slds-modal__content" id="modal-content-id-1"  >
+        <lightning:recordEditForm aura:id="recordViewForm" objectApiName="buildertek__Project_Task__c" onsubmit="{!c.handleSubmit}" density="Comfy" >
             <div class="" style="height:50vh;width:100%;overflow: auto;">
                 <div class="slds-p-around_medium" style="background-color:white;">
                     <lightning:layout multipleRows="true">

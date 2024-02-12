@@ -244,5 +244,69 @@
             // component.set('v.diplayPredecessorlist' , false);
 
     },
+    handleSubmit: function (component, event, helper) {
+        component.set("v.isDisabled", true);
+		component.set("v.isLoading", true);
+        event.preventDefault(); // Prevent default submit
+        var fields = event.getParam("fields");
+        var poId = component.get("v.selectedPOId");
+        if (poId != null && poId != '' && poId != undefined) {
+            fields["buildertek__Purchase_Order__c"] = poId;
+        }
+        var allData = JSON.stringify(fields);
+
+        var action = component.get("c.saveData");
+        action.setParams({
+            allData : allData
+        });
+        action.setCallback(this, function(response){
+            if(response.getState() == 'SUCCESS') {            
+                var result = response.getReturnValue();
+                console.log({result});
+                var saveNnew = component.get("v.isSaveNew");
+                if(saveNnew){
+                    $A.get('e.force:refreshView').fire();
+                    component.set("v.isSaveNew", false);
+                }else{
+                    var workspaceAPI = component.find("workspace");
+                    var focusedTabId = response.tabId;
+                    //timeout
+                    window.setTimeout(
+                        $A.getCallback(function() {
+                            workspaceAPI.getFocusedTabInfo().then(function(response) {
+                                workspaceAPI.closeTab({tabId: focusedTabId});
+                                component.set("v.isLoading", false);
+                            })
+                        }), 1000
+                        );
+                    var navEvt = $A.get("e.force:navigateToSObject");
+                    navEvt.setParams({
+                        "recordId": result,
+                        "slideDevName": "Detail"
+                    });
+                    navEvt.fire();
+                }
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "title": "Success!",
+                    "message": "The record has been saved successfully.",
+                    "type": "success"
+                });
+                toastEvent.fire();
+                component.set("v.isDisabled", false);
+            }else{
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "title": "Error!",
+                    "message": "Something went wrong. Please try again.",
+                    "type": "error"
+                });
+                toastEvent.fire();
+                component.set("v.isDisabled", false);
+                component.set("v.isLoading", false);
+            }
+        });
+        $A.enqueueAction(action);
+    },
 
 })
