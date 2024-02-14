@@ -1,29 +1,8 @@
 <aura:component controller="SchedulePOController" implements="force:appHostable,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes,lightning:actionOverride,force:hasRecordId,forceCommunity:availableForAllPageTypes">
      <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-     <aura:attribute name="scheduleString" type="string" />
-     <aura:attribute name="Schedules" type="list" />  
-     <aura:attribute name="ScheduleId" type="string" />
-     <!-- <aura:attribute name="taskRecord" type="Project_Task__c" default="{ 'sobjectType': 'Project_Task__c',
-                                                                                   'Name':''}"/> -->
+     <aura:attribute name="Schedules" type="list" />
      <aura:attribute name="Spinner" type="boolean" default="false"/>
-     <aura:attribute name="isNewTask" type="boolean" />
-     <aura:attribute name="isNewTasks" type="boolean" />
-     <aura:attribute name="taskName" type="String" />
-     <aura:attribute name="description" type="String" />
-     <aura:attribute name="duration" type="String" />
-     <aura:attribute name="startDate" type="Date" />
-     <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
-     <aura:attribute name="selectedContactRecord" type="sObject" default="{}"/>
-    <aura:attribute name="selectedAccountRecord" type="sObject" default="{}"/>
-     <aura:attribute name="selectedProjectRecord" type="sObject" default="{}"/>
-     <aura:attribute name="isProject" type="boolean" default="false"/>
-    <aura:attribute name="isVendor" type="boolean" default="false"/>
-     <aura:attribute name="scheduleRecId" type="String"/>
-     <aura:attribute name="projectId" type="String"/>
-     <aura:attribute name="selectedPhaseValue" type="String"/>
-     <aura:attribute name="selectedLookUpRecordName" type="String"/> 
      <aura:attribute name="selectedValue" type="String"/>
-     <aura:attribute name="selectedProjectId" type="String"/>
      <aura:attribute name="listOfFields" type="List" />
 
      <!-- predecessor lookup -->
@@ -34,6 +13,15 @@
      <aura:attribute name="selectedPredecessor" type="String" default="" />
      <aura:attribute name="selectedPredecessorId" type="String" default="" />
 
+     <aura:attribute name="selectedProjectId" type="String"/>
+     <aura:attribute name="selectedTaskName" type="String"/>
+     <aura:attribute name="selectedVendorId" type="String"/>
+     <aura:attribute name="isDisabled" type="Boolean" default="false"/>
+     <aura:attribute name="StartDate" type="Date"/>
+     <aura:attribute name="FinishDate" type="Date"/>
+     <aura:attribute name="durationNum" type="Integer"/>
+     <aura:attribute name="disablefields" type="Boolean" default="true"/>
+
 
      
      <ltng:require styles="{!$Resource.MOdalPreviewWidth52}"/>
@@ -42,18 +30,81 @@
      </header>   
     <div class="slds-modal__content" id="modal-content-id-1"  >
         <lightning:recordEditForm aura:id="recordViewForm" objectApiName="buildertek__Project_Task__c" onsubmit="{!c.handleSubmit}" density="Comfy" >
-            <div class="" style="height:50vh;width:100%;overflow: auto;">
+            <div class="" style="height:55vh;width:100%;overflow: auto;">
                 <div class="slds-p-around_medium" style="background-color:white;">
                     <lightning:layout multipleRows="true">
                         <aura:iteration items="{!v.listOfFields}" var="field">
                             <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
-                                <aura:if  isTrue="{!and(field.name != 'buildertek__Purchase_Order__c', field.name != 'buildertek__Project__c')}" >                                 
-                                    <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="inputFields"   />  
-                                        <aura:set attribute="else"> 
-                                            <aura:if  isTrue="{!and(field.name =='buildertek__Project__c')}" >        
-                                                <lightning:inputField fieldName="{!field.name}" aura:id="inputFields"  value="{!v.parentRecordId}" disabled="{!v.forProject}" onchange="{!c.changeProject}"/>
-                                            </aura:if>
-                                        </aura:set>
+                                <aura:if isTrue="{!and(and(and(and(and(and(and(field.name !='buildertek__Project__c',field.name !='Name')
+                                ,field.name != 'buildertek__Schedule__c'),field.name != 'buildertek__Dependency__c'),
+                                field.name != 'buildertek__Contractor__c'),field.name != 'buildertek__Start__c'),field.name != 'buildertek__Finish__c'),field.name != 'buildertek__Duration__c')}">
+                                    <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="inputFields" />
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!field.name == 'buildertek__Start__c'}">
+                                            <div class="preInput">
+                                                <lightning:input type="date" label="Start Date" aura:id="startDate" name="Start Date" value="{!v.StartDate}" required="true" onchange="{!c.enbleFinishAndDuration}"/>
+                                            </div>    
+                                        </aura:if>
+                                        <aura:if isTrue="{!field.name == 'buildertek__Finish__c'}">
+                                            <div class="preInput">
+                                                <lightning:input type="date" label="Finish Date" aura:id="finishDate" name="Finish Date" value="{!v.FinishDate}" onchange="{!c.changeDuration}" disabled="{!v.disablefields}"/>
+                                            </div>    
+                                        </aura:if>
+                                        <aura:if isTrue="{!field.name == 'buildertek__Duration__c'}">
+                                            <lightning:inputField fieldName="{!field.name}" aura:id="inputFields" value="{!v.durationNum}" onchange="{!c.changeFinishDate}" disabled="{!v.disablefields}"/>    
+                                        </aura:if>
+                                        <aura:if isTrue="{!field.name == 'Name'}">
+                                            <lightning:inputField fieldName="{!field.name}" aura:id="inputFields" value="{!v.selectedTaskName}" required="true"/>
+                                        </aura:if>
+                                        <aura:if isTrue="{!field.name == 'buildertek__Project__c'}">
+                                            <lightning:inputField fieldName="{!field.name}" aura:id="inputFields" value="{!v.selectedProjectId}" onchange="{!c.changeProject}" />
+                                        </aura:if>
+                                        <aura:if isTrue="{!field.name == 'buildertek__Schedule__c'}">
+                                            <div class="preInput">
+                                                <lightning:select name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" onchange="{!c.handleScheduleChange}">
+                                                    <option text="None" value="" /> 
+                                                    <aura:iteration items="{!v.Schedules}" var="sch">
+                                                        <option text="{!sch.getSchedulesList.Name +' - '+sch.getSchedulesList.buildertek__Description__c}" value="{!sch.getSchedulesList.Id}" />
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </div>
+                                        </aura:if>
+                                        <aura:if isTrue="{!field.name == 'buildertek__Dependency__c'}">
+                                            <div class="slds-form-element__control preInput" style="margin-top: 0.35rem;">
+                                                <label class="rkclass">Predecessor</label>
+                                                <lightning:input autocomplete="off" type="search" placeholder="Search Manufacturer" variant="label-hidden" value="{!v.selectedPredecessor}" onfocus="{!c.serachPredecessor}" onblur="{!c.hideList}" onkeyup="{!c.onkeyUp}" />
+                                                <aura:if isTrue="{!v.diplayPredecessorlist}" >
+                                                    <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox" style="height:100px;" onmousedown="{!c.preventHide}">
+                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                            <aura:iteration items="{!v.predecessorList}" var="result">
+                                                                <li role="presentation" class="slds-listbox__item" data-value="{!result.value}" onclick="{!c.clickPredecessorValue}" data-id="{!result.key}">
+                                                                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
+                                                                        <span class="slds-media__body">
+                                                                            <span class="slds-truncate" title="All Predecessor">
+                                                                                <span>{!result.value}</span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            </aura:iteration>
+                    
+                    
+                                                            <aura:if isTrue="{!empty(v.predecessorList)}">
+                                                                <span>
+                                                                    <p class="blank-lst">
+                                                                    No records found
+                                                                    </p>
+                                                                </span>
+                                                            </aura:if>
+                                                        </ul>
+                                                    </div>
+                                                </aura:if>
+                                            </div>
+                                        </aura:if>
+                                        <aura:if isTrue="{!field.name == 'buildertek__Contractor__c'}">
+                                            <lightning:inputField fieldName="{!field.name}" aura:id="inputFields" value="{!v.selectedVendorId}"/>
+                                        </aura:if>
+                                    </aura:set>
                                 </aura:if>
                             </lightning:layoutItem>
                         </aura:iteration>
@@ -74,10 +125,9 @@
              <div class="slds-spinner__dot-a"></div>
              <div class="slds-spinner__dot-b"></div>
                <div class="custom-loading-text">
-                           <b>Processing, Please Wait</b>
-                       </div>
-               
-           </div>
+                    <b>Processing, Please Wait</b>
+                </div>
+            </div>
         </div>
     </aura:if>
 </aura:component>

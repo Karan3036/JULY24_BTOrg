@@ -207,4 +207,42 @@ public with sharing class SchedulePOController {
         }
         return pickListValuesList;
     }
+
+    @AuraEnabled
+    public static MessageClass saveData(String allData, String recordId, String scheduleId){
+        MessageClass msg = new MessageClass();
+        try {
+            buildertek__Project_Task__c newRecord = (buildertek__Project_Task__c) JSON.deserialize(allData, buildertek__Project_Task__c.class);
+            insert newRecord;
+
+            buildertek__Purchase_Order__c po = new buildertek__Purchase_Order__c();
+            po.Id = recordId;
+            po.buildertek__Schedule__c = scheduleId;
+            po.buildertek__Schedule_Item__c = newRecord.Id;
+            update po;
+
+            msg.Status = 'Success';
+            msg.Message = 'Purchase Order scheduled successfully';
+            msg.RecordId = newRecord.Id;
+        
+        } catch (Exception ex) {
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(ex);
+            }
+            msg.Status = 'Failed';
+            msg.Message = ex.getMessage();
+            msg.RecordId = null;
+        }
+        return msg; 
+    }
+
+    public class MessageClass{
+        @AuraEnabled
+        public String Status {get;set;}
+        @AuraEnabled
+        public String Message {get;set;}
+        @AuraEnabled
+        public Id RecordId {get;set;}
+    }
 }
