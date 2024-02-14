@@ -180,7 +180,7 @@
        // "yyyy MM dd"
        //
         newFromstr = $A.localizationService.formatDate(newfromdate, "yyyy-MM-dd");
-        newTostr = $A.localizationService.formatDate(newtodate, "yyyy-MM-dd")
+        newTostr = $A.localizationService.formatDate(newtodate, "yyyy-MM-dd");
 
         console.log('currentWeekDates 4 ========> ');
         //alert(JSON.stringify(component.get("v.selectedTradetype")));
