@@ -182,6 +182,9 @@
         newFromstr = $A.localizationService.formatDate(newfromdate, "yyyy-MM-dd");
         newTostr = $A.localizationService.formatDate(newtodate, "yyyy-MM-dd");
 
+        console.log('newFromstr---->', newFromstr);
+        console.log('newTostr---->', newTostr);
+
         console.log('currentWeekDates 4 ========> ');
         //alert(JSON.stringify(component.get("v.selectedTradetype")));
         //alert(fromdateStr+'<-------from-----todate---->'+todateStr);
