@@ -4,7 +4,7 @@ public with sharing class BT_CreateProjectFromOpportunity {
         Opportunity opp;
 
 
-            opp = [SELECT Id, AccountId, Account.Name from Opportunity where Id =: recordId];
+            opp = [SELECT Id, AccountId, Account.Name, CloseDate from Opportunity where Id =: recordId];
 
 
 
@@ -12,7 +12,7 @@ public with sharing class BT_CreateProjectFromOpportunity {
     }
 
     @AuraEnabled
-    public static string createProject(String recordId, String projectName, String account, String projectManager, Date contractDate){
+    public static string createProject(String recordId, String projectName, String account, String projectManager, Date contractDate, Date closeDate){
         List<Id> quoteIdsList = new List<Id>();
         list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id,
                                                                                                     buildertek__Org_Base_URL__c
@@ -49,6 +49,7 @@ public with sharing class BT_CreateProjectFromOpportunity {
            }
             project.buildertek__Project_Manager__c = projectManager;
             project.buildertek__Contract_Date__c = contractDate;
+            project.buildertek__Closing_Date__c = closeDate;
             project.buildertek__Opportunity__c =  recordId;
             project.buildertek__State__c = opp.Account.Billingstate;
              project.buildertek__Address__c = opp.Account.Billingstreet;
