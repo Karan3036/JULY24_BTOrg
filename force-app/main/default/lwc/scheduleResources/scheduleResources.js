@@ -3,6 +3,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import myResource from '@salesforce/resourceUrl/ScheduleLWCCss';
 import fetchScheduleData from '@salesforce/apex/scheduleResourceController.fetchScheduleData';
+import updateResource from '@salesforce/apex/scheduleResourceController.updateScheduleItemResources';
 import getScheduleData from "@salesforce/apex/GetProjectAndScheduleForGanttCmp.getScheduleData";
 
 export default class ScheduleResources extends LightningElement {
@@ -18,13 +19,14 @@ export default class ScheduleResources extends LightningElement {
     @track selectedProjectId;
     @track selectedScheduleId;
     @track selectedScheduleIdForJS;
-    @track isEditEnabled = false;
     @track editRecordId;
     @track selectedVendorId;
     @track selectedVendorResources1 = '';
     @track selectedVendorResources2 = '';
     @track selectedVendorResources3 = '';
     @track vendorOptions = [];
+    @track selectedInternalResourceId = '';
+    @track internalResourcesOption = [];
     @track vendorResourcesOptions = [];
     @track scheduleDataWrapper = {};
     @track vendorResourcesMap = {};
@@ -96,6 +98,7 @@ export default class ScheduleResources extends LightningElement {
                             project: task.buildertek__Schedule__r.hasOwnProperty('buildertek__Project__r') ? task.buildertek__Schedule__r.buildertek__Project__r.Name : '',
                             schedule: task.buildertek__Schedule__r.buildertek__Description__c,
                             taskName: task.Name,
+                            internalResource: task.hasOwnProperty('buildertek__Internal_Resource__r') ? task.buildertek__Internal_Resource__r.Name : '',
                             vendor: task.hasOwnProperty('buildertek__Contractor__r') ? task.buildertek__Contractor__r.Name : '',
                             vendorResources1: task.hasOwnProperty('buildertek__Contractor_Resource_1__r') ? task.buildertek__Contractor_Resource_1__r.Name : '',
                             vendorResources2: task.hasOwnProperty('buildertek__Contractor_Resource_2__r') ? task.buildertek__Contractor_Resource_2__r.Name : '',
@@ -141,20 +144,16 @@ export default class ScheduleResources extends LightningElement {
     editResource(event) {
         this.editRecordId = event.currentTarget.dataset.id;
         let currentVendorId = event.currentTarget.dataset.vendorid;
-        
-        // Update tableData to set isEditing for the current row
+        // Enable the edit mode for the selected record and disable for others
         this.tableData = this.tableData.map(row => ({
             ...row,
             isEditing: row.id === this.editRecordId
         }));
-    
-        // Get the selected row that is being edited
+
         const selectedRecord = this.tableData.find(row => row.id === this.editRecordId);
-    
-        // If entering edit mode, update selectedVendorId and vendorResources for the selected row
         if (selectedRecord.isEditing) {
             this.selectedVendorId = currentVendorId ? this.vendorOptions.find(option => option.label === selectedRecord.vendor)?.value : '';
-            
+
             if (this.selectedVendorId) {
                 this.vendorResourcesOptions = [{ label: 'None', value: '' }];
                 if (this.vendorResourcesMap[this.selectedVendorId]) {
@@ -166,31 +165,27 @@ export default class ScheduleResources extends LightningElement {
                     );
                 }
             }
-    
-            // Store selectedVendorId only once
+
+            // Set the selected values for the vendor and vendor resources
             selectedRecord.selectedVendorId = this.selectedVendorId;
-    
-            // Store selected values for each vendor resource field
+
             ['1', '2', '3'].forEach(index => {
                 const fieldName = `vendorResources${index}`;
                 const fieldValue = selectedRecord[fieldName];
                 selectedRecord[`selectedVendorResources${index}`] = fieldValue ? this.vendorResourcesOptions.find(option => option.label === fieldValue)?.value : '';
             });
         }
-    
-        console.log(`Selected Vendor Id: ${this.selectedVendorId}, Selected Vendor Resources 1: ${selectedRecord.selectedVendorResources1}, Selected Vendor Resources 2: ${selectedRecord.selectedVendorResources2}, Selected Vendor Resources 3: ${selectedRecord.selectedVendorResources3}`);
+        selectedRecord['selectedInternalResourceId'] = selectedRecord.internalResource ? this.internalResourcesOption.find(option => option.label === selectedRecord.internalResource)?.value : '';
+        console.log(`Selected Vendor Id: ${this.selectedVendorId}, Selected Vendor Resources 1: ${selectedRecord.selectedVendorResources1}, Selected Vendor Resources 2: ${selectedRecord.selectedVendorResources2}, Selected Vendor Resources 3: ${selectedRecord.selectedVendorResources3} Selected Internal Resource: ${selectedRecord.selectedInternalResourceId}`);
     }
-    
-    
-    
-    
 
-    closeEditFields(event) {
+    closeEditFields() {
         this.tableData = this.tableData.map(row => {
             return { ...row, isEditing: false };
         });
     }
 
+    // * Method to handle vendor change
     vendorChange(event) {
         this.selectedVendorId = event.target.value;
         console.log('Selected Vendor:', this.selectedVendorId);
@@ -200,8 +195,8 @@ export default class ScheduleResources extends LightningElement {
             if (this.vendorResourcesMap[this.selectedVendorId]) {
                 this.vendorResourcesOptions = this.vendorResourcesOptions.concat(
                     this.vendorResourcesMap[this.selectedVendorId].map(ele => ({
-                        label: ele,
-                        value: ele.Id
+                        label: ele.label,
+                        value: ele.value
                     }))
                 );
             }
@@ -226,11 +221,9 @@ export default class ScheduleResources extends LightningElement {
         } else if (fieldName === 'selectedVendorResources3') {
             this.selectedVendorResources3 = event.target.value;
         }
-        console.log('selectedVendorResources1:', this.selectedVendorResources1);
-        console.log('selectedVendorResources2:', this.selectedVendorResources2);
-        console.log('selectedVendorResources3:', this.selectedVendorResources3);
     }
 
+    // * Create map of vendor and its resources 
     processScheduleDataWrapper() {
         this.vendorOptions = this.scheduleDataWrapper.contractorAndResourcesList ?
             this.scheduleDataWrapper.contractorAndResourcesList.map(ele => ({
@@ -238,7 +231,7 @@ export default class ScheduleResources extends LightningElement {
                 value: ele.Id
             })) : [];
         console.log('vendorOptions:', JSON.parse(JSON.stringify(this.vendorOptions)));
-    
+
         if (this.scheduleDataWrapper.contractorAndResourcesList) {
             this.scheduleDataWrapper.contractorAndResourcesList.forEach(vendor => {
                 const vendorId = vendor.Id;
@@ -252,6 +245,46 @@ export default class ScheduleResources extends LightningElement {
             });
         }
         console.log('vendorResourcesMap:', JSON.parse(JSON.stringify(this.vendorResourcesMap)));
+
+        this.internalResourcesOption = this.scheduleDataWrapper.internalResourcesList ? this.scheduleDataWrapper.internalResourcesList.map(ele => ({
+            label: ele.Name,
+            value: ele.Id
+        })) : [];
+        console.log('internalResourcesOption:', JSON.parse(JSON.stringify(this.internalResourcesOption)));
+    }
+
+    internalResourceChange(event) {
+        this.selectedInternalResourceId = event.target.value;
+        console.log('Selected Internal Resource:', this.selectedInternalResourceId);
+    }
+
+    // * Method to handle save button click
+    saveResource() {
+        this.isLoading = true;
+        const updatedRecord = {
+            Id: this.editRecordId,
+            buildertek__Contractor__c: this.selectedVendorId,
+            buildertek__Contractor_Resource_1__c: this.selectedVendorResources1,
+            buildertek__Contractor_Resource_2__c: this.selectedVendorResources2,
+            buildertek__Contractor_Resource_3__c: this.selectedVendorResources3,
+            buildertek__Internal_Resource_1__c: this.selectedInternalResourceId
+        };
+        console.log('Updated Record:', updatedRecord);
+        updateResource({ scheduleItem: updatedRecord })
+            .then((result) => {
+                console.log('Result:', result);
+                this.showToast('Success', 'Record updated successfully', 'success');
+                this.tableData = this.tableData.map(row => {
+                    return { ...row, isEditing: false };
+                });
+            })
+            .catch((error) => {
+                console.log('Error:', error);
+                this.showToast('Error', 'There was an error while updating the record. Please contact the administrator to resolve this issue.', 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
     }
 
 }

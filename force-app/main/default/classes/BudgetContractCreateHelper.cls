@@ -201,6 +201,7 @@ public without sharing class BudgetContractCreateHelper {
                 buildertek__Quantity__c = currQuoteLine.buildertek__Quantity__c,
                 buildertek__Unit_Price__c = currQuoteLine.buildertek__Unit_Cost__c,
                 buildertek__Sort_Id__c = currQuoteLine.buildertek__Priority__c,
+                buildertek__Category__c = currQuoteLine.buildertek__Category__c,
                 //buildertek__Unit_Price__c = currQuoteLine.buildertek__Net_Unit__c,
                 
                 // buildertek__Sales_Price__c = currQuoteLine.buildertek__Net_Total_Price__c, 
@@ -587,7 +588,8 @@ public without sharing class BudgetContractCreateHelper {
                                     buildertek__Status__c,
                                     buildertek__Priority__c,
                                     buildertek__Purchase_Order__c, 
-                                    buildertek__Grouping__r.Name
+                                    buildertek__Grouping__r.Name,
+                                    buildertek__Category__c
                                     FROM buildertek__Quote_Item__c
                                     WHERE buildertek__Quote__c IN: quoteIds  And buildertek__Status__c != 'Reject'];      
         

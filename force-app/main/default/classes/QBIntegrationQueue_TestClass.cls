@@ -34,219 +34,488 @@ public without sharing class QBIntegrationQueue_TestClass {
     //     public static String unSuccess_Basic_Response_JSONbody = '{"Fault":{"Error":[{"Message":"Duplicate Name Exists Error","Detail":"The name supplied already exists. : null","code":"6240"}],"type":"ValidationFault"},"time":"2023-12-27T02:34:47.279-08:00"}';
     //     public static String unSuccess_SyncToken_Response_JSONbody = '{"Fault":{"Error":[{"Message":"Stale Object Error","Detail":"Stale Object Error : You and karan.pa@mvclouds.com were working on this at the same time. karan.pa@mvclouds.com finished before you did, so your work was not saved.","code":"5010","element":""}],"type":"ValidationFault"},"time":"2023-12-25T03:39:23.297-08:00"}';
 
-    // public static Account createAccount(){
-    //     Account acc = new Account(
-    //         Name = 'QB Test Acc',
-    //         Description = 'QB Test Description',
-    //         ShippingCity = 'TestCity',
-    //         ShippingStreet = 'TestStreet',
-    //         ShippingState = 'TestState',
-    //         ShippingPostalCode = '12345',
-    //         ShippingLatitude = 37.7749,
-    //         ShippingLongitude = -122.4194,
-    //         ShippingCountry = 'TestCountry',
-    //         buildertek__Email_Address__c = 'test@example.com',
-    //         Fax = '123-456-7890',
-    //         Phone = '987-654-3210',
-    //         BillingCity = 'BillingCity',
-    //         BillingStreet = 'BillingStreet',
-    //         BillingState = 'BillingState',
-    //         BillingPostalCode = '54321',
-    //         BillingLatitude = 37.7749,
-    //         BillingLongitude = -122.4194,
-    //         BillingCountry = 'BillingCountry',
-    //         buildertek__QB_Type__c = 'Customer'
-    //     );
-    //     insert acc;
-    //     return acc;
-    // }
-    // public static buildertek__Billings__c createSI(string AccId){
-    //     // sales invoice without tax rate
-    //     buildertek__Billings__c inv = new buildertek__Billings__c();
-    //     inv.Name = 'QB Test Invoice';
-    //     inv.buildertek__Customer_Account__c = AccId;
-    //     inv.buildertek__Tax_Rate__c = 15;
-    //     insert inv;
-    //     return inv;
-    // }
-    // public static List<buildertek__Billable_Lines__c> createSalesIvoiceLine(String SIid){
-    //     List<buildertek__Billable_Lines__c> SILines = new List<buildertek__Billable_Lines__c>();
-    //     buildertek__Billable_Lines__c item1 = new buildertek__Billable_Lines__c();
-    //     item1.buildertek__Item_Name__c = 'QB Test Line 1';
-    //     item1.buildertek__Billings__c = SIid;
-    //     item1.buildertek__Unit_Price__c = 100;
-    //     item1.buildertek__Quantity__c = 1;
-    //     SILines.add(item1);
-    //     insert SILines;
-    //     return SILines;
-    // }
-    // public static buildertek__Receipt__c createReceipt(String SIid){
-    //     buildertek__Receipt__c rec = new buildertek__Receipt__c(
-    //         buildertek__Billing__c = SIid,
-    //         buildertek__Amount__c = 100
-    //     );
-    //     insert rec;
-    //     return rec;
-    // }
+    public static Account createAccount(){
+        Account acc = new Account(
+            Name = 'QB Test Acc',
+            Description = 'QB Test Description',
+            ShippingCity = 'TestCity',
+            ShippingStreet = 'TestStreet',
+            ShippingState = 'TestState',
+            ShippingPostalCode = '12345',
+            ShippingLatitude = 37.7749,
+            ShippingLongitude = -122.4194,
+            ShippingCountry = 'TestCountry',
+            buildertek__Email_Address__c = 'test@example.com',
+            Fax = '123-456-7890',
+            Phone = '987-654-3210',
+            BillingCity = 'BillingCity',
+            BillingStreet = 'BillingStreet',
+            BillingState = 'BillingState',
+            BillingPostalCode = '54321',
+            BillingLatitude = 37.7749,
+            BillingLongitude = -122.4194,
+            BillingCountry = 'BillingCountry',
+            buildertek__QB_Type__c = 'Customer'
+        );
+        insert acc;
+        return acc;
+    }
+    public static Account createVendorAccount(){
+        Account acc = new Account(
+            Name = 'QB Test Acc 1',
+            Description = 'QB Test Description',
+            ShippingCity = 'TestCity',
+            ShippingStreet = 'TestStreet',
+            ShippingState = 'TestState',
+            ShippingPostalCode = '12345',
+            ShippingLatitude = 37.7749,
+            ShippingLongitude = -122.4194,
+            ShippingCountry = 'TestCountry',
+            buildertek__Email_Address__c = 'test@example.com',
+            Fax = '123-456-7890',
+            Phone = '987-654-3210',
+            BillingCity = 'BillingCity',
+            BillingStreet = 'BillingStreet',
+            BillingState = 'BillingState',
+            BillingPostalCode = '54321',
+            BillingLatitude = 37.7749,
+            BillingLongitude = -122.4194,
+            BillingCountry = 'BillingCountry',
+            buildertek__QB_Type__c = 'Vendor',
+            buildertek__QB_Id__c = '534'
+        );
+        insert acc;
+        return acc;
+    }
+    public static buildertek__Billings__c createSI(string AccId){
+        // sales invoice without tax rate
+        buildertek__Billings__c inv = new buildertek__Billings__c();
+        inv.Name = 'QB Test Invoice';
+        inv.buildertek__Customer_Account__c = AccId;
+        inv.buildertek__Tax_Rate__c = 15;
+        inv.buildertek__QB_Id__c = '15';
+        inv.buildertek__Terms__c = 'Net 30';
+        inv.buildertek__Tax_Rate__c = double.valueOf(12.43);
+        insert inv;
+    return inv;
+    }
 
-    // public static void success_MockTest(){
-    //     MockTest(null, false);
-    // }
-    // public static void unsuccess_MockTest(String error_AT){
-    //     MockTest(error_AT, false);
-    // }
-    // public static void syncToken_unsuccess_MockTest(String error_AT){
-    //     MockTest(error_AT, true);
-    // }
-    // public static void MockTest(String error_AT, boolean is_SyncToken_Error){
-    //     QBMockTest MockCallout = new QBMockTest(error_AT, is_SyncToken_Error);
-    //     Test.setMock(HttpCalloutMock.class, MockCallout);
-    // }
+    public static List<buildertek__Billable_Lines__c> createSalesIvoiceLine(String SIid){
+        List<buildertek__Billable_Lines__c> SILines = new List<buildertek__Billable_Lines__c>();
+        buildertek__Billable_Lines__c invLine = new buildertek__Billable_Lines__c();
+        invLine.buildertek__Item_Name__c = 'inv line 1';
+        invLine.buildertek__Billings__c = SIid;
+        invLine.buildertek__QB_Id__c = '12';
+        invLine.buildertek__QBO_Name__c =' inv line 1';
+        invLine.buildertek__Quantity__c = 12;
+        invLine.buildertek__Unit_Price__c = 30;
+        SILines.add(invLine);
+        
+        buildertek__Billable_Lines__c invLine1 = new buildertek__Billable_Lines__c();
+        invLine1.buildertek__Item_Name__c = 'inv line 1';
+        invLine1.buildertek__Billings__c = SIid;
+        invLine1.buildertek__QBO_Name__c =' inv line 1';
+        invLine1.buildertek__Quantity__c = 12;
+        invLine1.buildertek__Unit_Price__c = 30;
+        SILines.add(invLine1);
+        insert SILines;
+
+        return SILines;
+    }
+    public static buildertek__Receipt__c createReceipt(String SIid){
+        buildertek__Receipt__c rec = new buildertek__Receipt__c(
+            buildertek__Billing__c = SIid,
+            buildertek__Amount__c = 100
+        );
+        insert rec;
+        return rec;
+    }
+
+    public static void success_MockTest(){
+        MockTest(null, false);
+    }
+    public static void unsuccess_MockTest(String error_AT){
+        MockTest(error_AT, false);
+    }
+    public static void syncToken_unsuccess_MockTest(String error_AT){
+        MockTest(error_AT, true);
+    }
+    public static void MockTest(String error_AT, boolean is_SyncToken_Error){
+        QBMockTest MockCallout = new QBMockTest(error_AT, is_SyncToken_Error);
+        Test.setMock(HttpCalloutMock.class, MockCallout);
+    }
 
     // // ======================== >  TEST Class For QBIntegrationQueue_SIFlow < ==============================
-    // @isTest
-    // public static void SIFlow_QBcallouts_Test(){
+    @isTest
+    public static void SIFlow_QBcallouts_Test(){
 
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
         
-    //     Test.startTest();
-    //     success_MockTest();
-    //     QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+        Test.startTest();
+        success_MockTest();
+        QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
         
-    //     Test.stopTest();
-    // }
-    // @isTest
-    // public static void SIFlow_unsuccess_customer_QBcallouts_Test(){
+        Test.stopTest();
+    }
+    @isTest
+    public static void SIFlow_unsuccess_customer_QBcallouts_Test(){
 
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
 
-    //         Test.startTest();
-    //         unsuccess_MockTest('customer_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
-    // @isTest
-    // public static void SIFlow_unsuccess_item_QBcallouts_Test(){
+            Test.startTest();
+            unsuccess_MockTest('customer_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void SIFlow_unsuccess_item_QBcallouts_Test(){
 
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
 
-    //         Test.startTest();
-    //         unsuccess_MockTest('item_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
-    // @isTest
-    // public static void SIFlow_unsuccess_taxService_QBcallouts_Test(){
+            Test.startTest();
+            unsuccess_MockTest('item_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void SIFlow_unsuccess_taxService_QBcallouts_Test(){
 
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
 
-    //         Test.startTest();
-    //         unsuccess_MockTest('taxservice_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
-    // @isTest
-    // public static void SIFlow_unsuccess_term_QBcallouts_Test(){
+            Test.startTest();
+            unsuccess_MockTest('taxservice_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void SIFlow_unsuccess_term_QBcallouts_Test(){
 
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
 
-    //         Test.startTest();
-    //         unsuccess_MockTest('term_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
-    // @isTest
-    // public static void SIFlow_unsuccess_invoice_QBcallouts_Test(){
+            Test.startTest();
+            unsuccess_MockTest('term_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void SIFlow_unsuccess_invoice_QBcallouts_Test(){
 
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
 
-    //         Test.startTest();
-    //         unsuccess_MockTest('invoice_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
-    // @isTest
-    // public static void SIFlow_unsuccess_payment_QBcallouts_Test(){
+            Test.startTest();
+            unsuccess_MockTest('invoice_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void SIFlow_unsuccess_payment_QBcallouts_Test(){
 
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
 
-    //         Test.startTest();
-    //         unsuccess_MockTest('payment_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
+            Test.startTest();
+            unsuccess_MockTest('payment_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
 
-    // @isTest
-    // public static void qb_SyncTokenError_customer_QBcallouts_Test(){
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
-    //         Test.startTest();
-    //         syncToken_unsuccess_MockTest('customer_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
-    // @isTest
-    // public static void qb_SyncTokenError_invoice_QBcallouts_Test(){
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+    @isTest
+    public static void qb_SyncTokenError_customer_QBcallouts_Test(){
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
+            Test.startTest();
+            syncToken_unsuccess_MockTest('customer_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void qb_SyncTokenError_invoice_QBcallouts_Test(){
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
         
-    //     // List<String> calloutObjects = new List<String>{
-    //     //     'customer_400','item_400','taxservice_400','invoice_400','payment_400'
-    //     // };
-    //         Test.startTest();
-    //         syncToken_unsuccess_MockTest('invoice_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
-    // @isTest
-    // public static void qb_SyncTokenError_payment_QBcallouts_Test(){
-    //     Account acc = createAccount();
-    //     buildertek__Billings__c inv = createSI(acc.Id);
-    //     List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
-    //     buildertek__Receipt__c rec = createReceipt(inv.Id);
-    //     String ReceiptId = rec.Id;
+        // List<String> calloutObjects = new List<String>{
+        //     'customer_400','item_400','taxservice_400','invoice_400','payment_400'
+        // };
+            Test.startTest();
+            syncToken_unsuccess_MockTest('invoice_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void qb_SyncTokenError_payment_QBcallouts_Test(){
+        Account acc = createAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> SILines = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        String ReceiptId = rec.Id;
         
-    //     // List<String> calloutObjects = new List<String>{
-    //     //     'customer_400','item_400','taxservice_400','invoice_400','payment_400'
-    //     // };
-    //         Test.startTest();
-    //         syncToken_unsuccess_MockTest('payment_400');
-    //         QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
-    //         Test.stopTest();
-    // }
+        // List<String> calloutObjects = new List<String>{
+        //     'customer_400','item_400','taxservice_400','invoice_400','payment_400'
+        // };
+            Test.startTest();
+            syncToken_unsuccess_MockTest('payment_400');
+            QBIntegrationQueue_SIFlow.qb_Payment_Invoice_Flow_Callout(inv.Id, ReceiptId);
+            Test.stopTest();
+    }
+    @isTest
+    public static void Query_QB_Recordtest() {
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        buildertek__Billings__c inv1 = createSI(vendorAcc.Id);
+        
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.SI = inv;
+        wrapper.SyncObjName = 'buildertek__Billings__c';
+        wrapper.QueryCustomer_VendorFlag = true;
+        wrapper.acc = acc;
+        wrapper.SI = inv;
 
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper vendorWrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        vendorWrapper.SI = inv1;
+        vendorWrapper.SyncObjName = 'buildertek__Billings__c';
+        vendorWrapper.QueryCustomer_VendorFlag = true;
+        vendorWrapper.acc = vendorAcc;
+
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper WrapperFlagFalse = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        WrapperFlagFalse.SI = inv;
+        WrapperFlagFalse.SyncObjName = 'buildertek__Billings__c';
+        WrapperFlagFalse.QueryCustomer_VendorFlag = false;
+        WrapperFlagFalse.acc = acc;
+
+        Test.startTest();
+        try {
+            success_MockTest();
+            QBIntegrationQueue_SIFlow.Query_QB_Record(wrapper);
+            QBIntegrationQueue_SIFlow.Query_QB_Record(vendorWrapper);
+            QBIntegrationQueue_SIFlow.Query_QB_Record(WrapperFlagFalse);
+        } catch(Exception e) {
+            System.debug('Exception-->'+e);
+            System.debug('Exception-->'+e.getMessage());
+            System.debug('Exception-->'+e.getLineNumber());
+            System.debug('Exception-->'+e.getStackTraceString());
+        }
+        Test.stopTest();
+    }
+    @isTest
+    public static void sync_invoice_in_QB() {
+
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> invLine = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+
+        Map<Id, List<String>> lineIdsMap = new Map<Id, List<String>>();
+        lineIdsMap.put(
+                Id.valueOf(invLine[0].Id), // Salesforce ID
+                new List<String> { 
+                    invLine[0].buildertek__QB_Id__c, invLine[0].buildertek__QBO_Name__c, string.valueOf(invLine[0].buildertek__SubTotal__c), string.valueOf(invLine[0].buildertek__Quantity__c), string.valueOf(invLine[0].buildertek__Unit_Price__c)
+                }
+        );
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.Get_Access_Token = false;
+        wrapper.SyncObjName = 'buildertek__Billings__c';
+        wrapper.acc = acc;
+        wrapper.SI = inv;
+        wrapper.lineIdsMap = lineIdsMap;
+        wrapper.receiptID = rec.Id;
+
+        Test.startTest();
+            success_MockTest();
+            QBIntegrationQueue_SIFlow.sync_invoice_in_QB(wrapper);
+        Test.stopTest();
+    }
+    @isTest
+    public static void sync_invoice_in_QB1() {
+
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        List<buildertek__Billable_Lines__c> invLine = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        Map<Id, List<String>> lineIdsMap = new Map<Id, List<String>>();
+        lineIdsMap.put(
+                Id.valueOf(invLine[0].Id), // Salesforce ID
+                new List<String> { 
+                    invLine[0].buildertek__QB_Id__c, invLine[0].buildertek__QBO_Name__c, string.valueOf(invLine[0].buildertek__SubTotal__c), string.valueOf(invLine[0].buildertek__Quantity__c), string.valueOf(invLine[0].buildertek__Unit_Price__c)
+                }
+        );
+        
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.Get_Access_Token = false;
+        wrapper.SyncObjName = 'buildertek__Billings__c';
+        wrapper.acc = acc;
+        wrapper.SI = inv;
+        wrapper.lineIdsMap = lineIdsMap;
+        wrapper.receiptID = rec.Id;
+
+        Test.startTest();
+            unsuccess_MockTest('invoice_400');
+            QBIntegrationQueue_SIFlow.sync_invoice_in_QB(wrapper);
+        Test.stopTest();
+    }
+    @isTest
+    public static void sync_invoice_in_QB2() {
+
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        buildertek__Billings__c inv1 = createSI(vendorAcc.Id);
+        List<buildertek__Billable_Lines__c> invLine = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        Map<Id, List<String>> lineIdsMap = new Map<Id, List<String>>();
+        lineIdsMap.put(
+                Id.valueOf(invLine[0].Id), // Salesforce ID
+                new List<String> { 
+                    invLine[0].buildertek__QB_Id__c, invLine[0].buildertek__QBO_Name__c, string.valueOf(invLine[0].buildertek__SubTotal__c), string.valueOf(invLine[0].buildertek__Quantity__c), string.valueOf(invLine[0].buildertek__Unit_Price__c)
+                }
+        );
+        
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.Get_Access_Token = false;
+        wrapper.SyncObjName = 'buildertek__Billings__c';
+        wrapper.acc = acc;
+        wrapper.SI = inv;
+        wrapper.lineIdsMap = lineIdsMap;
+        wrapper.receiptID = rec.Id;
+
+        Test.startTest();
+            syncToken_unsuccess_MockTest('invoice_400');
+            QBIntegrationQueue_SIFlow.sync_invoice_in_QB(wrapper);
+        Test.stopTest();
+    }
+    @isTest
+    public static void sync_Payment_In_QB() {
+
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        buildertek__Billings__c inv1 = createSI(vendorAcc.Id);
+        List<buildertek__Billable_Lines__c> invLine = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.Get_Access_Token = false;
+        wrapper.SyncObjName = 'buildertek__Receipt__c';
+        wrapper.acc = acc;
+        wrapper.SI = inv;
+        wrapper.receiptID = rec.Id;
+
+        Test.startTest();
+        unsuccess_MockTest('payment_400');
+        QBIntegrationQueue_SIFlow.sync_Payment_In_QB(wrapper);
+        Test.stopTest();
+    }
+    @isTest
+    public static void sync_Payment_In_QB1() {
+
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        buildertek__Billings__c inv1 = createSI(vendorAcc.Id);
+        List<buildertek__Billable_Lines__c> invLine = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+    
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.Get_Access_Token = false;
+        wrapper.SyncObjName = 'buildertek__Receipt__c';
+        wrapper.acc = acc;
+        wrapper.SI = inv;
+        wrapper.receiptID = rec.Id;
+
+        Test.startTest();
+        syncToken_unsuccess_MockTest('payment_400');
+        QBIntegrationQueue_SIFlow.sync_Payment_In_QB(wrapper);
+        Test.stopTest();
+    }
+    @isTest
+    public static void sync_Term_in_QB2() {
+
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        buildertek__Billings__c inv1 = createSI(vendorAcc.Id);
+        List<buildertek__Billable_Lines__c> invLine = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        Map<Id, List<String>> lineIdsMap = new Map<Id, List<String>>();
+        lineIdsMap.put(
+                Id.valueOf(invLine[0].Id), // Salesforce ID
+                new List<String> { 
+                    invLine[0].buildertek__QB_Id__c, invLine[0].buildertek__QBO_Name__c, string.valueOf(invLine[0].buildertek__SubTotal__c), string.valueOf(invLine[0].buildertek__Quantity__c), string.valueOf(invLine[0].buildertek__Unit_Price__c)
+                }
+        );
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.Get_Access_Token = false;
+        wrapper.acc = acc;
+        wrapper.SI = inv;
+        wrapper.receiptID = rec.Id;
+        wrapper.lineIdsMap = lineIdsMap;
+
+        Test.startTest();
+        unsuccess_MockTest('term_400');
+        QBIntegrationQueue_SIFlow.sync_Term_in_QB(wrapper);
+        Test.stopTest();
+    }
+    @isTest
+    public static void sync_TaxRate_in_QB() {
+
+        Account acc = createAccount();
+        Account vendorAcc = createVendorAccount();
+        buildertek__Billings__c inv = createSI(acc.Id);
+        buildertek__Billings__c inv1 = createSI(vendorAcc.Id);
+        List<buildertek__Billable_Lines__c> invLine = createSalesIvoiceLine(inv.Id);
+        buildertek__Receipt__c rec = createReceipt(inv.Id);
+        Map<Id, List<String>> lineIdsMap = new Map<Id, List<String>>();
+        lineIdsMap.put(
+                Id.valueOf(invLine[0].Id), // Salesforce ID
+                new List<String> { 
+                    invLine[0].buildertek__QB_Id__c, invLine[0].buildertek__QBO_Name__c, string.valueOf(invLine[0].buildertek__SubTotal__c), string.valueOf(invLine[0].buildertek__Quantity__c), string.valueOf(invLine[0].buildertek__Unit_Price__c)
+                }
+        );
+        QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper wrapper = new QBIntegrationQueue_SIFlow.salesInvoiceFlow_Wrapper();
+        wrapper.Get_Access_Token = false;
+        wrapper.acc = acc;
+        wrapper.SI = inv;
+        wrapper.receiptID = rec.Id;
+        wrapper.lineIdsMap = lineIdsMap;
+        Test.startTest();
+
+        success_MockTest();
+        QBIntegrationQueue_SIFlow.sync_TaxRate_in_QB(wrapper);
+        Test.stopTest();
+    }
 }

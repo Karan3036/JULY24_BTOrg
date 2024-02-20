@@ -140,6 +140,14 @@ public with sharing class QuoteDAO{
                 ProdIds.add(PE.Product2Id);
             }
         }
+
+        // BUIL-3925
+        Map<String, Boolean> Family_IsActive = new Map<String, Boolean>();
+        for( Schema.PicklistEntry pickListVal : product2.Family.getDescribe().getPicklistValues()){
+            Family_IsActive.put(pickListVal.getLabel(), pickListVal.isActive());
+            system.debug('pickListVal : ' + pickListVal);
+        }
+
         //list<Product2> productfamlylst = [select id, Name,family from Product2 where Id IN :ProdIds AND family != null order by family];
         List<AggregateResult> productfamlylst = [SELECT toLabel(Family) familyLabel
                                                  FROM Product2
@@ -155,7 +163,9 @@ public with sharing class QuoteDAO{
             List<String> sortedProductFamilies = new List<String>();
     
             for (AggregateResult agg : productfamlylst) {
-                sortedProductFamilies.add(String.valueOf(agg.get('familyLabel')));
+                if(Family_IsActive.get(String.valueOf(agg.get('familyLabel'))) == true){ // BUIL-3925....
+                    sortedProductFamilies.add(String.valueOf(agg.get('familyLabel')));
+                }
             }
             
             sortedProductFamilies.sort();
@@ -2336,7 +2346,7 @@ public with sharing class QuoteDAO{
         quoteLineWrapperClass mainWrapper = new quoteLineWrapperClass();
         Integer pageSize = recordToDisply;
         Integer offset = (pageNumber - 1) * pageSize;
-        List<String> gorupingFieldList = new List<String>{'id','buildertek__Build_Phase__c', 'buildertek__Build_Reference_1__c','buildertek__Base_Location__c','buildertek__Location_Picklist__c','buildertek__Location_Detailed_Area__c','buildertek__Location_Detail_Reference_1__c','buildertek__BL_SERVICE_CATEGORY__c', 'buildertek__Product_Family__c', 'buildertek__Sub_Group__c', 'buildertek__Grouping__c'};
+        List<String> gorupingFieldList = new List<String>{'id','buildertek__Build_Phase__c', 'buildertek__Build_Reference_1__c','buildertek__Base_Location__c','buildertek__Location_Picklist__c','buildertek__Location_Detailed_Area__c','buildertek__Location_Detail_Reference_1__c','buildertek__BL_SERVICE_CATEGORY__c', 'buildertek__Product_Family__c', 'buildertek__Sub_Group__c', 'buildertek__Grouping__c', 'buildertek__Category__c', 'buildertek__Category__r.Name'};
         String apiString = '';
 
         List<BT_Lightning_Utils.dataTableFields> column = BT_Lightning_Utils.getFieldSetForDataTable('buildertek__Quote_Item__c', 'buildertek__BT_Related_List_View_Fields');
@@ -2346,7 +2356,7 @@ public with sharing class QuoteDAO{
             }
         }
         String query = 'SELECT Id, '+apiString+' buildertek__Build_Phase__c, buildertek__Build_Phase__r.Name, buildertek__Build_Reference_1__c, buildertek__Base_Location__c, buildertek__Location_Picklist__c, buildertek__Location_Detailed_Area__c, ';
-        query += 'buildertek__Location_Detail_Reference_1__c, buildertek__BL_SERVICE_CATEGORY__c, buildertek__Product_Family__c, buildertek__Sub_Group__c, buildertek__Sub_Group__r.Name, buildertek__Grouping__c, buildertek__Grouping__r.Name ';
+        query += 'buildertek__Location_Detail_Reference_1__c, buildertek__BL_SERVICE_CATEGORY__c, buildertek__Product_Family__c, buildertek__Sub_Group__c, buildertek__Category__c, buildertek__Category__r.Name, buildertek__Sub_Group__r.Name, buildertek__Grouping__c, buildertek__Grouping__r.Name, buildertek__Cost_Code__r.Name ';
         query += 'FROM buildertek__Quote_Item__c WHERE buildertek__Quote__c =\''+quoteId+'\''+' ORDER BY '+groupingList[0];
         if (groupingList.size() > 1) {
             query += ', '+groupingList[1];
@@ -2418,13 +2428,25 @@ public with sharing class QuoteDAO{
         priceWrap.priceWrapList = new List<pricebook2>();
         List<pricebook2> PriceList = [SELECT Id, Name FROM pricebook2 ORDER BY Name ASC ];
         priceWrap.priceWrapList=PriceList;
-        if(recordId != null){
-            buildertek__Quote__c quoteRecord = [Select Id, Name , buildertek__Project__c , buildertek__Project__r.buildertek__Price_Book__c , buildertek__Project__r.buildertek__Price_Book__r.Name From buildertek__Quote__c  WHERE Id = :recordId];
-            if(quoteRecord.buildertek__Project__c != null && quoteRecord.buildertek__Project__r.buildertek__Price_Book__c !=null){
-                pricebook2 selectedPriceList = [SELECT Id, Name FROM pricebook2 where Id=:quoteRecord.buildertek__Project__r.buildertek__Price_Book__c LIMIT 1];
-                priceWrap.defaultValue= selectedPriceList;
+        
+        if(PriceList.size() > 0){
+            if(recordId != null){
+                buildertek__Quote__c quoteRecord = [Select Id, Name , buildertek__Project__c , buildertek__Project__r.buildertek__Price_Book__c , buildertek__Project__r.buildertek__Price_Book__r.Name From buildertek__Quote__c  WHERE Id = :recordId];
+                if(quoteRecord.buildertek__Project__c != null && quoteRecord.buildertek__Project__r.buildertek__Price_Book__c !=null){
+                    pricebook2 selectedPriceList = [SELECT Id, Name FROM pricebook2 where Id=:quoteRecord.buildertek__Project__r.buildertek__Price_Book__c LIMIT 1];
+                    if(selectedPriceList != null){
+                        priceWrap.defaultValue= selectedPriceList;
+                    }
+                    else{
+                        priceWrap.defaultValue = PriceList[0];
+                    }
+                }
+                else{
+                    priceWrap.defaultValue = PriceList[0];
+                }
             }
         }
+
         priceWrapper.add(priceWrap);
         return priceWrapper;
     }
@@ -2459,6 +2481,21 @@ public with sharing class QuoteDAO{
             aProduct.QuantityUnitOfMeasure = pEntry.Product2.QuantityUnitOfMeasure;     
             products.add(aProduct);
         }
+
+        List<PriceBookEntry> pEntries2 = [SELECT Id,Product2Id, toLabel(Product2.Family), 
+                                            Product2.IsActive, Pricebook2.Name  //----
+                                            FROM PricebookEntry WHERE Pricebook2Id=:pbookId AND Product2.Family != null AND IsActive = True 
+                                            ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 50000];
+        Set<String> ProductfamilySet = new Set<String>();
+        for(PriceBookEntry PE : pEntries2){
+            if(PE.Product2.Family != null){
+                ProductfamilySet.add(PE.Product2.Family);
+            }
+        }
+        productWrapper aProduct = new productWrapper();
+        aProduct.Id = null;
+        aProduct.ProductFamilySet = new List<String>(ProductfamilySet);
+        products.add(aProduct);
 
         return products;
     }
@@ -2562,6 +2599,9 @@ public with sharing class QuoteDAO{
 
         @AuraEnabled
         public String PriceBookEntryId;
+
+        @AuraEnabled 
+        public List<String> ProductFamilySet;
     }
 
     @AuraEnabled
@@ -2586,7 +2626,7 @@ public with sharing class QuoteDAO{
                     familyFilter = (prodctfamly == '--None--') ? 'AND toLabel(product2.family) = null' : 'AND toLabel(product2.family) = :prodctfamly';
                 }
 
-                String peQuery = 'SELECT id, Product2Id, product2.family FROM PricebookEntry WHERE pricebook2Id = :parentId ' + familyFilter;
+                String peQuery = 'SELECT id, Product2Id, product2.family,buildertek__Unit_Cost__c FROM PricebookEntry WHERE pricebook2Id = :parentId ' + familyFilter;
                 PElist = Database.query(peQuery);
 
                 for (pricebookEntry PE : PElist){
@@ -2601,7 +2641,7 @@ public with sharing class QuoteDAO{
             }else if(ObjectName == 'Product2' && (parentId == null || parentId == '')){
                 System.debug('inisde 2nd if');
      
-                 PElist = [select id, Product2Id, product2.family from pricebookEntry];   
+                 PElist = [select id, Product2Id, product2.family,buildertek__Unit_Cost__c from pricebookEntry];   
                  for (pricebookEntry PE : PElist){
                      ProdIds.add(PE.Product2Id);
                  } 
@@ -2617,10 +2657,10 @@ public with sharing class QuoteDAO{
                     String PricebookFilter = '';
                     if(parentId != null && parentId != ''){
                         PricebookFilter = 'WHERE Pricebook2Id = \''+ parentId +'\' ';
-                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c, (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries '+ PricebookFilter +' order by CreatedDate DESC LIMIT 1)  from ' + ObjectName + ' WHERE ' + searchKey + ' AND ' + filter + ' order by Name ASC LIMIT 800';
+                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c,buildertek__Category__c, (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries '+ PricebookFilter +' order by CreatedDate DESC LIMIT 1)  from ' + ObjectName + ' WHERE ' + searchKey + ' AND ' + filter + ' order by Name ASC LIMIT 800';
                     }
                     else{
-                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c, (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries order by CreatedDate DESC LIMIT 1)  from ' + ObjectName + ' WHERE ' + searchKey + ' AND ' + filter + ' order by Name ASC LIMIT 800';
+                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c,buildertek__Category__c, (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries order by CreatedDate DESC LIMIT 1)  from ' + ObjectName + ' WHERE ' + searchKey + ' AND ' + filter + ' order by Name ASC LIMIT 800';
                     }
                 }
                 else{
@@ -2632,10 +2672,10 @@ public with sharing class QuoteDAO{
                     String PricebookFilter = '';
                     if(parentId != null && parentId != ''){
                         PricebookFilter = 'WHERE Pricebook2Id = \''+ parentId +'\' ';
-                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries '+ PricebookFilter +' order by CreatedDate DESC LIMIT 1) from ' + ObjectName + ' WHERE ' + searchKey + ' order by Name ASC LIMIT 800';
+                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c,buildertek__Category__c, (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries '+ PricebookFilter +' order by CreatedDate DESC LIMIT 1) from ' + ObjectName + ' WHERE ' + searchKey + ' order by Name ASC LIMIT 800';
                     }
                     else{
-                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries order by CreatedDate DESC LIMIT 1) from ' + ObjectName + ' WHERE ' + searchKey + ' order by Name ASC LIMIT 800';
+                        sQuery = 'select id, Name, buildertek__Vendor__c,QuantityUnitOfMeasure,buildertek__Cost_Code__c,buildertek__Quote_Group__c ,buildertek__Category__c, (SELECT Id, Name, buildertek__Unit_Cost__c,buildertek__Markup__c,Pricebook2Id FROM PricebookEntries order by CreatedDate DESC LIMIT 1) from ' + ObjectName + ' WHERE ' + searchKey + ' order by Name ASC LIMIT 800';
                     }
                 }
                 else{

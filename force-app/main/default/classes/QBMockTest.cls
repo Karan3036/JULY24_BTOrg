@@ -82,10 +82,13 @@ global class QBMockTest implements HttpCalloutMock {
                     else if(req.getEndpoint().contains('TaxCode')){
                         // ResponseBody = query_TaxCode_Response;
                         ResponseBody = this.error_At == 'taxservice_400'  ? unSuccess_Basic_Response_JSONbody : queryNull_Response;
+                        this.code = this.error_At == 'taxservice_400'  ? 400 : 200;
+
                     }
                     else if(req.getEndpoint().contains('Term')){
                         // ResponseBody = query_Term_Response;
                         ResponseBody = this.error_At == 'term_400'  ? unSuccess_Basic_Response_JSONbody : queryNull_Response;
+                        this.code = this.error_At == 'term_400'  ? 400 : 200;
                     }
                     else if(req.getEndpoint().contains('Customer')){
                         ResponseBody = query_Customer_Response;

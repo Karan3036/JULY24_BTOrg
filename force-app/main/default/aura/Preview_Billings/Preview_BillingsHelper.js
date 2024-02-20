@@ -16,6 +16,7 @@
 	    });
 	    $A.enqueueAction(action);
 	},
+	
 	getContact : function(component, event, helper) {
         var action = component.get("c.getObjectContact");
 		console.log('recordId=====>',component.get("v.recordId"));
@@ -38,8 +39,6 @@
         });
         $A.enqueueAction(action);
 	},
-	
-	
 	
 	
 })

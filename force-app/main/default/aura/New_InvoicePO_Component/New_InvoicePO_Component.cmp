@@ -12,7 +12,7 @@
 <aura:attribute name="poList" type="List" />
 <aura:attribute name="allPORecords" type="List" />
 <aura:attribute name="selectedPOId" type="Id" default="" />
-<aura:attribute name="isdisabled" type="Boolean" default="false"/>
+<aura:attribute name="isDisabled" type="Boolean" default="false"/>
 
 
 

@@ -3,6 +3,10 @@
         try {
             $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire();
             var action = component.get("c.getMasterPO");
+            action.setParams({	
+                'recordId': component.get("v.recordId"),		
+                'searchKeyword' : ''
+            });
             action.setCallback(this, function(response){
                 var result = response.getReturnValue();
                 console.log('result---> ',result);
@@ -208,4 +212,7 @@
             console.log('Error---> ',error);
         }
     },
+    onSearch: function (component, event, helper) {
+        helper.doSearchHelper(component, event, helper);
+   },
 })

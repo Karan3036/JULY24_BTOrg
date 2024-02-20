@@ -309,7 +309,7 @@ public class MassUpdateTakeOffLines{
     }
 
     @AuraEnabled
-    public static Map<Id, Id> get_ProductPhase_BuildPhase(String takeOffId){
+    public static Map<Id, Id> get_ProductPhase_BuildPhase(){
         try {
             List<buildertek__Quote_Line_Group__c> ProductPhase = [SELECT Id, Name FROM buildertek__Quote_Line_Group__c];
             List<buildertek__Build_Phase__c> BuildPhases = [SELECT Id, Name FROM buildertek__Build_Phase__c];

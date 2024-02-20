@@ -1038,6 +1038,15 @@ public with sharing class BT_AdminConfigurationController{
         scheduleChildConfiguration.Disable__c = false;
         firstLevelNodes.add(scheduleChildConfiguration);
 
+        Admin_Interface_Node_Configuration__c accountEmailConfiguration = new Admin_Interface_Node_Configuration__c();
+        accountEmailConfiguration.Name = 'Account Configuration';
+        accountEmailConfiguration.Disable__c = false;
+        accountEmailConfiguration.Index__c = 52;
+        accountEmailConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        accountEmailConfiguration.Open_New_Tab__c = false;
+        accountEmailConfiguration.Tab_Name__c = 'Account Configuration';
+        accountEmailConfiguration.Description__c = 'Configure Account Setting for sending expiration email.';
+        firstLevelNodes.add(accountEmailConfiguration);
 
         try {
             DMLManager.insertAsUser(firstLevelNodes);

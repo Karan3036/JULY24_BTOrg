@@ -7,19 +7,10 @@
     <aura:attribute name="vendorList" type="Project_Vendors__c[]" />
     <aura:attribute name="scheduleItemList" type="Project_Task__c[]" />
     <aura:attribute name="showModal" type="Boolean" default="false" />
-    <!-- <aura:html tag="style">
-        .slds-modal__content {
-        display:none;
-        }
-        .modal-container.slds-modal__container{
-        display:none;
-        }
-    </aura:html> -->
+
     <c:BT_Spinner />
     <aura:if isTrue="{!v.showModal}">
         <ltng:require styles="{!$Resource.MOdalPreviewWidth72}" />
-        <c:BT_Spinner />
-
         <div class="slds-modal__header" style="font-size:17px;font-weight:bold">
             Sync Vendors
         </div>

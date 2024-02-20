@@ -25,6 +25,9 @@
                         <p class="header-text">Task Name</p>
                     </div>
                     <div class="slds-col">
+                        <p class="header-text">Internal Resource</p>
+                    </div>
+                    <div class="slds-col">
                         <p class="header-text">Vendor</p>
                     </div>
                     <div class="slds-col">
@@ -54,27 +57,32 @@
                                     <p class="record-value">{row.taskName}</p>
                                 </div>
                                 <div class="slds-col comboHideLabel">
+                                    <lightning-combobox name="internal resource" value={row.selectedInternalResourceId}
+                                        options={internalResourcesOption} onchange={internalResourceChange} placeholder="Select Internal Resource"
+                                        class="fixed-width-dropdown"></lightning-combobox>
+                                </div>
+                                <div class="slds-col comboHideLabel">
                                     <lightning-combobox name="vendor" value={row.selectedVendorId}
-                                        options={vendorOptions} onchange={vendorChange}
-                                        placeholder="Select Vendor"></lightning-combobox>
+                                        options={vendorOptions} onchange={vendorChange} placeholder="Select Vendor"
+                                        class="fixed-width-dropdown"></lightning-combobox>
                                 </div>
                                 <div class="slds-col comboHideLabel">
-                                    <lightning-combobox name="vendor" value={row.selectedVendorResources1}
+                                    <lightning-combobox name="vendor resource1" value={row.selectedVendorResources1}
                                         data-field="selectedVendorResources1" options={vendorResourcesOptions}
-                                        onchange={vendorResourcesChange}
-                                        placeholder="Select Vendor Resources"></lightning-combobox>
+                                        onchange={vendorResourcesChange} placeholder="Select Vendor Resources"
+                                        class="fixed-width-dropdown"></lightning-combobox>
                                 </div>
                                 <div class="slds-col comboHideLabel">
-                                    <lightning-combobox name="vendor" value={row.selectedVendorResources2}
+                                    <lightning-combobox name="vendor resource2" value={row.selectedVendorResources2}
                                         data-field="selectedVendorResources2" options={vendorResourcesOptions}
-                                        onchange={vendorResourcesChange}
-                                        placeholder="Select Vendor Resources"></lightning-combobox>
+                                        onchange={vendorResourcesChange} placeholder="Select Vendor Resources"
+                                        class="fixed-width-dropdown"></lightning-combobox>
                                 </div>
                                 <div class="slds-col comboHideLabel">
-                                    <lightning-combobox name="vendor" value={row.selectedVendorResources3}
+                                    <lightning-combobox name="vendor resource3" value={row.selectedVendorResources3}
                                         data-field="selectedVendorResources3" options={vendorResourcesOptions}
-                                        onchange={vendorResourcesChange}
-                                        placeholder="Select Vendor Resources"></lightning-combobox>
+                                        onchange={vendorResourcesChange} placeholder="Select Vendor Resources"
+                                        class="fixed-width-dropdown"></lightning-combobox>
                                 </div>
                                 <div class="slds-col">
                                     <p class="record-value">{row.startDate}</p>
@@ -92,6 +100,9 @@
                             <template if:false={row.isEditing}>
                                 <div class="slds-col slds-truncate">
                                     <p class="record-value">{row.taskName}</p>
+                                </div>
+                                <div class="slds-col slds-truncate">
+                                    <p class="record-value">{row.internalResource}</p>
                                 </div>
                                 <div class="slds-col slds-truncate">
                                     <p class="record-value">{row.vendor}</p>
@@ -113,7 +124,8 @@
                                 </div>
                                 <div class="slds-col">
                                     <lightning-icon icon-name='utility:edit' alternative-text='edit' size='xx-small'
-                                        title='edit' onclick={editResource} data-id={row.id} data-vendorid={row.vendor}></lightning-icon>
+                                        title='edit' onclick={editResource} data-id={row.id}
+                                        data-vendorid={row.vendor}></lightning-icon>
                                 </div>
                             </template>
                         </div>
