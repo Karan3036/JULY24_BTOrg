@@ -98,7 +98,7 @@ export default class ScheduleResources extends LightningElement {
                             project: task.buildertek__Schedule__r.hasOwnProperty('buildertek__Project__r') ? task.buildertek__Schedule__r.buildertek__Project__r.Name : '',
                             schedule: task.buildertek__Schedule__r.buildertek__Description__c,
                             taskName: task.Name,
-                            internalResource: task.hasOwnProperty('buildertek__Internal_Resource__r') ? task.buildertek__Internal_Resource__r.Name : '',
+                            internalResource: task.hasOwnProperty('buildertek__Internal_Resource_1__r') ? task.buildertek__Internal_Resource_1__r.Name : '',
                             vendor: task.hasOwnProperty('buildertek__Contractor__r') ? task.buildertek__Contractor__r.Name : '',
                             vendorResources1: task.hasOwnProperty('buildertek__Contractor_Resource_1__r') ? task.buildertek__Contractor_Resource_1__r.Name : '',
                             vendorResources2: task.hasOwnProperty('buildertek__Contractor_Resource_2__r') ? task.buildertek__Contractor_Resource_2__r.Name : '',
@@ -166,7 +166,7 @@ export default class ScheduleResources extends LightningElement {
                 }
             }
 
-            // Set the selected values for the vendor and vendor resources
+            // Set the selected values for the internal resource, vendor and vendor resources
             selectedRecord.selectedVendorId = this.selectedVendorId;
 
             ['1', '2', '3'].forEach(index => {
@@ -209,7 +209,7 @@ export default class ScheduleResources extends LightningElement {
         console.log('vendorResourcesOptions:', this.vendorResourcesOptions);
     }
 
-    // TODO - Implement the vendorResourcesChange methods
+    // * Method to handle vendor resources change
     vendorResourcesChange(event) {
         console.log('Selected Vendor Resources', event.target.value);
         const fieldName = event.target.dataset.field;
@@ -261,30 +261,66 @@ export default class ScheduleResources extends LightningElement {
     // * Method to handle save button click
     saveResource() {
         this.isLoading = true;
-        const updatedRecord = {
-            Id: this.editRecordId,
-            buildertek__Contractor__c: this.selectedVendorId,
-            buildertek__Contractor_Resource_1__c: this.selectedVendorResources1,
-            buildertek__Contractor_Resource_2__c: this.selectedVendorResources2,
-            buildertek__Contractor_Resource_3__c: this.selectedVendorResources3,
-            buildertek__Internal_Resource_1__c: this.selectedInternalResourceId
-        };
-        console.log('Updated Record:', updatedRecord);
-        updateResource({ scheduleItem: updatedRecord })
-            .then((result) => {
-                console.log('Result:', result);
-                this.showToast('Success', 'Record updated successfully', 'success');
-                this.tableData = this.tableData.map(row => {
-                    return { ...row, isEditing: false };
+        if ((this.selectedVendorResources1 === this.selectedVendorResources2 && this.selectedVendorResources1 !== '' && this.selectedVendorResources2 !== '') || (this.selectedVendorResources1 === this.selectedVendorResources3 && this.selectedVendorResources1 !== '' && this.selectedVendorResources3 !== '') || (this.selectedVendorResources2 === this.selectedVendorResources3 && this.selectedVendorResources2 !== '' && this.selectedVendorResources3 !== '')) {
+            this.showToast('Warning', 'Please select different resources for the vendor', 'warning');
+            this.isLoading = false;
+            return;
+        }
+        if (this.checkResourceConflict()) {
+            const updatedRecord = {
+                Id: this.editRecordId,
+                buildertek__Contractor__c: this.selectedVendorId,
+                buildertek__Contractor_Resource_1__c: this.selectedVendorResources1,
+                buildertek__Contractor_Resource_2__c: this.selectedVendorResources2,
+                buildertek__Contractor_Resource_3__c: this.selectedVendorResources3,
+                buildertek__Internal_Resource_1__c: this.selectedInternalResourceId
+            };
+            console.log('Updated Record:', updatedRecord);
+            updateResource({ scheduleItem: updatedRecord })
+                .then((result) => {
+                    console.log('Result:', result);
+                    this.showToast('Success', 'Record updated successfully', 'success');
+                    this.tableData = this.tableData.map(row => {
+                        return { ...row, isEditing: false };
+                    });
+                    this.tableData = this.tableData.map(row => {
+                        return row.id === this.editRecordId ? {
+                            ...row,
+                            vendor: this.vendorOptions.find(option => option.value === this.selectedVendorId)?.label,
+                            vendorResources1: this.vendorResourcesOptions.find(option => option.value === this.selectedVendorResources1)?.label,
+                            vendorResources2: this.vendorResourcesOptions.find(option => option.value === this.selectedVendorResources2)?.label,
+                            vendorResources3: this.vendorResourcesOptions.find(option => option.value === this.selectedVendorResources3)?.label,
+                            internalResource: this.internalResourcesOption.find(option => option.value === this.selectedInternalResourceId)?.label
+                        } : row;
+                    });
+                })
+                .catch((error) => {
+                    console.log('Error:', error);
+                    this.showToast('Error', 'There was an error while updating the record. Please contact the administrator to resolve this issue.', 'error');
+                })
+                .finally(() => {
+                    this.isLoading = false;
                 });
-            })
-            .catch((error) => {
-                console.log('Error:', error);
-                this.showToast('Error', 'There was an error while updating the record. Please contact the administrator to resolve this issue.', 'error');
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
+        } else {
+            this.showToast('Warning', 'Conflicting dates found. Please resolve the conflicts before saving the record', 'warning');
+            this.isLoading = false;
+        }
     }
 
+    //* Check for conflicting dates before assigning resources
+    checkResourceConflict() {
+        const selectedStartDate = this.tableData.find(row => row.id === this.editRecordId).startDate;
+        const selectedEndDate = this.tableData.find(row => row.id === this.editRecordId).endDate;
+        const selectedVendorId = this.selectedVendorId;
+        const selectedResource1 = this.selectedVendorResources1;
+        const selectedResource2 = this.selectedVendorResources2;
+        const selectedResource3 = this.selectedVendorResources3;
+        console.log(`Selected Start Date: ${selectedStartDate}, Selected End Date: ${selectedEndDate}, Selected Vendor Id: ${selectedVendorId}, Selected Resource 1: ${selectedResource1}, Selected Resource 2: ${selectedResource2}, Selected Resource 3: ${selectedResource3}`);
+        let conflictVendorResource = this.vendorResourcesMap[selectedVendorId].map(ele => ({
+            label: ele.label,
+            value: ele.value
+        }))
+        console.log('Vendor Resources Map:', conflictVendorResource);
+        
+    }
 }
