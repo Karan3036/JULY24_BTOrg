@@ -47,6 +47,7 @@ public with sharing class createWorkOrderController {
             
             returnValue.state = 'Success';
             returnValue.returnMessage = 'Work Order created successfully!';
+            returnValue.workorderId = wo.Id;
         } catch (Exception e) {
             System.debug('Error in createWorkOrder ..' + e.getMessage() + '\n' + e + '\n Exception line no : ' + e.getLineNumber() + '--->' + e.getStackTraceString());
             
@@ -55,7 +56,8 @@ public with sharing class createWorkOrderController {
                 BT_ExceptionHandler.Store_Exception(e);
             }
             returnValue.state = 'Error';
-            returnValue.returnMessage = 'There was an issue creating the Work Order! Please contact your System Administrator.';
+            returnValue.returnMessage = e.getMessage();
+            returnValue.workorderId = '';
         }
         return returnValue;
     }
@@ -63,5 +65,6 @@ public with sharing class createWorkOrderController {
     public class ResponseWrapper {
         @AuraEnabled public String state;
         @AuraEnabled public String returnMessage;
+        @AuraEnabled public String workorderId;
     }
 }
