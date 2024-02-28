@@ -219,7 +219,7 @@ private class RFQDAOTest {
         //RFQDAO.addProductsToList('',rfqItemList[0],1);
         RFQDAO.createTask(con.Id,rfq.Id,'test');
         RFQDAO.createMultipleTasks(contactsIds,rfq.Id,'test');
-        RFQDAO.getmasterRFQItems();
+        RFQDAO.getmasterRFQItems('');
         RFQDAO.linkNewRfqItems(rfqItemMap);
         RFQDAO.importRFQItems(rfqItemListIds,rfq.Id);
         RFQDAO.createRFQFromQuote(q.Id,quoteitem.Id);

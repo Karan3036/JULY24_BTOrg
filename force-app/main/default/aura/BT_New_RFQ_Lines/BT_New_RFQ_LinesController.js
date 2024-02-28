@@ -32,7 +32,7 @@
 
     importMasterRFQLine: function (component, event, helper) {
         //alert('hi');
-        if (component.get("v.rfqRecord.buildertek__Status__c") != "Awarded") {
+        if (component.get("v.rfqRecord.buildertek__Status__c") == "New") {
             $A.createComponents(
                 [
                     [
@@ -89,9 +89,9 @@
             var toastEvent = $A.get("e.force:showToast");
             toastEvent.setParams({
                 mode: "sticky",
-                message: "You cannot create RFQ lines after an RFQ has been Awarded",
+                message: "Cannot create RFQ line. RFQ status must be 'New'.",
                 type: "error",
-                duration: "10000",
+                duration: "3000",
                 mode: "dismissible",
             });
             toastEvent.fire();
