@@ -13,9 +13,9 @@
      handleCheck : function(component, event, helper) {
         var checkbox = event.getSource();
        //alert(checkbox);
-          var getAllId = component.find("checkContractor");
+        var getAllId = component.find("checkContractor");
         var Submittals = component.get("v.objInfo");
-          var selectedRfqIds  = component.get("v.selectedobjInfo");
+        var selectedRfqIds  = component.get("v.selectedobjInfo");
         // alert(selectedRfqIds);
        //  var man = component.get("v.recordid");
         // alert(getAllId.length);
@@ -26,6 +26,7 @@
                // alert( JSON.stringify(Submittals[i].MasterRFQItem.Id == checkbox.get("v.text")));
                // alert(Submittals[i].SubmittalCheck == false);
 	            Submittals[i].SubmittalCheck = true;
+                component.set("v.selectedobjInfo", Submittals[i]);
 	        }
 	        else if(Submittals[i].MasterRFQItem.Id == checkbox.get("v.text") && Submittals[i].SubmittalCheck == true){
               //  alert("hai");
@@ -36,6 +37,7 @@
              var index = selectedRfqIds.indexOf(checkbox.get("v.text"));
              selectedRfqIds.splice(index,1);
          }
+         
      },
     
     selectAll : function(component, event, helper) {     
@@ -88,7 +90,7 @@
             }   
         }
      
-     
+    component.set("v.selectedobjInfo", getAllId);
     },
     doCancel : function(component, event, helper) {
         component.get("v.onCancel")();     

@@ -38,7 +38,6 @@
                         result.forEach(function(item){       
                             if(item.MasterRFQItem.Name != null){
                                 if (item.MasterRFQItem.Name.length > maxLength) {
-                                    console.log('is it working');
                                     item.MasterRFQItem.truncatedName = item.MasterRFQItem.Name.substring(0, maxLength - 3) + "...";
                                 } else {
                                     item.MasterRFQItem.truncatedName = item.MasterRFQItem.Name;
@@ -46,7 +45,6 @@
                             }
                             if(item.MasterRFQItem.buildertek__Description__c != null){
                                 if (item.MasterRFQItem.buildertek__Description__c.length > (maxLength + 20)) {
-                                    console.log('is it working');
                                     item.MasterRFQItem.truncateddes = item.MasterRFQItem.buildertek__Description__c.substring(0, maxLength + 17) + "...";
                                 } else {
                                     item.MasterRFQItem.truncateddes = item.MasterRFQItem.buildertek__Description__c;
@@ -54,17 +52,12 @@
                             }
                         })
                         component.set("v.objInfo",result);
-                        console.log('check 1');
                         var pageSize = component.get("v.pageSize");
-                        console.log('start 1');
                         var totalRecordsList = result;
                         var totalLength = totalRecordsList.length ;
-                        console.log('start 2');
                         component.set("v.totalRecordsCount", totalLength);
                         component.set("v.startPage",0);
-                        console.log('start 3');
                         component.set("v.endPage",pageSize-1);
-                        console.log('check 2');
 
                         var PaginationLst = [];
                         for(var i=0; i < pageSize; i++){
@@ -156,6 +149,7 @@
         }
         start = start + counter;
         end = end + counter;
+        this.updateCheckboxValues(component);
         component.set("v.startPage",start);
         component.set("v.endPage",end);
         component.set('v.PaginationList', Paginationlist);
@@ -171,7 +165,6 @@
 
         }
          
-
       
     },
     previous : function(component,event,sObjectList,end,start,pageSize){
@@ -188,10 +181,12 @@
         }
         start = start - counter;
         end = end - counter;
+        this.updateCheckboxValues(component);
         component.set("v.startPage",start);
         component.set("v.endPage",end);
         component.set('v.PaginationList', Paginationlist);
         const allActive = Paginationlist.every(function(obj) {
+            
             return obj.isChecked === true;
          });
          if(allActive){
@@ -201,7 +196,9 @@
            component.find("selectAllRFQ").set("v.value", false);
 
         }
+        
     },
+
     updatePagination: function(component, filteredList) {
         var pageSize = component.get("v.pageSize");
         var totalRecordsCount = filteredList.length;
@@ -227,5 +224,41 @@
             PaginationList.push(filteredList[i]);
         }
         component.set("v.PaginationList", PaginationList);
+    },
+
+    updateCheckboxValues: function (component) {
+        try {
+            var PaginationList = component.get("v.PaginationList");
+            var selectedobjInfo = component.get("v.selectedobjInfo");
+            console.log(selectedobjInfo);
+        
+            // Iterate through PaginationList and update checkbox values
+            PaginationList.forEach(function (record) {
+                // Get the record ID for the checkbox
+                var recordId = record.Id;
+        
+                // Get the checkbox by name attribute
+                var checkboxes = component.find("checkContractor");
+        
+                // If there are multiple checkboxes, component.find() returns an array
+                if (Array.isArray(checkboxes)) {
+                    // Loop through the array of checkboxes
+                    checkboxes.forEach(function (checkbox) {
+                        if (checkbox.get("v.text") === recordId) {
+                            // Update the checkbox value based on checkedRecordIds
+                            checkbox.set("v.value", selectedobjInfo.includes(recordId));
+                        }
+                    });
+                } else {
+                    // If there's only one checkbox
+                    if (checkboxes.get("v.text") === recordId) {
+                        // Update the checkbox value based on checkedRecordIds
+                        checkboxes.set("v.value", selectedobjInfo.includes(recordId));
+                    }
+                }
+            });
+        } catch (error) {
+            console.log('Error---> ',error);
+        }
     },
 })
