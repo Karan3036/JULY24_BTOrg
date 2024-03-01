@@ -107,19 +107,88 @@
         color: white;
         background-color: rgba(27, 82, 151, 1.0) !important;
         }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        
+        .modal-content {
+            /* background-color: #fefefe; */
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 15px;
+            /* border: 1px solid #888; */
+            width: 40%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        /* Close button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .rkheader{
+            text-align: center;
+            border-bottom: 1px solid gray;
+            font-size: large;
+            font-family: monospace;
+        }
+
+        .rkbody{
+            height: 10vh;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .rkfooter{
+            border-top: 1px solid gray;
+            padding-top: 5px;
+            text-align: center;
+        }
     </style>
     <script>
         function submitQuote() {
             console.log('submitQuote');
-            var agreeFunction = new Function("Appurin.lightning.hideModalPopup({'modalPopupId' : 'lightningInfoPopup'}); acfsubmintQuote(); multiFiles(); return false;");
-            var confirmPromptOptions = {
-                'modalPopupId': 'lightningInfoPopup',
-                'title': 'Confirm',
-                'message': 'Are you sure you want to submit the Invoice?',
-                'agreeButtonLabel': 'Yes',
+            var input = document.getElementById('fileToUpload');
+            var filelength = input.files.length;
+            var agreeFunction;
+            var confirmPromptOptions;
+            if (filelength > 0) {
+                agreeFunction = new Function("Appurin.lightning.hideModalPopup({'modalPopupId' : 'lightningInfoPopup'}); multiFiles(); return false;");
+                confirmPromptOptions = {
+                    'modalPopupId': 'lightningInfoPopup',
+                    'title': 'Confirm',
+                    'message': 'Are you sure you want to submit the Invoice?',
+                    'agreeButtonLabel': 'Yes',
 
-                'discardButtonLabel': '{!JSENCODE($Label.buildertek__Cancel)}',
-                'agreeFunction': agreeFunction
+                    'discardButtonLabel': '{!JSENCODE($Label.buildertek__Cancel)}',
+                    'agreeFunction': agreeFunction
+                }
+            } else {
+                confirmPromptOptions = {
+                    'modalPopupId': 'lightningInfoPopup1'
+                }
             }
             Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
         }
@@ -140,38 +209,6 @@
         }
 
         var uploadFileData = [];
-
-        function fileSelected(){
-            console.log('fileSelected');
-            var temp = event.target;
-            console.log('Event Data == >',{temp});
-            var size = document.getElementById('fileToUpload');
-            uploadFileData = size.files;
-            if (size.files.length > 0) {
-                document.getElementById('fileToUpload').disabled = true;
-                for (let index = 0; index < size.files.length; index++) {
-                    var file = document.getElementById('fileToUpload').files[index];
-                    if (file) {
-                        console.log('files log ',file);
-                        document.getElementById('fileError').style.display = 'none';
-                        document.getElementById('fileNameFieldId').innerHTML += `<img class="slds-button__icon slds-button__icon--left" src="{!$Resource.Close_Icon}" alt="remove" onclick="removeFiles(${index})"/> ${file.name} <br/>` ;
-                        document.getElementById('fileNameFieldId').style.display = 'block';
-
-                        var fileSize = 0;
-                        if (file.size > (36 * 1024 * 1024)) {
-                            alert('File too large, greater than 36MB');
-                            return;
-                        }
-                        if (file.size > 1024 * 1024)
-                            fileSize = (Math.round(file.size * 100 / (1024 * 1024)) / 100).toString() + 'MB';
-                        else
-                            fileSize = (Math.round(file.size * 100 / 1024) / 100).toString() + 'KB';
-                    }else{
-
-                    }
-                }
-            }
-        }
 
         function removeFiles(ind) {
             console.log('removeFiles');
@@ -199,9 +236,36 @@
                 document.getElementById('fileNameFieldId').style.display = 'block';
 
             }
-
-
+            
+            // Clear file input field
+            document.getElementById('fileToUpload').value = '';
         }
+
+        function fileSelected(){
+            console.log('fileSelected');
+            var temp = event.target;
+            console.log('Event Data == >',{temp});
+            var size = document.getElementById('fileToUpload');
+            uploadFileData = size.files;
+            if (size.files.length > 0) {
+                // Remove existing content from file list display
+                document.getElementById('fileNameFieldId').innerHTML = '';
+                document.getElementById('fileError').style.display = 'none';
+                document.getElementById('fileNameFieldId').style.display = 'block';
+                
+                // Display selected files
+                for (let index = 0; index < size.files.length; index++) {
+                    var file = document.getElementById('fileToUpload').files[index];
+                    if (file) {
+                        document.getElementById('fileError').style.display = 'none';
+                        document.getElementById('fileNameFieldId').innerHTML += `<img class="slds-button__icon slds-button__icon--left" src="{!$Resource.Close_Icon}" alt="remove" onclick="removeFiles(${index})"/> ${file.name} <br/>` ;
+                    } else {
+                        // Handle case if file is not available
+                    }
+                }
+            }
+        }
+
 
         function upload(){
             console.log('upload');
@@ -264,13 +328,44 @@
                 alert(evt.target.error);
             }
         }
+
+        function uploadContentVersion(filename, filecontent, fileSize, fileType) {
+            uploadFileToPurchaseorder(filename, encodeURIComponent(filecontent), fileSize, fileType);
+        }
+
+        function closeWindow() {
+            document.getElementById('fileToUpload').value = null;
+            document.getElementById('fileNameField').innerHTML = '';
+            document.getElementById('fileError').style.display = 'none';
+            document.getElementById('fileNameFieldId').innerHTML = '';
+            document.getElementById('fileNameFieldId').style.display = 'none';
+            document.getElementById("idDialog").className = document.getElementById("idDialog").className.replace(/(?:^|\s)slds-fade-in-open(?!\S)/g, ' slds-fade-in-close');
+            document.getElementById("idBackDrop").className = document.getElementById("idBackDrop").className.replace(/(?:^|\s)slds-modal-backdrop--open(?!\S)/g, ' slds-modal-backdrop--close');
+            var confirmPromptOptions = {'modalPopupId': 'lightningInfoPopup2'}
+            Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
+        }
+
+        function handleComplete() {
+            console.log('handleComplete---->');
+            var confirmPromptOptions = {'modalPopupId': 'lightningInfoPopup2'}
+            Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
+    
+    }
+
+    function closeModal() {
+            document.getElementById('myModal').style.display = 'none';
+        }
     </script>
     <apex:form id="form" html-autocomplete="off">
 
         <apex:actionStatus id="splashStatus" onstart="startSplash();" onstop="endSplash(); " />
 
-        <apex:actionFunction name="acfsubmintQuote" action="{!submintQuote}" status="splashStatus" rerender="form,iserrorMessage"/>
-        <apex:actionFunction name="fileToBackEnd" action="{!submintQuote}" status="splashStatus" rerender="form,iserrorMessage"/>
+        <apex:actionFunction name="uploadFileToPurchaseorder" action="{!uploadFileToPurchaseorder}" status="splashStatus" rerender="form,iserrorMessage">
+            <apex:param name="firstParam" value="" assignTo="{!latestFileName}"/>
+            <apex:param name="secondParam" value="" assignTo="{!fileContents}"/>
+            <apex:param name="filesize" value="" assignTo="{!fileSize}"/>
+            <apex:param name="filetype" value="" assignTo="{!fileType}"/>
+        </apex:actionFunction>
 
         <div class="slds slds-scope">
             <div id="splashDiv" class="apInitiallyDivDisplayNone" style="z-index:9998;">
@@ -283,6 +378,7 @@
                 </div>
             </div>
         </div>
+
         <apex:outputPanel rendered="{!iserrorMessage == true}" id="iserrorMessage">
             <apex:outputPanel rendered="{!iserrorMessage == true}">
                 <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
@@ -293,13 +389,15 @@
                 </div>
             </apex:outputPanel>
         </apex:outputPanel>
-        <apex:outputPanel rendered="{!isReload == true}" id="isReload">
-            <apex:outputPanel rendered="{!isReload == true}">
-                <script>
-                    window.location.reload();
-                </script>
-            </apex:outputPanel>
+
+        <apex:outputPanel layout="block" id="errorModal" style="display: {!IF(errorMessageVisible, 'block', 'none')}">
+            <div class="customPopup">
+                <span class="close" onclick="closeErrorModal()">&times;</span>
+                <h2>Error</h2>
+                <p>{!errorMessage}</p>
+            </div>
         </apex:outputPanel>
+
         <div class="slds-scope" style="width:80%;margin: 0 auto;padding: 10px 50px;">
             <div class="slds-box">
                 <apex:outputPanel>
@@ -400,7 +498,7 @@
                                      aria-describedby="fileLabel" onchange="fileSelected()" />
                             <label class="slds-file-selector__body" for="fileToUpload">
                                 <div class="slds-file-selector__button slds-button slds-button_brand" id="buttonWidth">
-                                    <img class="slds-button__icon slds-button__icon--left" src="{!$Resource.buildertek__SLDS+'/assets/icons/utility/upload_60.png'}"/>
+                                    <img class="slds-button__icon slds-button__icon--left" src="{!$Resource.RequestImageUploaderImg}"/>
                                     Upload New Files
                                 </div>
                                 <div styleClass="slds-file-selector__text">
@@ -415,7 +513,7 @@
                     <br/>
                     <center>
                         <button type="button" class="slds-button slds-button_neutral" onclick="window.close();">Close</button>
-                        <button type="button" class="slds-button slds-button_neutral" onclick="submitQuote();">Submit</button>
+                        <button type="button" class="{!if(ShowSubmitButton,'slds-hide','slds-button slds-button_brand')}" onclick="submitQuote();">Submit</button>
                     </center>
                 </apex:outputPanel>
             </div>
@@ -426,7 +524,7 @@
                         <div class="apModalHeader">
                             <button id="lightningInfoPopupCloseIcon" class="slds-button slds-modal__close slds-button--icon-inverse" onClick="Appurin.lightning.hideModalPopup({'modalPopupId':'{!JSENCODE($Component.lightningInfoPopup)}'}); return false;"
                                 title="{!$Label.Close}">
-                                <c:BT_LightningSvg parentId="lightningInfoPopupCloseIcon" styleClass="slds-button__icon slds-button__icon--large" path="/assets/icons/utility-sprite/svg/symbols.svg#close"/>
+                                <!-- <c:BT_LightningSvg parentId="lightningInfoPopupCloseIcon" styleClass="slds-button__icon slds-button__icon--large" path="/assets/icons/utility-sprite/svg/symbols.svg#close"/> -->
                                 <span class="slds-assistive-text">{!$Label.Close}</span>
                             </button>
                             <h2 class="apModalHeading" id="lightningInfoPopupHeader">{$Label.Warning}</h2>
@@ -446,14 +544,48 @@
                 </div>
                 <div class="slds-backdrop slds-backdrop--open" style="z-index: 5881;"></div>
             </apex:outputPanel>
-            <!-- <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop"></div> -->
+            <apex:outputPanel layout="block" id="lightningInfoPopup1" style="display: none; z-index: 8552;">
+                <div class="apModal" style="z-index: 8551;">
+                    <div class="apModalContainer">
+                        <div class="apModalHeader">
+                            <button id="lightningInfoPopupCloseIcon" class="slds-button slds-modal__close slds-button--icon-inverse" onClick="Appurin.lightning.hideModalPopup({'modalPopupId':'{!JSENCODE($Component.lightningInfoPopup1)}'}); return false;"
+                                title="{!$Label.Close}">
+                                <c:BT_LightningSvg parentId="lightningInfoPopupCloseIcon" styleClass="slds-button__icon slds-button__icon--large" path="/assets/icons/utility-sprite/svg/symbols.svg#close"/>
+                                <span class="slds-assistive-text">{!$Label.Close}</span>
+                            </button>
+                            <h2 class="apModalHeading" id="lightningInfoPopupHeader">Error</h2>
+                        </div>
+                        <div class="apModalContent">
+                            <div class="apNotifyContainer" style="position: relative; text-align:center;">
+                                <div>
+                                    <h2 id="lightningInfoPopupMessage">Please upload an Invoice</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="apModalFooter">
+                            <button id="lightningInfoPopupCloseButton" onClick="Appurin.lightning.hideModalPopup({'modalPopupId':'{!JSENCODE($Component.lightningInfoPopup1)}'}); return false;">Close</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open" style="z-index: 5881;"></div>
+            </apex:outputPanel>
+            <div id="myModal" class="modal" style="{!IF(isModalVisible, 'display: block;', 'display: none;')}">
+                <div class="modal-content">
+                    <div class="rkheader slds-modal__header">
+                        <h2 style="margin-bottom: 1px;" class="slds-text-heading--medium">{!modalTitle}</h2>
+                    </div>
+                    <div class="rkbody slds-modal__content slds-p-around--medium">
+                        <p>{!modalMessage}</p>
+                    </div>
+                    <div class="rkfooter slds-modal__footer">
+                        <button type="button" class="slds-button slds-button_neutral" onclick="closeModal()">{!modalButtonLabel}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop"></div>
         </div>
 
 
-        <!-- <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop1"></div> -->
+        <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop1"></div>
     </apex:form>
-
-
-
-
 </apex:page>

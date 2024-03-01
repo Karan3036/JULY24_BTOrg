@@ -82,27 +82,31 @@
 	},
     
     importRFQItems: function(component, event, helper){
-        component.set("v.Spinner", true);
+        try {
+            component.set("v.Spinner", true);
         var Records = component.get("v.mainObjectId");
 	    var rfqItems = component.get("v.objInfo");
-	    var SubOptions = [];
+        var checkedRecordIds = component.get("v.checkedRecordIds");
+	    // var SubOptions = [];
        // alert(SubOptions);
         if(rfqItems != null){
-	    for(var i=0 ; i < rfqItems.length;i++){
-         // alert(rfqItems[i].SubmittalCheck );
-	        if(rfqItems[i].SubmittalCheck == true){
-	            SubOptions.push(rfqItems[i].MasterRFQItem.Id);
-	        }
-	    }
-	    if(SubOptions.length > 0){
-	        component.set("v.selectedobjInfo",SubOptions);
-            console.log(SubOptions);
+	    // for(var i=0 ; i < rfqItems.length;i++){
+        //  // alert(rfqItems[i].SubmittalCheck );
+	    //     if(rfqItems[i].SubmittalCheck == true){
+	    //         SubOptions.push(rfqItems[i].MasterRFQItem.Id);
+	    //     }
+	    // }
+	    if(checkedRecordIds.length > 0){
+	        // component.set("v.selectedobjInfo",SubOptions);
+            // console.log(SubOptions);
             console.log(Records);
 	        var action = component.get("c.importRFQItems");
-            action.setParams({Id : SubOptions, RFQId : Records})
+            action.setParams({Id : checkedRecordIds, RFQId : Records})
             action.setCallback(this, function(response) {
                 var state = response.getState();
+                console.log({state});
                 var result = response.getReturnValue();
+                console.log({result});
                 if (state === "SUCCESS") {
                     component.set("v.Spinner", false);
                     component.get("v.onSuccess")();  
@@ -137,6 +141,10 @@
             toastEvent.fire();
             
         }
+        } catch (error) {
+            console.log({error});
+        }
+        
 	},
     next : function(component,event,sObjectList,end,start,pageSize){
         var Paginationlist = [];
@@ -149,21 +157,13 @@
         }
         start = start + counter;
         end = end + counter;
-        this.updateCheckboxValues(component);
+        // this.updateCheckboxValues(component);
         component.set("v.startPage",start);
         component.set("v.endPage",end);
         component.set('v.PaginationList', Paginationlist);
+        this.updateCheckboxValues(component);
 
-        const allActive = Paginationlist.every(function(obj) {
-            return obj.isChecked === true;
-         });
-         if(allActive){
-            component.find("selectAllRFQ").set("v.value", true);
 
-        }else{
-           component.find("selectAllRFQ").set("v.value", false);
-
-        }
          
       
     },
@@ -181,21 +181,11 @@
         }
         start = start - counter;
         end = end - counter;
-        this.updateCheckboxValues(component);
         component.set("v.startPage",start);
         component.set("v.endPage",end);
         component.set('v.PaginationList', Paginationlist);
-        const allActive = Paginationlist.every(function(obj) {
-            
-            return obj.isChecked === true;
-         });
-         if(allActive){
-            component.find("selectAllRFQ").set("v.value", true);
-
-        }else{
-           component.find("selectAllRFQ").set("v.value", false);
-
-        }
+        this.updateCheckboxValues(component);
+        
         
     },
 
@@ -226,39 +216,75 @@
         component.set("v.PaginationList", PaginationList);
     },
 
+    // updateCheckboxValues: function (component) {
+    //     try {
+    //         var PaginationList = component.get("v.PaginationList");
+    //     var selectedobjInfo = component.get("v.selectedobjInfo");
+    //     console.log('selectedobjInfo-->',selectedobjInfo);
+    //     console.log('recordlength-->',component.get("v.PaginationList").length);
+    //     console.log('Inside updateCheckboxValues');
+    
+    //     // Iterate through PaginationList and update checkbox values
+    //     PaginationList.forEach(function (record) {
+    //         // Get the record ID for the checkbox
+    //         var recordId = record.MasterRFQItem.Id;
+    //         console.log(recordId);
+    
+    //         // Get the checkbox by name attribute
+    //         var checkboxes = component.find("checkContractor");
+    //         console.log('checkboxes-->',checkboxes);
+    //         // If there are multiple checkboxes, component.find() returns an array
+    //         if (Array.isArray(checkboxes)) {
+    //             // Loop through the array of checkboxes
+    //             checkboxes.forEach(function (checkbox) {
+                    
+    //                 if (checkbox.get("v.text") === recordId) {
+    //                     console.log('--->',checkbox.get("v.text"));
+    //                     console.log('compared');
+    //                     checkbox.set("v.value", selectedobjInfo.includes(recordId));
+    //                 }
+    //             });
+    //         } else {
+    //             // If there's only one checkbox
+    //             if (checkboxes.get("v.text") === recordId) {
+    //                 // Update the checkbox value based on checkedRecordIds
+    //                 checkboxes.set("v.value", selectedobjInfo.includes(recordId));
+    //             }
+    //         }
+    //     });
+    //     } catch (error) {
+    //         console.log('error-->',error);
+    //     }
+        
+    // },
     updateCheckboxValues: function (component) {
-        try {
-            var PaginationList = component.get("v.PaginationList");
-            var selectedobjInfo = component.get("v.selectedobjInfo");
-            console.log(selectedobjInfo);
-        
-            // Iterate through PaginationList and update checkbox values
-            PaginationList.forEach(function (record) {
-                // Get the record ID for the checkbox
-                var recordId = record.Id;
-        
-                // Get the checkbox by name attribute
-                var checkboxes = component.find("checkContractor");
-        
-                // If there are multiple checkboxes, component.find() returns an array
-                if (Array.isArray(checkboxes)) {
-                    // Loop through the array of checkboxes
-                    checkboxes.forEach(function (checkbox) {
-                        if (checkbox.get("v.text") === recordId) {
-                            // Update the checkbox value based on checkedRecordIds
-                            checkbox.set("v.value", selectedobjInfo.includes(recordId));
-                        }
-                    });
-                } else {
-                    // If there's only one checkbox
-                    if (checkboxes.get("v.text") === recordId) {
+        var PaginationList = component.get("v.PaginationList");
+        var checkedRecordIds = component.get("v.checkedRecordIds");
+    
+        // Iterate through PaginationList and update checkbox values
+        PaginationList.forEach(function (record) {
+            // Get the record ID for the checkbox
+            var recordId = record.MasterRFQItem.Id;
+    
+            // Get the checkbox by name attribute
+            var checkboxes = component.find("checkInspection");
+    
+            // If there are multiple checkboxes, component.find() returns an array
+            if (Array.isArray(checkboxes)) {
+                // Loop through the array of checkboxes
+                checkboxes.forEach(function (checkbox) {
+                    if (checkbox.get("v.text") === recordId) {
                         // Update the checkbox value based on checkedRecordIds
-                        checkboxes.set("v.value", selectedobjInfo.includes(recordId));
+                        checkbox.set("v.value", checkedRecordIds.includes(recordId));
                     }
+                });
+            } else {
+                // If there's only one checkbox
+                if (checkboxes.get("v.text") === recordId) {
+                    // Update the checkbox value based on checkedRecordIds
+                    checkboxes.set("v.value", checkedRecordIds.includes(recordId));
                 }
-            });
-        } catch (error) {
-            console.log('Error---> ',error);
-        }
+            }
+        });
     },
 })
