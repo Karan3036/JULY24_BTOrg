@@ -105,21 +105,6 @@
             Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
         }
 
-        function reloadPage() {
-            console.log('*reloadPage');
-            window.location.reload();
-        }
-
-        function showFileNameField() {
-            console.log('*showFileNameField');
-            var input = document.getElementById('fileToUpload');
-            if (input.files.length > 0) {
-                var file = input.files[0];
-                document.getElementById('fileNameField').innerHTML = file.name;
-                document.getElementById('fileNameId').value = file.name;
-            }
-        }
-
         var uploadFileData = [];
 
         function removeFiles(ind) {
@@ -148,7 +133,6 @@
 
             }
             
-            // Clear file input field
             document.getElementById('fileToUpload').value = '';
         }
 
@@ -169,8 +153,6 @@
                     if (file) {
                         document.getElementById('fileError').style.display = 'none';
                         document.getElementById('fileNameFieldId').innerHTML += `<img class="slds-button__icon slds-button__icon--left" src="{!$Resource.Close_Icon}" alt="remove" onclick="removeFiles(${index})"/> ${file.name} <br/>` ;
-                    } else {
-                        // Handle case if file is not available
                     }
                 }
             }
