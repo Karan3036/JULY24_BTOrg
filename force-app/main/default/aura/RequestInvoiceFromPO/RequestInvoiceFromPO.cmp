@@ -30,8 +30,8 @@
                     </div>
                 </div>
             </div>
-            <footer role="contentinfo" class="slds-docked-form-footer fixedFooter"
-                style="display:block;text-align:right;padding-right:5px;">
+            <footer role="contentinfo" class="slds-docked-form-footer fixedFooter slds-modal__footer"
+                style="display:block;text-align:right;">
                 <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Close</button>
                 <button class="slds-button slds-button--brand" onclick="{!c.sendmailtovendor}">Yes</button>
             </footer>

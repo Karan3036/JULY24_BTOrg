@@ -4,52 +4,8 @@
     <c:BT_JsAndCssIncludeComponent importJquery="true" importAppurinUtil="true" importJQueryLayout="true" importFancyTree="false"
         importJqGrid="false" importEasyTooltip="true" importAppurinCss="true" importCkEditor="false" importGnattChart="false"
         importLightningDesign="true" />
-
-    <head>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-
-        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" />
-        <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"/>
-         <apex:includeScript value="{!$Resource.FileUploadJs}"/>
-    </head>
-
+        
     <style>
-        .customPopup1 {
-        background-color: white;
-        border-style: solid;
-        border-width: 2px;
-        left: 20%;
-        padding: 10px;
-        position: absolute;
-        z-index: 9999;
-        width: 500px;
-        top: 20%;
-        }
-
-        .disabledTextBox {
-        background-color: white;
-        border: 1px solid;
-        color: black;
-        cursor: default;
-        width: 90px;
-        display: table;
-        padding: 2px 1px;
-        text-align:right;
-        }
-
-        .closeButton {
-        float: right;
-        }
-        .hideListButton {
-            float: left;
-        }
-
-        .showListButton {
-            float: left;
-        }
-
         .bPageBlock {
             border-top: unset;
         }
@@ -67,34 +23,6 @@
 
         .helpOrb {
             display: none;
-        }
-
-        .customPopup{
-        background-color: lightgrey;
-        border-style: solid;
-        border-radius: 10px;
-        border-width: 1px;
-        left: 55%;
-        position: fixed;
-        padding: 5px;
-        box-shadow: 0px 3px 7px rgba(1, 1, 1, 5);
-        background: #fff;
-        width: 600px;
-        margin-left: -200px;
-        top: 10px;
-        max-width: 700px;
-        }
-        .customPopup .close{
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        transition: all 200ms;
-        font-size: 20px;
-        text-decoration: none;
-        color: #333;
-        }
-        .customPopup .close:hover{
-        color: red;
         }
 
         .apexp .bPageBlock.apexDefaultPageBlock .pbBody .pbSubheader .hideListButton {
@@ -129,21 +57,6 @@
             height: auto;
             border-radius: 10px;
         }
-        
-        /* Close button */
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
 
         .rkheader{
             text-align: center;
@@ -169,7 +82,6 @@
     </style>
     <script>
         function submitQuote() {
-            console.log('submitQuote');
             var input = document.getElementById('fileToUpload');
             var filelength = input.files.length;
             var agreeFunction;
@@ -194,12 +106,12 @@
         }
 
         function reloadPage() {
-            console.log('reloadPage');
+            console.log('*reloadPage');
             window.location.reload();
         }
 
         function showFileNameField() {
-            console.log('showFileNameField');
+            console.log('*showFileNameField');
             var input = document.getElementById('fileToUpload');
             if (input.files.length > 0) {
                 var file = input.files[0];
@@ -211,7 +123,6 @@
         var uploadFileData = [];
 
         function removeFiles(ind) {
-            console.log('removeFiles');
             console.log('uploadFileData ==> ',{uploadFileData});
             var filelst = uploadFileData;
             var newFileList = [];
@@ -242,7 +153,6 @@
         }
 
         function fileSelected(){
-            console.log('fileSelected');
             var temp = event.target;
             console.log('Event Data == >',{temp});
             var size = document.getElementById('fileToUpload');
@@ -266,23 +176,7 @@
             }
         }
 
-
-        function upload(){
-            console.log('upload');
-            var file = document.getElementById('fileToUpload').files[0];
-            if(file){
-                var reader = new FileReader();
-                reader.onload = loaded;
-                reader.onerror = errorHandler;
-                reader.readAsDataURL(file);
-            }else{
-                document.getElementById('fileError').style.display = 'block';
-            }
-
-        }
-
         function multiFiles() {
-            console.log('multiFiles');
             if (uploadFileData != undefined && uploadFileData.length > 0) {
                 console.log('uploadFileData @@ ',{uploadFileData});
                 var fileData = uploadFileData[0];
@@ -294,7 +188,6 @@
         }
 
         function multiFilesLoad(evt) {
-            console.log('multiFilesLoad');
             var fileData = uploadFileData[0];
             console.log('fileData ',{fileData});
             var filename = fileData.name;
@@ -304,23 +197,10 @@
 
             console.log('fileContent ==> '+fileContent);
             fileContent = fileContent.substr(fileContent.indexOf(',') + 1);
-            uploadContentVersion(filename, fileContent, fileSize, fileType);
-        }
-
-
-
-        function loaded(evt) {
-            console.log('loaded');
-            var filename = document.getElementById('fileToUpload').files[0].name;
-            var fileType = document.getElementById('fileToUpload').files[0].type;
-            var fileSize = document.getElementById('fileToUpload').files[0].size;
-            var fileContent = String(evt.target.result);
-            fileContent = fileContent.substr(fileContent.indexOf(',') + 1);
-            uploadContentVersion(filename, fileContent, fileSize, fileType);
+            uploadContentVersion(filename, fileContent);
         }
 
         function errorHandler(evt) {
-            console.log('errorHandler');
             if (evt.target.error.name == 'NotReadableError') {
                 alert('File could not be read');
             }
@@ -330,29 +210,10 @@
         }
 
         function uploadContentVersion(filename, filecontent, fileSize, fileType) {
-            uploadFileToPurchaseorder(filename, encodeURIComponent(filecontent), fileSize, fileType);
+            uploadFileToPurchaseorder(filename, encodeURIComponent(filecontent));
         }
 
-        function closeWindow() {
-            document.getElementById('fileToUpload').value = null;
-            document.getElementById('fileNameField').innerHTML = '';
-            document.getElementById('fileError').style.display = 'none';
-            document.getElementById('fileNameFieldId').innerHTML = '';
-            document.getElementById('fileNameFieldId').style.display = 'none';
-            document.getElementById("idDialog").className = document.getElementById("idDialog").className.replace(/(?:^|\s)slds-fade-in-open(?!\S)/g, ' slds-fade-in-close');
-            document.getElementById("idBackDrop").className = document.getElementById("idBackDrop").className.replace(/(?:^|\s)slds-modal-backdrop--open(?!\S)/g, ' slds-modal-backdrop--close');
-            var confirmPromptOptions = {'modalPopupId': 'lightningInfoPopup2'}
-            Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
-        }
-
-        function handleComplete() {
-            console.log('handleComplete---->');
-            var confirmPromptOptions = {'modalPopupId': 'lightningInfoPopup2'}
-            Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
-    
-    }
-
-    function closeModal() {
+        function closeModal() {
             document.getElementById('myModal').style.display = 'none';
         }
     </script>
@@ -363,8 +224,6 @@
         <apex:actionFunction name="uploadFileToPurchaseorder" action="{!uploadFileToPurchaseorder}" status="splashStatus" rerender="form,iserrorMessage">
             <apex:param name="firstParam" value="" assignTo="{!latestFileName}"/>
             <apex:param name="secondParam" value="" assignTo="{!fileContents}"/>
-            <apex:param name="filesize" value="" assignTo="{!fileSize}"/>
-            <apex:param name="filetype" value="" assignTo="{!fileType}"/>
         </apex:actionFunction>
 
         <div class="slds slds-scope">
@@ -390,14 +249,6 @@
             </apex:outputPanel>
         </apex:outputPanel>
 
-        <apex:outputPanel layout="block" id="errorModal" style="display: {!IF(errorMessageVisible, 'block', 'none')}">
-            <div class="customPopup">
-                <span class="close" onclick="closeErrorModal()">&times;</span>
-                <h2>Error</h2>
-                <p>{!errorMessage}</p>
-            </div>
-        </apex:outputPanel>
-
         <div class="slds-scope" style="width:80%;margin: 0 auto;padding: 10px 50px;">
             <div class="slds-box">
                 <apex:outputPanel>
@@ -409,12 +260,10 @@
                             <center>
                                 <b>
                                     <ul>
-                                        <h2 style="font-size: 1.3rem;text-transform: uppercase;text-decoration: underline;margin-top: -25px;">SUBMIT YOUR INVOICE TO {!purchaseOrderRecord.Name}</h2>
+                                        <h2 style="font-size: 1.3rem;text-transform: uppercase;text-decoration: underline;margin-top: -25px;">SUBMIT YOUR INVOICE TO {!purchaseOrderRecord[0].Name}</h2>
                                     </ul>
                                 </b>
                             </center>
-                            <br/>
-
                         </span>
                     </div>
                 </apex:outputPanel>
@@ -423,11 +272,11 @@
                 <apex:pageBlock title="PO Page">
                     <div>
                         <apex:pageBlockSection title="PO Details" columns="2">
-                            <apex:outputField value="{!purchaseOrderRecord.buildertek__Project__r.Name}" />
-                            <apex:outputField value="{!purchaseOrderRecord.Name}" />
-                            <apex:outputField value="{!purchaseOrderRecord.buildertek__Vendor__r.Name}" />
-                            <apex:outputField value="{!purchaseOrderRecord.buildertek__PO_Total__c}" />
-                            <apex:outputField value="{!purchaseOrderRecord.buildertek__Description__c}" />
+                            <apex:outputField value="{!purchaseOrderRecord[0].buildertek__Project__r.Name}" />
+                            <apex:outputField value="{!purchaseOrderRecord[0].Name}" />
+                            <apex:outputField value="{!purchaseOrderRecord[0].buildertek__Vendor__r.Name}" />
+                            <apex:outputField value="{!purchaseOrderRecord[0].buildertek__PO_Total__c}" />
+                            <apex:outputField value="{!purchaseOrderRecord[0].buildertek__Description__c}" />
                         </apex:pageBlockSection>
                     </div>
                     <br/>
@@ -439,13 +288,13 @@
                         <table width="100%" class="slds-table slds-table_bordered slds-table_cell-buffer">
                             <thead>
                                 <tr class="slds-text-title_caps">
-                                    <th scope="col" width="20%">
+                                    <th scope="col" width="35%">
                                         Line Item
                                     </th>
                                     <!-- <th scope="col" width="23%">
                                         Product
                                     </th> -->
-                                    <th scope="col" width="23%">
+                                    <th scope="col" width="35%">
                                         Description
                                     </th>
                                     <th scope="col" width="10%">
@@ -463,23 +312,23 @@
                                 <apex:variable value="{!0}" var="rowNum" />
                                 <apex:repeat value="{!poLineRecord}" var="item">
                                     <tr>
-                                        <td style="white-space: normal">
-                                            <apex:outputField value="{!item.Name}" />
+                                        <td style="white-space: normal" width="35%">
+                                            <apex:outputField value="{!item.Name}"/>
                                         </td>
                                         <!-- <td style="white-space: normal">
                                             <apex:outputField value="{!item.buildertek__Product__c}" />
                                         </td> -->
-                                        <td>
-                                            <apex:outputField value="{!item.buildertek__Description__c}" styleClass="slds-input"/>
+                                        <td style="white-space: normal" width="35%">
+                                            <apex:outputField value="{!item.buildertek__Description__c}"/>
                                         </td>
-                                        <td>
-                                            <apex:outputField value="{!item.buildertek__Quantity__c}" style="width:100px;"/>
+                                        <td width="10%">
+                                            <apex:outputField value="{!item.buildertek__Quantity__c}"/>
                                         </td>
-                                        <td>
-                                            <apex:outputField value="{!item.buildertek__Unit_Price__c}" styleClass="slds-input" style="width:100px;"/>
+                                        <td width="10%">
+                                            <apex:outputField value="{!item.buildertek__Unit_Price__c}"/>
                                         </td>
-                                        <td>
-                                            <apex:outputField value="{!item.buildertek__Total_Price__c}" styleClass="slds-input" style="width:100px;"/>
+                                        <td width="10%">
+                                            <apex:outputField value="{!item.buildertek__Total_Price__c}"/>
                                         </td>
                                     </tr>
                                 </apex:repeat>
@@ -513,7 +362,7 @@
                     <br/>
                     <center>
                         <button type="button" class="slds-button slds-button_neutral" onclick="window.close();">Close</button>
-                        <button type="button" class="{!if(ShowSubmitButton,'slds-hide','slds-button slds-button_brand')}" onclick="submitQuote();">Submit</button>
+                        <button type="button" class="{!if(HideSubmitButton,'slds-hide','slds-button slds-button_brand')}" onclick="submitQuote();">Submit</button>
                     </center>
                 </apex:outputPanel>
             </div>
@@ -582,10 +431,10 @@
                     </div>
                 </div>
             </div>
-            <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop"></div>
+            <!-- <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop"></div> -->
         </div>
 
 
-        <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop1"></div>
+        <!-- <div class="slds-modal-backdrop slds-modal-backdrop--close" id="idBackDrop1"></div> -->
     </apex:form>
 </apex:page>

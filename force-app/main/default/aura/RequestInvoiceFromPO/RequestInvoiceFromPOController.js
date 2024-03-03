@@ -11,7 +11,7 @@
             console.log('Result =>', { result });
             $A.get("e.c:BT_SpinnerEvent").setParams({"action": "HIDE"}).fire();
             $A.get("e.force:closeQuickAction").fire();
-            if (result.status == 'success') {
+            if (result.status == 'SUCCESS') {
                 helper.showToastHelper(component, event, helper,result.status , result.message , result.status , 3000);
             } else {
                 helper.showToastHelper(component, event, helper,result.status , result.message , result.status , 3000);

@@ -79,10 +79,10 @@ public with sharing class RequestInvoiceFromPOController {
                     Messaging.SendEmailResult resultsemail = results[0];
                     System.debug('resultsemail---->' + resultsemail);
                     if (resultsemail.isSuccess()) {
-                        returnWr.status = 'success';
-                        returnWr.message = 'Mail sent successfully to the vendor.';
+                        returnWr.status = 'SUCCESS';
+                        returnWr.message = 'Email successfully sent to the vendor.';
                     } else {
-                        returnWr.status = 'error';
+                        returnWr.status = 'ERROR';
                         returnWr.message = String.valueOf(resultsemail.getErrors());
                     }
 
