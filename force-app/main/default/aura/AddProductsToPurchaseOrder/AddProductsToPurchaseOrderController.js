@@ -146,7 +146,12 @@
     },
     
     closeModal: function (component, event, helper) {
-         var workspaceAPI = component.find("workspace");
+        var myPageRef = component.get("v.pageReference");
+        var recordId = myPageRef.state.buildertek__parentId;
+        if(!recordId){
+            recordId = component.get("v.recordId");
+        }
+        var workspaceAPI = component.find("workspace");
         workspaceAPI.getFocusedTabInfo().then(function(response) {
             var focusedTabId = response.tabId;
             workspaceAPI.closeTab({tabId: focusedTabId});
@@ -156,6 +161,10 @@
             console.log(error);
         });
         //component.get("v.onCancel")(); 
+        $A.get("e.force:navigateToSObject").setParams({
+            "recordId": recordId,
+            "slideDevName": "detail"
+        }).fire();
     },
     
     doRfqSearch: function (component, event, helper) {
