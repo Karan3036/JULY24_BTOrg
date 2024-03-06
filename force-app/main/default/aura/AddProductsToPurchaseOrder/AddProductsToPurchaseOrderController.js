@@ -27,7 +27,7 @@
         var productTypeValue = component.get("v.searchProductTypeFilter");
         var tradeValue = component.get("v.searchTradeTypeFilter");
          var priceBook = component.get("v.searchPriceBookFilter");
-        helper.getRfqList(component, event, helper, pageNumber, pageSize, productTypeValue, tradeValue, productFamilyValue, productValue, productCategoryValue, priceBook);
+        helper.getRfqList(component, event, helper, pageNumber, pageSize, productFamilyValue, tradeValue, productTypeValue, productValue, productCategoryValue, priceBook);
     },
     
     handlePrev: function (component, event, helper) {
@@ -40,7 +40,7 @@
         var productTypeValue = component.get("v.searchProductTypeFilter");
         var tradeValue = component.get("v.searchTradeTypeFilter");
          var priceBook = component.get("v.searchPriceBookFilter");
-        helper.getRfqList(component, event, helper, pageNumber, pageSize, productTypeValue, tradeValue, productFamilyValue, productValue, productCategoryValue, priceBook);
+         helper.getRfqList(component, event, helper, pageNumber, pageSize, productFamilyValue, tradeValue, productTypeValue, productValue, productCategoryValue, priceBook);
     },
     selectRfq: function (component, event, helper) {
         var checkbox = event.getSource();

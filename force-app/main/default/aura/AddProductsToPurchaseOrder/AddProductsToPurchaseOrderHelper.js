@@ -105,6 +105,12 @@
                     "v.TotalPages",
                     Math.ceil(resultData.totalRecords / pageSize)
                 );
+                console.log('rfqRecordList--->',component.get("v.rfqRecordList"));
+                console.log('PageNumber--->',component.get("v.PageNumber"));
+                console.log('TotalRecords--->',component.get("v.TotalRecords"));
+                console.log('RecordStart--->',component.get("v.RecordStart"));
+                console.log('RecordEnd--->',component.get("v.RecordEnd"));
+                console.log('TotalPages--->',component.get("v.TotalPages"));
             }
         });  
         $A.enqueueAction(action);

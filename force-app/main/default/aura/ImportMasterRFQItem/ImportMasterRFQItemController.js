@@ -10,35 +10,6 @@
         
 	},
     
-    //  handleCheck : function(component, event, helper) {
-    //     var checkbox = event.getSource();
-    //    //alert(checkbox);
-    //     var getAllId = component.find("checkContractor");
-    //     var Submittals = component.get("v.objInfo");
-    //     var selectedRfqIds  = component.get("v.selectedobjInfo");
-    //     // alert(selectedRfqIds);
-    //    //  var man = component.get("v.recordid");
-    //     // alert(getAllId.length);
-    //     // alert(JSON.stringify(Submittals));
-	//     for(var i=0 ; i < Submittals.length;i++){
-    //        // alert(Submittals.length);
-	//         if(Submittals[i].MasterRFQItem.Id == checkbox.get("v.text") && Submittals[i].SubmittalCheck == false){
-    //            // alert( JSON.stringify(Submittals[i].MasterRFQItem.Id == checkbox.get("v.text")));
-    //            // alert(Submittals[i].SubmittalCheck == false);
-	//             Submittals[i].SubmittalCheck = true;
-    //             component.set("v.selectedobjInfo", Submittals[i]);
-	//         }
-	//         else if(Submittals[i].MasterRFQItem.Id == checkbox.get("v.text") && Submittals[i].SubmittalCheck == true){
-    //           //  alert("hai");
-	//              Submittals[i].SubmittalCheck = false;
-    //         }
-    //     }
-    //      if(selectedRfqIds.indexOf(checkbox.get("v.text")) > -1){
-    //          var index = selectedRfqIds.indexOf(checkbox.get("v.text"));
-    //          selectedRfqIds.splice(index,1);
-    //      }
-         
-    //  },
 
      handleCheckbox: function (component, event, helper) {
         var checkbox = event.getSource();
