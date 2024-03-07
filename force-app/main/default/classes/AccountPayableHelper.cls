@@ -258,7 +258,11 @@ public with sharing class AccountPayableHelper {
             for(buildertek__Account_Payable__c invoicePo : invoiceList){
                 if(invoicePo.buildertek__BT_Budget_Line__c==null && invoicePo.buildertek__Budget__c != oldInvoiceMap.get(invoicePo.Id).buildertek__Budget__c && invoicePo.buildertek__Budget__c!=null){
                         buildertek__Budget_Item__c budgetLine = new buildertek__Budget_Item__c();
-                        budgetLine.Name = invoicePo.Name + ' budget line';
+                        if (invoicePo.buildertek__Description__c != '' && invoicePo.buildertek__Description__c != null) {
+                            budgetLine.Name = invoicePo.Name + ' ' + invoicePo.buildertek__Description__c;
+                        } else {
+                            budgetLine.Name = invoicePo.Name;
+                        }
                         budgetLine.buildertek__Unit_Price__c = 0;
                         budgetLine.buildertek__Invoice_PO__c = invoicePo.buildertek__Net_Amount__c;
                         budgetLine.buildertek__Quantity__c = 1;

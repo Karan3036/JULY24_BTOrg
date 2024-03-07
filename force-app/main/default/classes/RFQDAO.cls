@@ -370,6 +370,7 @@ Throws [Exceptions]: NA
 ****************************************************************************/
     @AuraEnabled
     public static string sendRFQEmailToVendor(List<String> rfqToVendorLinkIds){
+        System.debug('rfqToVendorLinkIds-->'+rfqToVendorLinkIds);
         List<RFQ_To_Vendor__c> rfqVendors = new List<RFQ_To_Vendor__c>();
         //  for(string vendorId: rfqToVendorLinkIds){
         //          RFQ_To_Vendor__c rfqVendor = new RFQ_To_Vendor__c();
