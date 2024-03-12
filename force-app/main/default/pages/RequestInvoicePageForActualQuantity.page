@@ -1,4 +1,4 @@
-<apex:page controller="RequestInvoicePageController"   showheader="false" id="pageId">
+<apex:page controller="RequestInvoicePageForAQ"   showheader="false" id="pageId">
     <apex:slds />
     <apex:includeLightning />
     <c:BT_JsAndCssIncludeComponent importJquery="true" importAppurinUtil="true" importJQueryLayout="true" importFancyTree="false"
@@ -79,14 +79,37 @@
             padding-top: 5px;
             text-align: center;
         }
+
+        .slds-scope .slds-icon {
+            width: 1.5rem !important;
+            height: 1.5rem !important;
+        }
+
+        .slds-scope input {
+            background-color: #fff;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 100%;
+            transition: border .1s linear, background-color .1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem +(1px* 2));
+        }
     </style>
     <script>
+
+        var submitBoolean = true;
         function submitQuote() {
             var input = document.getElementById('fileToUpload');
             var filelength = input.files.length;
             var agreeFunction;
             var confirmPromptOptions;
-            if (filelength > 0) {
+            // if (filelength > 0) {
+            //     if (submitBoolean == false) {
+            //         return;
+            //     }
                 agreeFunction = new Function("Appurin.lightning.hideModalPopup({'modalPopupId' : 'lightningInfoPopup'}); multiFiles(); return false;");
                 confirmPromptOptions = {
                     'modalPopupId': 'lightningInfoPopup',
@@ -97,11 +120,11 @@
                     'discardButtonLabel': '{!JSENCODE($Label.buildertek__Cancel)}',
                     'agreeFunction': agreeFunction
                 }
-            } else {
-                confirmPromptOptions = {
-                    'modalPopupId': 'lightningInfoPopup1'
-                }
-            }
+            // } else {
+            //     confirmPromptOptions = {
+            //         'modalPopupId': 'lightningInfoPopup1'
+            //     }
+            // }
             Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
         }
 
@@ -213,6 +236,36 @@
         function closeModal() {
             document.getElementById('myModal').style.display = 'none';
         }
+
+    function inputLimiter(e, allow) {
+            var AllowableCharacters = '';
+
+            if (allow == 'Numbers') { AllowableCharacters = '1234567890'; }
+
+            var k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+            if (k != 13 && k != 8 && k != 0) {
+                if ((e.ctrlKey == false) && (e.altKey == false)) {
+                    return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+
+        function checkActualQuantity(inputField, quantity) {
+            var actualQuantity = parseFloat(inputField.value);
+            if (actualQuantity > quantity) {
+                submitBoolean = false;
+                inputField.parentNode.querySelector("#actualQuantityError").style.display = 'block';
+            } else {
+                submitBoolean = true;
+                inputField.parentNode.querySelector("#actualQuantityError").style.display = 'none';
+            }
+        }
+
+
     </script>
     <apex:form id="form" html-autocomplete="off">
 
@@ -285,17 +338,17 @@
                         <table width="100%" class="slds-table slds-table_bordered slds-table_cell-buffer">
                             <thead>
                                 <tr class="slds-text-title_caps">
-                                    <th scope="col" width="35%">
+                                    <th scope="col" width="25%">
                                         Line Item
                                     </th>
-                                    <!-- <th scope="col" width="23%">
-                                        Product
-                                    </th> -->
                                     <th scope="col" width="35%">
                                         Description
                                     </th>
                                     <th scope="col" width="10%">
                                         Quantity
+                                    </th>
+                                    <th scope="col" width="10%">
+                                        Actual Quantity
                                     </th>
                                     <th scope="col" width="10%">
                                         Unit Price({!companycurrency})
@@ -309,25 +362,28 @@
                                 <apex:variable value="{!0}" var="rowNum" />
                                 <apex:repeat value="{!poLineRecord}" var="item">
                                     <tr>
-                                        <td style="white-space: normal" width="35%">
+                                        <td style="white-space: normal" width="25%">
                                             <apex:outputField value="{!item.Name}"/>
                                         </td>
-                                        <!-- <td style="white-space: normal">
-                                            <apex:outputField value="{!item.buildertek__Product__c}" />
-                                        </td> -->
                                         <td style="white-space: normal" width="35%">
-                                            <apex:outputField value="{!item.Description__c}"/>
+                                            <apex:outputField value="{!item.buildertek__Description__c}"/>
                                         </td>
                                         <td width="10%">
-                                            <apex:outputField value="{!item.Quantity__c}"/>
+                                            <apex:outputField value="{!item.buildertek__Quantity__c}"/>
                                         </td>
                                         <td width="10%">
-                                            <apex:outputField value="{!item.Unit_Price__c}"/>
+                                            <input id="inputValue" onkeypress="return inputLimiter(event,'Numbers');" value="{!item.buildertek__Actual_Quantity__c}" styleClass="slds-input" onchange="checkActualQuantity(this, {!item.buildertek__Quantity__c})"/>
+                                            <!-- <input value="{!item.buildertek__Quantity__c}"/> -->
+                                            <div id="actualQuantityError" style="color: red; display: none;">Actual quantity cannot exceed quantity</div>
                                         </td>
                                         <td width="10%">
-                                            <apex:outputField value="{!item.Total_Price__c}"/>
+                                            <apex:outputField value="{!item.buildertek__Unit_Price__c}"/>
+                                        </td>
+                                        <td width="10%">
+                                            <apex:outputField value="{!item.buildertek__Total_Price__c}"/>
                                         </td>
                                     </tr>
+                                    <apex:variable var="rowNum" value="{!rowNum + 1}" />
                                 </apex:repeat>
                             </tbody>
                         </table>

@@ -173,7 +173,7 @@
                     var toastEvent = $A.get("e.force:showToast");
                     toastEvent.setParams({
                         "title": "Error!",
-                        "message": "Something went wrong. Please try again.",
+                        "message": errors,
                         "type": "error"
                     });
                     toastEvent.fire();
