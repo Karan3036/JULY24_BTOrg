@@ -27,6 +27,10 @@ public without sharing class RequestInvoicePageForAQ{
 
     public Boolean HideSubmitButton { get; set; }
 
+    public Map<Id, buildertek__Purchase_Order_Item__c> oldPurchaseOrderItemsMap { get; set; }
+
+    public Map<Id, buildertek__Purchase_Order_Item__c> newPurchaseOrderItemsMap { get; set; }
+
     public RequestInvoicePageForAQ(){
         try{
             
@@ -44,6 +48,13 @@ public without sharing class RequestInvoicePageForAQ{
                 if (!tempPurchaseOrderList[0].buildertek__Purchase_Order_Items__r.isEmpty()) {
                     poLineRecord = tempPurchaseOrderList[0].buildertek__Purchase_Order_Items__r;
                 }
+            }
+
+            oldPurchaseOrderItemsMap = new Map<Id, buildertek__Purchase_Order_Item__c>();
+            newPurchaseOrderItemsMap = new Map<Id, buildertek__Purchase_Order_Item__c>();
+            for (buildertek__Purchase_Order_Item__c item : poLineRecord) {
+                oldPurchaseOrderItemsMap.put(item.Id, item.clone());
+                newPurchaseOrderItemsMap.put(item.Id, item.clone());
             }
 
             isErrorMessage = false;
@@ -72,23 +83,34 @@ public without sharing class RequestInvoicePageForAQ{
             //     update itemsToUpdate;
             // }
 
-            System.debug('poLineRecord-->'+poLineRecord);
+            // System.debug('poLineRecord-->'+poLineRecord);
 
             buildertek__Account_Payable__c newContractorInvoice = new  buildertek__Account_Payable__c();
             newContractorInvoice.buildertek__Project__c = purchaseOrderRecord[0].buildertek__Project__c;
             newContractorInvoice.buildertek__Purchase_Order__c = purchaseOrderRecord[0].Id;
             insert newContractorInvoice;
 
-            List<buildertek__Account_Payable_Item__c> newContractorInvoiceLines = new List<buildertek__Account_Payable_Item__c>();
             for (buildertek__Purchase_Order_Item__c item : poLineRecord) {
-                buildertek__Account_Payable_Item__c newContractorInvoiceLine = new buildertek__Account_Payable_Item__c();
-                newContractorInvoiceLine.Name = item.Name;
-                newContractorInvoiceLine.buildertek__Account_Payable__c = newContractorInvoice.Id;
-                newContractorInvoiceLine.buildertek__Purchase_Order_Item__c = item.Id;
-                newContractorInvoiceLine.buildertek__Quantity__c = item.buildertek__Quantity__c;
-                newContractorInvoiceLine.buildertek__Unit_Price__c = item.buildertek__Unit_Price__c;
-                newContractorInvoiceLine.buildertek__Description__c = item.buildertek__Description__c;
-                newContractorInvoiceLines.add(newContractorInvoiceLine);
+                if (newPurchaseOrderItemsMap.containsKey(item.Id)) {
+                    newPurchaseOrderItemsMap.get(item.Id).buildertek__Actual_Quantity__c = item.buildertek__Actual_Quantity__c;
+                }
+            }
+
+            // Compare old and new maps and create account payable items if necessary
+            List<buildertek__Account_Payable_Item__c> newContractorInvoiceLines = new List<buildertek__Account_Payable_Item__c>();
+            for (Id itemId : oldPurchaseOrderItemsMap.keySet()) {
+                buildertek__Purchase_Order_Item__c oldItem = oldPurchaseOrderItemsMap.get(itemId);
+                buildertek__Purchase_Order_Item__c newItem = newPurchaseOrderItemsMap.get(itemId);
+                if (oldItem.buildertek__Actual_Quantity__c != newItem.buildertek__Actual_Quantity__c && newItem.buildertek__Actual_Quantity__c != null) {
+                    buildertek__Account_Payable_Item__c newContractorInvoiceLine = new buildertek__Account_Payable_Item__c();
+                    newContractorInvoiceLine.Name = newItem.Name;
+                    newContractorInvoiceLine.buildertek__Account_Payable__c = newContractorInvoice.Id;
+                    newContractorInvoiceLine.buildertek__Purchase_Order_Item__c = newItem.Id;
+                    newContractorInvoiceLine.buildertek__Quantity__c = newItem.buildertek__Actual_Quantity__c;
+                    newContractorInvoiceLine.buildertek__Unit_Price__c = newItem.buildertek__Unit_Price__c;
+                    newContractorInvoiceLine.buildertek__Description__c = newItem.buildertek__Description__c;
+                    newContractorInvoiceLines.add(newContractorInvoiceLine);
+                }
             }
 
             if (!newContractorInvoiceLines.isEmpty()) {

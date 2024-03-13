@@ -106,10 +106,10 @@
             var filelength = input.files.length;
             var agreeFunction;
             var confirmPromptOptions;
-            // if (filelength > 0) {
-            //     if (submitBoolean == false) {
-            //         return;
-            //     }
+            if (filelength > 0) {
+                if (submitBoolean == false) {
+                    return;
+                }
                 agreeFunction = new Function("Appurin.lightning.hideModalPopup({'modalPopupId' : 'lightningInfoPopup'}); multiFiles(); return false;");
                 confirmPromptOptions = {
                     'modalPopupId': 'lightningInfoPopup',
@@ -120,11 +120,11 @@
                     'discardButtonLabel': '{!JSENCODE($Label.buildertek__Cancel)}',
                     'agreeFunction': agreeFunction
                 }
-            // } else {
-            //     confirmPromptOptions = {
-            //         'modalPopupId': 'lightningInfoPopup1'
-            //     }
-            // }
+            } else {
+                confirmPromptOptions = {
+                    'modalPopupId': 'lightningInfoPopup1'
+                }
+            }
             Appurin.lightning.showConfirmPrompt(confirmPromptOptions);
         }
 
@@ -372,9 +372,10 @@
                                             <apex:outputField value="{!item.buildertek__Quantity__c}"/>
                                         </td>
                                         <td width="10%">
-                                            <input id="inputValue" onkeypress="return inputLimiter(event,'Numbers');" value="{!item.buildertek__Actual_Quantity__c}" styleClass="slds-input" onchange="checkActualQuantity(this, {!item.buildertek__Quantity__c})"/>
-                                            <!-- <input value="{!item.buildertek__Quantity__c}"/> -->
-                                            <div id="actualQuantityError" style="color: red; display: none;">Actual quantity cannot exceed quantity</div>
+                                            <apex:outputPanel>
+                                                <apex:inputField id="inputValue" onkeypress="return inputLimiter(event,'Numbers');" value="{!item.buildertek__Actual_Quantity__c}" styleClass="slds-input" onchange="checkActualQuantity(this, {!item.buildertek__Quantity__c})" ignoreEditPermissionForRendering="true"/>
+                                                <div id="actualQuantityError" style="color: red; display: none;">Actual quantity cannot exceed quantity</div>
+                                            </apex:outputPanel>
                                         </td>
                                         <td width="10%">
                                             <apex:outputField value="{!item.buildertek__Unit_Price__c}"/>
