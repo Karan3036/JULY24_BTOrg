@@ -59,6 +59,10 @@ public class createAllPOfromBOM_controller {
                             }
                         }
                     }
+
+                    system.debug('VenodrId_CostCode : ' + VenodrId_Phase);
+                    system.debug('VenodrId_Phase : ' + VenodrId_Phase);
+                    system.debug('VenodrId_Category : ' + VenodrId_Category);
                     
                     List<buildertek__Purchase_Order__c> POsToCreate_List = new List<buildertek__Purchase_Order__c>();
                     List<Id> createdPOsIds = new List<Id>();
@@ -127,9 +131,11 @@ public class createAllPOfromBOM_controller {
                     // ---------------------------------------- Schedule item matching and Mapping Field Logic --------------------------
 
                     buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [SELECT Id,buildertek__Update_Quantity__c,buildertek__Show_Fabrication_taxes__c, buildertek__Match_BOM_Lines_with_Schedule_Items__c FROM buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'BOM Settings' LIMIT 1];
+                    // if "Match BOM line with Schedule item" admin setting is checked true, run match schedule item logic...
                     if(adminInterfaceNodeConfigurations.buildertek__Match_BOM_Lines_with_Schedule_Items__c == true){
                         List<buildertek__Schedule__c> scheduleList = [SELECT ID,buildertek__Description__c, Name FROM buildertek__Schedule__c WHERE buildertek__Project__c =: BOM.buildertek__Project__c ORDER BY CreatedDate DESC LIMIT 1];
                         String scheduleId = '';
+                        // used FIRST Schedule of Project for matching logic....
                         if(scheduleList.size() > 0){
                             scheduleId = scheduleList[0].Id;
                             System.debug('matched schedule : ' + scheduleList[0].buildertek__Description__c);
@@ -146,8 +152,17 @@ public class createAllPOfromBOM_controller {
                                         String schItemPhaseName = SchItem.buildertek__Phase__c != null ? SchItem.buildertek__Phase__c.toLowercase() : null;
                                         String poPhaseName = PO.buildertek__BT_Build_Phase__r.Name != null ? PO.buildertek__BT_Build_Phase__r.Name.toLowercase() : null;
                                         String Category = VenodrId_Category.containsKey(PO.buildertek__Vendor__c) ? VenodrId_Category.get(PO.buildertek__Vendor__c) : null;
-                                        if( SchItem.buildertek__Contractor__c == PO.buildertek__Vendor__c 
-                                        && schItemPhaseName == poPhaseName && SchItem.buildertek__Cost_Code__c == PO.buildertek__Cost_Code__c && SchItem.buildertek__BT_Category__c == Category && !PO_to_matchedSchItems.containsKey(PO.Id))
+                                        // Schedule Item Matching logic -- 
+                                        // // schedule item contractor == PO phase (first BOM vendor)  removed as per BUIL-3961....
+                                        // schedule item phase == PO phase (first BOM phase)
+                                        // schedule item cost code == PO cost code (first BOM cost code)
+                                        // schedule item category == PO categorty (first BOM category)
+                                        // get first schedule items that match above conditions....
+
+                                        if( schItemPhaseName == poPhaseName 
+                                            && SchItem.buildertek__Cost_Code__c == PO.buildertek__Cost_Code__c 
+                                            && SchItem.buildertek__BT_Category__c == Category 
+                                            && !PO_to_matchedSchItems.containsKey(PO.Id))
                                         {
                                             PO_to_matchedSchItems.put(PO.Id, SchItem);
                                             poToUpdate.add(PO);
@@ -155,7 +170,7 @@ public class createAllPOfromBOM_controller {
                                     }
                                 }
         
-                                system.debug('matched Sch Item : ' + PO_to_matchedSchItems);
+                                system.debug('matched Sch Item : ' + PO_to_matchedSchItems.values());
                                 system.debug('no of matched Sch Item : ' + PO_to_matchedSchItems.keySet().size());
         
                                 List<buildertek__Project_Task__c> schItemsToUpdate = new List<buildertek__Project_Task__c>();
@@ -169,11 +184,20 @@ public class createAllPOfromBOM_controller {
                                             PO.buildertek__Projected_Start_Date__c = MatchedScheduleItem.buildertek__Start__c;
                                             PO.buildertek__Projected_Completion_Date__c = MatchedScheduleItem.buildertek__Finish__c;
                                             MatchedScheduleItem.buildertek__Purchase_Order__c = PO.Id;
+                                            if(MatchedScheduleItem.buildertek__Contractor__c != PO.buildertek__Vendor__c){
+                                                MatchedScheduleItem.buildertek__Contractor__c = PO.buildertek__Vendor__c;       // added as per BUIL-3961
+                                                MatchedScheduleItem.buildertek__Contractor_Resource__c = null;
+                                                MatchedScheduleItem.buildertek__Contractor_Resource_1__c = null;
+                                                MatchedScheduleItem.buildertek__Contractor_Resource_2__c = null;
+                                                MatchedScheduleItem.buildertek__Contractor_Resource_3__c = null;
+                                            }
                                             // poToUpdate.add(PO);
                                             schItemsToUpdate.add(MatchedScheduleItem);
                                     }
                                 }
                                 
+                                system.debug('poToUpdate : ' + poToUpdate);
+                                system.debug('schItemsToUpdate ' + schItemsToUpdate);
             
                                 if(poToUpdate.size() > 0){
                                     update poToUpdate;

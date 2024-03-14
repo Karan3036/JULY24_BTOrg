@@ -1,9 +1,6 @@
 <aura:component controller="RequestInvoiceFromPOController"
-    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,lightning:actionOverride"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader"
     access="global">
-    <aura:attribute name="buttonName" type="String" default="" />
-    <!-- <aura:handler name="init" value="{!this}" action="{!c.handleInit}" />
-    <lightning:quickActionAPI aura:id="quickActionAPI" /> -->
     <ltng:require styles="{!$Resource.MOdalPreviewWidth52}"/> 
     <aura:html tag="style">
         .slds-modal__content {
