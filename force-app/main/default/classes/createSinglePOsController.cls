@@ -119,7 +119,8 @@ public with sharing class createSinglePOsController {
                                         // schedule item cost code == PO cost code (first BOM cost code)
                                         // schedule item category == PO categorty (first BOM category)
                                         // get first schedule items that match above conditions....
-                                        if( schItemPhaseName == poPhaseName 
+                                        if( SchItem.buildertek__Contractor__c == PO.buildertek__Vendor__c
+                                            // && schItemPhaseName == poPhaseName 
                                             && SchItem.buildertek__Cost_Code__c == PO.buildertek__Cost_Code__c 
                                             && SchItem.buildertek__BT_Category__c == Category 
                                             && !PO_to_matchedSchItems.containsKey(PO.Id)) {

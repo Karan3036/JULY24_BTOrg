@@ -208,7 +208,8 @@ public class createPOfromBOM_controller {
                         // schedule item phase == PO phase (first BOM phase)
                         // schedule item cost code == PO cost code (first BOM cost code)
                         // schedule item category == PO categorty (first BOM category)
-                                                if( schItemPhaseName == poPhaseName 
+                        if( SchItem.buildertek__Contractor__c == CreatedPOs.buildertek__Vendor__c
+                            // && schItemPhaseName == poPhaseName 
                             && SchItem.buildertek__Cost_Code__c == CreatedPOs.buildertek__Cost_Code__c 
                             && SchItem.buildertek__BT_Category__c == Category
                             && matchedSchItems.size() == 0)
