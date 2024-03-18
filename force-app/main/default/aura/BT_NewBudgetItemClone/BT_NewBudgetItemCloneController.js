@@ -4708,12 +4708,11 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     addInvoicePO:function (component, event, helper) {
         if(component.get("v.HaveCreateAccess")){
             console.log('add Invoice po button click......');
-            var selectedRecords = component.get('v.selectedRecs');
-    
             $A.get("e.c:BT_SpinnerEvent").setParams({
                 "action": "SHOW"
             }).fire();
-    
+            var selectedRecords = component.get('v.selectedRecs');
+            console.log('selectedRecords-->',{selectedRecords});
             if(selectedRecords.length < 1){
     
                 helper.addInvoicePOHelper(component, event, helper);

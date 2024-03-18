@@ -47,8 +47,9 @@
                   header[8] !== 'Trade Type' ||
                   header[9] !== 'Location' ||
                   header[10] !== 'Quantity' ||
-                  header[11] !== 'UOM' ||
-                  header[12] !== 'Cost Code' 
+                  header[11] !== 'Tax' ||
+                  header[12] !== 'UOM' ||
+                  header[13] !== 'Cost Code' 
               ) {
                   helper.showToast(component, 'Error', 'File Header Format is Invalid!');
                   return '';
@@ -164,7 +165,7 @@
      // declare variables
      var csvStringResult, keys, columnDivider;
      columnDivider = ',';
-     keys = ['Product','Price Book','Vendor','Sort Id','Product SKU','Product Code','Build Phase','Category','Trade Type','Location','Quantity','UOM','Cost Code'];
+     keys = ['Product','Price Book','Vendor','Sort Id','Product SKU','Product Code','Build Phase','Category','Trade Type','Location','Quantity','Tax','UOM','Cost Code'];
    
      csvStringResult = '';
      csvStringResult += keys.join(columnDivider);

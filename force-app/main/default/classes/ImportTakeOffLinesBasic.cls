@@ -141,11 +141,19 @@ public with sharing class ImportTakeOffLinesBasic{
                         throw new MyCustomException('Invalid Location value: '+ locationValue +' Please review the row No.' + (counter + 1));
                     }
                 }
+
                 String quant = wrapper.Quantity;
                 if (String.isNotBlank(quant)){
                     TakeoffLine.buildertek__Quantity__c = Decimal.valueOf(quant);
                 } else {
                     TakeoffLine.buildertek__Quantity__c = 0;
+                }
+
+                String tax = wrapper.Tax;
+                if (String.isNotBlank(tax)){
+                    TakeoffLine.buildertek__Tax__c = Decimal.valueOf(tax);
+                } else {
+                    TakeoffLine.buildertek__Tax__c = 0;
                 }
 
                 String uomValue = wrapper.UOM;
@@ -228,6 +236,7 @@ public with sharing class ImportTakeOffLinesBasic{
         public String TradeType;
         public String Location;
         public String Quantity;
+        public String Tax;
         public String UOM;
         public String CostCode;
        
